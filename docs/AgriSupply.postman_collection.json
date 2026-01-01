@@ -1,0 +1,1106 @@
+{
+	"info": {
+		"_postman_id": "agrisupply-api-collection",
+		"name": "AgriSupply API",
+		"description": "Complete API collection for AgriSupply Farm Connect System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"fullName\": \"Test User\",\n    \"phone\": \"+256701234567\",\n    \"role\": \"buyer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.accessToken) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.data.accessToken);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.data.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Google Auth",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"idToken\": \"google-id-token-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/google",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "google"]
+						}
+					}
+				},
+				{
+					"name": "Send Phone OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+256701234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/phone/send-otp",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "phone", "send-otp"]
+						}
+					}
+				},
+				{
+					"name": "Verify Phone OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+256701234567\",\n    \"otp\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/phone/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "phone", "verify"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot-password"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh-token"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fullName\": \"Updated Name\",\n    \"bio\": \"I love farming!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Upload Profile Photo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/profile/photo",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "profile", "photo"]
+						}
+					}
+				},
+				{
+					"name": "Get Farmers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/farmers?region=Central&page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "farmers"],
+							"query": [
+								{"key": "region", "value": "Central"},
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Farmer Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/farmers/:farmerId",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "farmers", ":farmerId"],
+							"variable": [
+								{"key": "farmerId", "value": "farmer-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Follow Farmer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/farmers/:farmerId/follow",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "farmers", ":farmerId", "follow"],
+							"variable": [
+								{"key": "farmerId", "value": "farmer-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Unfollow Farmer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/farmers/:farmerId/follow",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "farmers", ":farmerId", "follow"],
+							"variable": [
+								{"key": "farmerId", "value": "farmer-uuid-here"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?category=Vegetables&region=Central&page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"],
+							"query": [
+								{"key": "category", "value": "Vegetables"},
+								{"key": "region", "value": "Central"},
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/search?q=matooke&category=Fruits",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "search"],
+							"query": [
+								{"key": "q", "value": "matooke"},
+								{"key": "category", "value": "Fruits"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Featured Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/featured",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "featured"]
+						}
+					}
+				},
+				{
+					"name": "Get Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "categories"]
+						}
+					}
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/:productId",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", ":productId"],
+							"variable": [
+								{"key": "productId", "value": "product-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Fresh Matooke\",\n    \"description\": \"Organic matooke from Wakiso\",\n    \"category\": \"Fruits\",\n    \"price\": 35000,\n    \"unit\": \"bunch\",\n    \"quantityAvailable\": 50,\n    \"isOrganic\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						}
+					}
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 40000,\n    \"quantityAvailable\": 45\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/:productId",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", ":productId"],
+							"variable": [
+								{"key": "productId", "value": "product-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Upload Product Images",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/:productId/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", ":productId", "images"],
+							"variable": [
+								{"key": "productId", "value": "product-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add to Favorites",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/:productId/favorite",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", ":productId", "favorite"],
+							"variable": [
+								{"key": "productId", "value": "product-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Review",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5,\n    \"comment\": \"Excellent quality matooke!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/:productId/reviews",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", ":productId", "reviews"],
+							"variable": [
+								{"key": "productId", "value": "product-uuid-here"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Get My Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders?status=pending&page=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"],
+							"query": [
+								{"key": "status", "value": "pending"},
+								{"key": "page", "value": "1"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Farmer Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/farmer",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", "farmer"]
+						}
+					}
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"productId\": \"product-uuid-1\",\n            \"quantity\": 2\n        },\n        {\n            \"productId\": \"product-uuid-2\",\n            \"quantity\": 1\n        }\n    ],\n    \"deliveryAddress\": \"Wandegeya, Kampala\",\n    \"deliveryRegion\": \"Central\",\n    \"deliveryDistrict\": \"Kampala\",\n    \"paymentMethod\": \"mtn_mobile_money\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"]
+						}
+					}
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/:orderId",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", ":orderId"],
+							"variable": [
+								{"key": "orderId", "value": "order-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Confirm Order (Farmer)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/:orderId/confirm",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", ":orderId", "confirm"],
+							"variable": [
+								{"key": "orderId", "value": "order-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Changed my mind\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/:orderId/cancel",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", ":orderId", "cancel"],
+							"variable": [
+								{"key": "orderId", "value": "order-uuid-here"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Initiate Payment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"orderId\": \"order-uuid-here\",\n    \"paymentMethod\": \"mtn_mobile_money\",\n    \"phoneNumber\": \"+256771234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/initiate",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "initiate"]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/:paymentId/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", ":paymentId", "status"],
+							"variable": [
+								{"key": "paymentId", "value": "payment-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Methods",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/methods",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "methods"]
+						}
+					}
+				},
+				{
+					"name": "Get Payment History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/history",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "history"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "AI",
+			"item": [
+				{
+					"name": "Chat",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"What's the best time to plant maize in Central Uganda?\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/chat",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai", "chat"]
+						}
+					}
+				},
+				{
+					"name": "Analyze Image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								},
+								{
+									"key": "question",
+									"value": "What disease is affecting this plant?",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/analyze-image",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai", "analyze-image"]
+						}
+					}
+				},
+				{
+					"name": "Get Crop Analysis",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cropName\": \"Coffee\",\n    \"region\": \"Central\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ai/crop-analysis",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai", "crop-analysis"]
+						}
+					}
+				},
+				{
+					"name": "Get Farming Tips",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ai/farming-tips?region=Central&crops=maize,beans",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai", "farming-tips"],
+							"query": [
+								{"key": "region", "value": "Central"},
+								{"key": "crops", "value": "maize,beans"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Market Predictions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ai/market-predictions?crops=maize,coffee&timeframe=3 months",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai", "market-predictions"],
+							"query": [
+								{"key": "crops", "value": "maize,coffee"},
+								{"key": "timeframe", "value": "3 months"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Chat Sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ai/sessions",
+							"host": ["{{baseUrl}}"],
+							"path": ["ai", "sessions"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications"],
+							"query": [
+								{"key": "page", "value": "1"},
+								{"key": "limit", "value": "20"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/unread/count",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "unread", "count"]
+						}
+					}
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/:notificationId/read",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", ":notificationId", "read"],
+							"variable": [
+								{"key": "notificationId", "value": "notification-uuid"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Mark All as Read",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/read-all",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "read-all"]
+						}
+					}
+				},
+				{
+					"name": "Get Preferences",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/preferences",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "preferences"]
+						}
+					}
+				},
+				{
+					"name": "Update Preferences",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pushEnabled\": true,\n    \"emailEnabled\": true,\n    \"promotional\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notifications/preferences",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "preferences"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/dashboard",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Get Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/users?role=farmer&is_verified=true&page=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "users"],
+							"query": [
+								{"key": "role", "value": "farmer"},
+								{"key": "is_verified", "value": "true"},
+								{"key": "page", "value": "1"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Verify User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/users/:userId/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "users", ":userId", "verify"],
+							"variable": [
+								{"key": "userId", "value": "user-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Suspend User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"reason\": \"Violation of terms of service\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/users/:userId/suspend",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "users", ":userId", "suspend"],
+							"variable": [
+								{"key": "userId", "value": "user-uuid-here"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/products?status=pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "products"],
+							"query": [
+								{"key": "status", "value": "pending"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Approve Product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/products/:productId",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "products", ":productId"],
+							"variable": [
+								{"key": "productId", "value": "product-uuid"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Sales Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/analytics/sales?period=30d",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "analytics", "sales"],
+							"query": [
+								{"key": "period", "value": "30d"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Send Broadcast",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Weekend Sale!\",\n    \"message\": \"Get 20% off on all vegetables this weekend.\",\n    \"targetRole\": \"buyer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/notifications/broadcast",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "notifications", "broadcast"]
+						}
+					}
+				},
+				{
+					"name": "Export Reports",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/reports/export?type=orders&format=csv",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "reports", "export"],
+							"query": [
+								{"key": "type", "value": "orders"},
+								{"key": "format", "value": "csv"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/settings",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "settings"]
+						}
+					}
+				},
+				{
+					"name": "Update Settings",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"commissionRate\": 5,\n    \"deliveryFeePerKm\": 500\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/settings",
+							"host": ["{{baseUrl}}"],
+							"path": ["admin", "settings"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
