@@ -1,7 +1,7 @@
 class AppConfig {
   // Supabase Configuration
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+  static const String supabaseUrl = 'https://ugrraxmjvbujpdzfsvzt.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVncnJheG1qdmJ1anBkemZzdnp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNDYyNjEsImV4cCI6MjA4MjkyMjI2MX0.julW_csYQxpYGBdWG-jP1i5ARX4Ym-F0egeL_nkNOlo';
 
   // Backend API Configuration
   static const String apiBaseUrl = 'http://localhost:3000/api';
