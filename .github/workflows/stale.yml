@@ -1,0 +1,53 @@
+# Stale issue/PR management
+name: 'Stale Issues and PRs'
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        with:
+          # Issue settings
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had recent activity. 
+            It will be closed if no further activity occurs within 7 days.
+            
+            If this issue is still relevant:
+            - Add a comment with an update
+            - Remove the "stale" label
+            
+            Thank you for your contributions to AgriSupply! 🌾
+          stale-issue-label: 'stale'
+          days-before-issue-stale: 60
+          days-before-issue-close: 7
+          exempt-issue-labels: 'pinned,security,critical,in-progress,help-wanted'
+          
+          # PR settings
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has not had recent activity.
+            It will be closed if no further activity occurs within 14 days.
+            
+            If this PR is still in progress:
+            - Add a comment with an update
+            - Push new commits
+            - Remove the "stale" label
+            
+            Thank you for your contributions to AgriSupply! 🌾
+          stale-pr-label: 'stale'
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          exempt-pr-labels: 'pinned,security,critical,work-in-progress'
+          
+          # General settings
+          remove-stale-when-updated: true
+          operations-per-run: 100
