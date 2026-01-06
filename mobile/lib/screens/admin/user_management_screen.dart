@@ -6,6 +6,13 @@ import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../widgets/loading_overlay.dart';
 
+// Use string-based user type checking for mock data
+class _UserType {
+  static const String farmer = 'farmer';
+  static const String buyer = 'buyer';
+  static const String admin = 'admin';
+}
+
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({super.key});
 
