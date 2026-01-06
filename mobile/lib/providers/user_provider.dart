@@ -22,7 +22,7 @@ class UserProvider extends ChangeNotifier {
   bool _isLoading = false;
 
   // Filters
-  UserRole? _selectedRole;
+  String? _selectedRole;
   String? _selectedRegion;
   bool? _verifiedOnly;
   bool? _premiumOnly;
@@ -44,7 +44,7 @@ class UserProvider extends ChangeNotifier {
   UserModel? get selectedUser => _selectedUser;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
-  UserRole? get selectedRole => _selectedRole;
+  String? get selectedRole => _selectedRole;
   String? get selectedRegion => _selectedRegion;
   bool? get verifiedOnly => _verifiedOnly;
   bool? get premiumOnly => _premiumOnly;
@@ -252,7 +252,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Update user role (admin)
-  Future<bool> updateUserRole(String userId, UserRole newRole) async {
+  Future<bool> updateUserRole(String userId, String newRole) async {
     _errorMessage = null;
 
     try {
@@ -260,11 +260,11 @@ class UserProvider extends ChangeNotifier {
 
       final index = _users.indexWhere((u) => u.id == userId);
       if (index >= 0) {
-        _users[index] = _users[index].copyWith(role: newRole);
+        _users[index] = _users[index].copyWith(userType: newRole);
       }
 
       if (_selectedUser?.id == userId) {
-        _selectedUser = _selectedUser!.copyWith(role: newRole);
+        _selectedUser = _selectedUser!.copyWith(userType: newRole);
       }
 
       _calculateStats();
@@ -342,7 +342,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Set filters
-  void setRoleFilter(UserRole? role) {
+  void setRoleFilter(String? role) {
     _selectedRole = role;
     notifyListeners();
   }
@@ -396,7 +396,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Get users by role
-  List<UserModel> getUsersByRole(UserRole role) {
+  List<UserModel> getUsersByRole(String role) {
     return _users.where((u) => u.role == role).toList();
   }
 
