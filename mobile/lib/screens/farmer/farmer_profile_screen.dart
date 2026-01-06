@@ -103,8 +103,13 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
       };
 
       final success = await authProvider.updateProfile(
-        profileData,
-        profileImage: _profileImage,
+        fullName: _nameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        farmName: _farmNameController.text.trim(),
+        bio: _farmDescriptionController.text.trim(),
+        address: _addressController.text.trim(),
+        region: _selectedRegion,
+        district: _selectedDistrict,
       );
 
       if (!mounted) return;
@@ -167,7 +172,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
         ),
         body: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
-            _user = authProvider.currentUser;
+            _user = authProvider.user;
 
             return Form(
               key: _formKey,
