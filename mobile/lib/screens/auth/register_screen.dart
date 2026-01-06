@@ -66,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final result = await authProvider.signUp(
+      final success = await authProvider.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         fullName: _fullNameController.text.trim(),
@@ -76,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      if (result.success) {
+      if (success) {
         Navigator.pushReplacementNamed(
           context,
           AppRoutes.otpVerification,
@@ -86,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           },
         );
       } else {
-        _showError(result.message ?? 'Registration failed. Please try again.');
+        _showError(authProvider.errorMessage ?? 'Registration failed. Please try again.');
       }
     } catch (e) {
       _showError('An unexpected error occurred. Please try again.');
