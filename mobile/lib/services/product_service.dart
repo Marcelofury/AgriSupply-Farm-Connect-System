@@ -131,10 +131,10 @@ class ProductService {
   }
 
   // Update product status
-  Future<void> updateProductStatus(String productId, ProductStatus status) async {
+  Future<void> updateProductStatus(String productId, String status) async {
     try {
       await _apiService.update('products', productId, {
-        'status': status.toString().split('.').last,
+        'status': status,
         'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
