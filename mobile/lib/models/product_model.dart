@@ -271,3 +271,19 @@ class ProductUnit {
         tray,
       ];
 }
+
+class ProductStatus {
+  static const String active = 'active';
+  static const String inactive = 'inactive';
+  static const String outOfStock = 'out_of_stock';
+  static const String pending = 'pending';
+  static const String rejected = 'rejected';
+
+  static List<String> get all => [
+        active,
+        inactive,
+        outOfStock,
+        pending,
+        rejected,
+      ];
+}
