@@ -57,6 +57,12 @@ dependencies:
   # Charts & Analytics
   fl_chart: ^0.70.2
 
+  # Supabase
+  supabase_flutter: ^2.8.3
+  
+  # Google Sign In
+  google_sign_in: ^6.2.2
+
   # Utilities
   intl: any
   uuid: ^4.5.1
