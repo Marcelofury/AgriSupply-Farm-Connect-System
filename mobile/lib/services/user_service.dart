@@ -146,10 +146,10 @@ class UserService {
   }
 
   // Update user role (admin)
-  Future<void> updateUserRole(String userId, UserRole newRole) async {
+  Future<void> updateUserRole(String userId, String newRole) async {
     try {
       await _apiService.update('users', userId, {
-        'role': newRole.toString().split('.').last,
+        'role': newRole,
         'updated_at': DateTime.now().toIso8601String(),
       });
     } catch (e) {
