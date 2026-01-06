@@ -127,8 +127,8 @@ class _StatusInfo {
 }
 
 class OrderStatusTimeline extends StatelessWidget {
-  final OrderStatus currentStatus;
-  final Map<OrderStatus, DateTime>? statusDates;
+  final String currentStatus;
+  final Map<String, DateTime>? statusDates;
   final bool isVertical;
 
   const OrderStatusTimeline({
@@ -138,7 +138,7 @@ class OrderStatusTimeline extends StatelessWidget {
     this.isVertical = true,
   });
 
-  static final List<OrderStatus> _normalFlow = [
+  static final List<String> _normalFlow = [
     OrderStatus.pending,
     OrderStatus.confirmed,
     OrderStatus.processing,
