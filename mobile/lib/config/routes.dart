@@ -81,8 +81,8 @@ class AppRoutes {
         final args = settings.arguments as Map<String, dynamic>?;
         return _buildRoute(
           OtpVerificationScreen(
-            email: args?['email'] ?? '',
-            phone: args?['phone'] ?? '',
+            email: (args?['email'] as String?) ?? '',
+            phone: (args?['phone'] as String?) ?? '',
           ),
           settings,
         );
@@ -122,7 +122,7 @@ class AppRoutes {
       case farmerProfile:
         return _buildRoute(const FarmerProfileScreen(), settings);
       case aiAssistant:
-        return _buildRoute(const AiAssistantScreen(), settings);
+        return _buildRoute(const AIAssistantScreen(), settings);
       case premium:
         return _buildRoute(const PremiumScreen(), settings);
 

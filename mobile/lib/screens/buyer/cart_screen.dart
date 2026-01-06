@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../providers/cart_provider.dart';
+import '../../models/cart_model.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/quantity_selector.dart';
 
@@ -127,7 +128,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, dynamic item, CartProvider cartProvider) {
+  Widget _buildCartItem(BuildContext context, CartItemModel item, CartProvider cartProvider) {
     final product = item.product;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
