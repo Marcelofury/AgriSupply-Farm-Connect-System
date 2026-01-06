@@ -460,7 +460,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   Widget _buildStatsRow() {
     return Consumer<AuthProvider>(
       builder: (context, provider, child) {
-        final user = provider.currentUser;
+        final user = provider.user;
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -548,7 +548,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: enabled ? AppColors.grey100 : AppColors.grey50,
+            color: enabled ? AppColors.grey100 : AppColors.grey100,
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButton<String>(
@@ -630,7 +630,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
               Navigator.pop(context);
               final authProvider =
                   Provider.of<AuthProvider>(context, listen: false);
-              await authProvider.logout();
+              await authProvider.signOut();
               if (mounted) {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
