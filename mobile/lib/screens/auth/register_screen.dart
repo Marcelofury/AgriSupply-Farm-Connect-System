@@ -147,16 +147,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: _userTypes.map((type) {
-                      final isSelected = _selectedUserType == type['value'];
+                      final isSelected = _selectedUserType == (type['value'] as String);
                       return Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => _selectedUserType = type['value']);
+                            setState(() => _selectedUserType = type['value'] as String);
                           },
                           child: Container(
                             margin: EdgeInsets.only(
-                              right: type['value'] == 'buyer' ? 8 : 0,
-                              left: type['value'] == 'farmer' ? 8 : 0,
+                              right: (type['value'] as String) == 'buyer' ? 8 : 0,
+                              left: (type['value'] as String) == 'farmer' ? 8 : 0,
                             ),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -174,7 +174,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             child: Column(
                               children: [
                                 Icon(
-                                  type['icon'],
+                                  type['icon'] as IconData,
                                   size: 32,
                                   color: isSelected
                                       ? AppColors.primaryGreen
@@ -182,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  type['label'],
+                                  type['label'] as String,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: isSelected
@@ -192,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  type['description'],
+                                  type['description'] as String,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall

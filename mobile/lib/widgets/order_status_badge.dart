@@ -446,7 +446,7 @@ class _StatusInfoExtended {
 }
 
 class _HorizontalTimelineItem extends StatelessWidget {
-  final OrderStatus status;
+  final String status;
   final bool isCompleted;
   final bool isCurrent;
   final bool isLast;
@@ -511,56 +511,55 @@ class _HorizontalTimelineItem extends StatelessWidget {
   }
 
   _StatusInfoExtended _getStatusInfo() {
-    switch (status) {
-      case OrderStatus.pending:
-        return _StatusInfoExtended(
-          label: 'Placed',
-          color: AppColors.warning,
-          icon: Icons.receipt_long,
-          description: '',
-        );
-      case OrderStatus.confirmed:
-        return _StatusInfoExtended(
-          label: 'Confirmed',
-          color: AppColors.info,
-          icon: Icons.check_circle_outline,
-          description: '',
-        );
-      case OrderStatus.processing:
-        return _StatusInfoExtended(
-          label: 'Processing',
-          color: AppColors.secondaryOrange,
-          icon: Icons.inventory,
-          description: '',
-        );
-      case OrderStatus.shipped:
-        return _StatusInfoExtended(
-          label: 'Shipped',
-          color: AppColors.primaryGreen,
-          icon: Icons.local_shipping,
-          description: '',
-        );
-      case OrderStatus.inTransit:
-        return _StatusInfoExtended(
-          label: 'In Transit',
-          color: AppColors.primaryGreen,
-          icon: Icons.delivery_dining,
-          description: '',
-        );
-      case OrderStatus.delivered:
-        return _StatusInfoExtended(
-          label: 'Delivered',
-          color: AppColors.success,
-          icon: Icons.check_circle,
-          description: '',
-        );
-      default:
-        return _StatusInfoExtended(
-          label: 'Unknown',
-          color: AppColors.grey400,
-          icon: Icons.help_outline,
-          description: '',
-        );
+    if (status == OrderStatus.pending) {
+      return _StatusInfoExtended(
+        label: 'Placed',
+        color: AppColors.warning,
+        icon: Icons.receipt_long,
+        description: '',
+      );
+    } else if (status == OrderStatus.confirmed) {
+      return _StatusInfoExtended(
+        label: 'Confirmed',
+        color: AppColors.info,
+        icon: Icons.check_circle_outline,
+        description: '',
+      );
+    } else if (status == OrderStatus.processing) {
+      return _StatusInfoExtended(
+        label: 'Processing',
+        color: AppColors.secondaryOrange,
+        icon: Icons.inventory,
+        description: '',
+      );
+    } else if (status == OrderStatus.shipped) {
+      return _StatusInfoExtended(
+        label: 'Shipped',
+        color: AppColors.primaryGreen,
+        icon: Icons.local_shipping,
+        description: '',
+      );
+    } else if (status == OrderStatus.inTransit) {
+      return _StatusInfoExtended(
+        label: 'In Transit',
+        color: AppColors.primaryGreen,
+        icon: Icons.delivery_dining,
+        description: '',
+      );
+    } else if (status == OrderStatus.delivered) {
+      return _StatusInfoExtended(
+        label: 'Delivered',
+        color: AppColors.success,
+        icon: Icons.check_circle,
+        description: '',
+      );
+    } else {
+      return _StatusInfoExtended(
+        label: 'Unknown',
+        color: AppColors.grey400,
+        icon: Icons.help_outline,
+        description: '',
+      );
     }
   }
 }
@@ -641,6 +640,12 @@ class PaymentStatusBadge extends StatelessWidget {
           label: 'Refunded',
           color: AppColors.grey600,
           icon: Icons.undo,
+        );
+      default:
+        return _StatusInfo(
+          label: 'Unknown',
+          color: AppColors.grey400,
+          icon: Icons.help_outline,
         );
     }
   }

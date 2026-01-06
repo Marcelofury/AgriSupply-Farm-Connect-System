@@ -221,15 +221,16 @@ class CartProvider extends ChangeNotifier {
     _items.clear();
     
     if (json['items'] != null) {
-      for (final itemJson in json['items']) {
-        _items.add(CartItemModel.fromJson(itemJson));
+      final savedItems = json['items'] as List;
+      for (final itemJson in savedItems) {
+        _items.add(CartItemModel.fromJson(itemJson as Map<String, dynamic>));
       }
     }
     
-    _selectedPaymentMethod = json['payment_method'];
-    _deliveryAddress = json['delivery_address'];
-    _deliveryNotes = json['delivery_notes'];
-    _deliveryFee = (json['delivery_fee'] ?? 5000).toDouble();
+    _selectedPaymentMethod = json['payment_method'] as String?;
+    _deliveryAddress = json['delivery_address'] as String?;
+    _deliveryNotes = json['delivery_notes'] as String?;
+    _deliveryFee = ((json['delivery_fee'] ?? 5000) as num).toDouble();
     
     notifyListeners();
   }

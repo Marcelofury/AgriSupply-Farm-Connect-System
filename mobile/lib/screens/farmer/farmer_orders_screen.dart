@@ -198,7 +198,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
         List<OrderModel> orders = provider.farmerOrders
             .where((o) => o.status == status)
             .where((o) =>
-                o.orderNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                (o.orderNumber?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
                 o.buyerName.toLowerCase().contains(_searchQuery.toLowerCase()))
             .toList();
 

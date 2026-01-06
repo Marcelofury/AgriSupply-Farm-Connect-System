@@ -25,7 +25,8 @@ import '../screens/admin/user_management_screen.dart';
 // import '../screens/admin/product_management_screen.dart'; // TODO: Create this file
 // import '../screens/admin/order_management_screen.dart'; // TODO: Create this file
 import '../screens/admin/analytics_screen.dart';
-import '../screens/notifications_screen.dart';
+// import '../screens/notifications_screen.dart'; // TODO: File doesn't exist at this path
+import '../screens/common/notifications_screen.dart';
 
 class AppRoutes {
   // Auth Routes
