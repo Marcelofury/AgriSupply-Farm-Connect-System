@@ -27,7 +27,7 @@ class AuthService {
     required String password,
     required String fullName,
     required String phone,
-    required UserRole role,
+    required String role,
     String? farmName,
     String? region,
     String? district,
@@ -40,7 +40,7 @@ class AuthService {
         data: {
           'full_name': fullName,
           'phone': phone,
-          'role': role.toString().split('.').last,
+          'role': role,
         },
       );
 
@@ -54,7 +54,7 @@ class AuthService {
         'email': email,
         'full_name': fullName,
         'phone': phone,
-        'role': role.toString().split('.').last,
+        'role': role,
         'farm_name': farmName,
         'region': region,
         'district': district,

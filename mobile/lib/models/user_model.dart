@@ -23,6 +23,10 @@ class UserModel {
   final int? totalOrders;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool isSuspended;
+
+  /// Alias for userType - provides compatibility with code using 'role'
+  String get role => userType;
 
   UserModel({
     required this.id,
@@ -49,6 +53,7 @@ class UserModel {
     this.totalOrders,
     required this.createdAt,
     required this.updatedAt,
+    this.isSuspended = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -79,6 +84,7 @@ class UserModel {
       totalOrders: json['total_orders'] as int?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      isSuspended: json['is_suspended'] as bool? ?? false,
     );
   }
 
@@ -108,6 +114,7 @@ class UserModel {
       'total_orders': totalOrders,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'is_suspended': isSuspended,
     };
   }
 
@@ -136,6 +143,7 @@ class UserModel {
     int? totalOrders,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isSuspended,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -162,6 +170,7 @@ class UserModel {
       totalOrders: totalOrders ?? this.totalOrders,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isSuspended: isSuspended ?? this.isSuspended,
     );
   }
 
@@ -175,4 +184,13 @@ enum UserType {
   farmer,
   buyer,
   admin,
+}
+
+/// UserRole class with static String constants for role values
+class UserRole {
+  static const String farmer = 'farmer';
+  static const String buyer = 'buyer';
+  static const String admin = 'admin';
+
+  UserRole._(); // Private constructor to prevent instantiation
 }
