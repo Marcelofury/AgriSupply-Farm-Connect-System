@@ -37,14 +37,14 @@ class _UserManagementScreenState extends State<UserManagementScreen>
       id: 'user_$index',
       email: 'user$index@example.com',
       fullName: index % 2 == 0 ? 'Farmer $index' : 'Buyer $index',
-      userType: index % 2 == 0 ? UserType.farmer : UserType.buyer,
+      userType: index % 2 == 0 ? 'farmer' : 'buyer',
       phone: '+256 7${index}0 000 00$index',
       region: ['Central', 'Eastern', 'Northern', 'Western'][index % 4],
       district: 'District $index',
-      photoUrl: null,
       isPremium: index % 3 == 0,
       isVerified: index % 2 == 0,
       createdAt: DateTime.now().subtract(Duration(days: index * 5)),
+      updatedAt: DateTime.now(),
       rating: 3.5 + (index % 3) * 0.5,
     ),
   );
@@ -87,11 +87,11 @@ class _UserManagementScreenState extends State<UserManagementScreen>
       // Tab filter
       switch (_tabController.index) {
         case 1:
-          return user.userType == UserType.farmer;
+          return user.userType == _UserType.farmer;
         case 2:
-          return user.userType == UserType.buyer;
+          return user.userType == _UserType.buyer;
         case 3:
-          return user.userType == UserType.admin;
+          return user.userType == _UserType.admin;
         default:
           return true;
       }
