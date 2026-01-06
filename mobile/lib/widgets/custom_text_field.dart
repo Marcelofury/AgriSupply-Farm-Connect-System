@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final IconData? prefixIcon;
   final Widget? prefix;
   final Widget? suffix;
+  final Widget? suffixIcon;
   final bool obscureText;
   final bool enabled;
   final bool readOnly;
@@ -35,6 +36,7 @@ class CustomTextField extends StatefulWidget {
     this.prefixIcon,
     this.prefix,
     this.suffix,
+    this.suffixIcon,
     this.obscureText = false,
     this.enabled = true,
     this.readOnly = false,
@@ -127,7 +129,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                         setState(() => _obscureText = !_obscureText);
                       },
                     )
-                  : widget.suffix,
+                  : widget.suffixIcon ?? widget.suffix,
               filled: true,
               fillColor: widget.enabled ? AppColors.grey100 : AppColors.grey50,
               contentPadding: widget.contentPadding ??

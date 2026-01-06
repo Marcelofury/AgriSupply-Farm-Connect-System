@@ -4,7 +4,9 @@ import '../config/theme.dart';
 import '../models/product_model.dart';
 
 class CategoryChip extends StatelessWidget {
-  final String category;
+  final String? category;
+  final String? label;
+  final String? icon;
   final bool isSelected;
   final VoidCallback? onTap;
   final bool showIcon;
@@ -12,12 +14,17 @@ class CategoryChip extends StatelessWidget {
 
   const CategoryChip({
     super.key,
-    required this.category,
+    this.category,
+    this.label,
+    this.icon,
     this.isSelected = false,
     this.onTap,
     this.showIcon = true,
     this.isLarge = false,
-  });
+  }) : assert(category != null || label != null, 'Either category or label must be provided');
+
+  String get _displayText => label ?? category!;
+  String get _iconText => icon ?? ProductCategory.getIcon(_displayText);
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +58,13 @@ class CategoryChip extends StatelessWidget {
           children: [
             if (showIcon) ...[
               Text(
-                ProductCategory.getIcon(category),
+                _iconText,
                 style: TextStyle(fontSize: isLarge ? 18 : 14),
               ),
               SizedBox(width: isLarge ? 8 : 6),
             ],
             Text(
-              category,
+              _displayText,
               style: TextStyle(
                 fontSize: isLarge ? 14 : 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
