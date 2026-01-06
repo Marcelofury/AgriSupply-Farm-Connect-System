@@ -875,7 +875,7 @@ class _SettingsTab extends StatelessWidget {
                           onPressed: () {
                             final authProvider =
                                 Provider.of<AuthProvider>(context, listen: false);
-                            authProvider.logout();
+                            authProvider.signOut();
                             Navigator.pushNamedAndRemoveUntil(
                               context,
                               '/login',

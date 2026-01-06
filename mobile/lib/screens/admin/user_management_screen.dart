@@ -248,14 +248,14 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   _buildStatItem(
                       'Farmers',
                       _users
-                          .where((u) => u.userType == UserType.farmer)
+                          .where((u) => u.userType == _UserType.farmer)
                           .length
                           .toString()),
                   Container(height: 30, width: 1, color: AppColors.grey300),
                   _buildStatItem(
                       'Buyers',
                       _users
-                          .where((u) => u.userType == UserType.buyer)
+                          .where((u) => u.userType == _UserType.buyer)
                           .length
                           .toString()),
                   Container(height: 30, width: 1, color: AppColors.grey300),
@@ -359,7 +359,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: user.userType == UserType.farmer
+                    backgroundColor: user.userType == _UserType.farmer
                         ? AppColors.primaryGreen.withOpacity(0.1)
                         : AppColors.info.withOpacity(0.1),
                     backgroundImage: user.photoUrl != null
@@ -371,7 +371,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: user.userType == UserType.farmer
+                              color: user.userType == _UserType.farmer
                                   ? AppColors.primaryGreen
                                   : AppColors.info,
                             ),
@@ -460,19 +460,19 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: user.userType == UserType.farmer
+                            color: user.userType == _UserType.farmer
                                 ? AppColors.primaryGreen.withOpacity(0.1)
                                 : AppColors.info.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            user.userType == UserType.farmer
+                            user.userType == _UserType.farmer
                                 ? 'Farmer'
                                 : 'Buyer',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: user.userType == UserType.farmer
+                              color: user.userType == _UserType.farmer
                                   ? AppColors.primaryGreen
                                   : AppColors.info,
                             ),
@@ -647,7 +647,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 const SizedBox(height: 24),
                 _buildDetailItem('Phone', user.phone ?? 'Not provided'),
                 _buildDetailItem('User Type',
-                    user.userType == UserType.farmer ? 'Farmer' : 'Buyer'),
+                    user.userType == _UserType.farmer ? 'Farmer' : 'Buyer'),
                 _buildDetailItem('Region', user.region ?? 'Not provided'),
                 _buildDetailItem('District', user.district ?? 'Not provided'),
                 _buildDetailItem(
