@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/notification_model.dart';
 import 'api_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationService {
   final ApiService _apiService = ApiService();
