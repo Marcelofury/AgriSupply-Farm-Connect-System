@@ -292,6 +292,14 @@ conversation back to farming-related topics.
     }
   }
 
+  // Simple chat method - alias for sendMessage
+  Future<String> chat(String message) async {
+    return await sendMessage(
+      message: message,
+      userId: 'anonymous',
+    );
+  }
+
   // Quick questions for the AI assistant
   static List<String> get quickQuestions => [
     'What crops grow best in my region?',

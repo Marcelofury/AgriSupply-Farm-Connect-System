@@ -37,7 +37,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
   void _addWelcomeMessage() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final userName = authProvider.currentUser?.fullName.split(' ').first ?? 'Farmer';
+    final userName = authProvider.user?.fullName.split(' ').first ?? 'Farmer';
 
     _messages.add(ChatMessage(
       content: '''Hello $userName! 👋
