@@ -11,7 +11,8 @@ class OrderModel {
   final double subtotal;
   final double deliveryFee;
   final double totalAmount;
-  final String status; // pending, confirmed, processing, shipped, delivered, cancelled
+  final String
+  status; // pending, confirmed, processing, shipped, delivered, cancelled
   final String paymentStatus; // pending, paid, failed, refunded
   final String paymentMethod; // mobile_money, cash_on_delivery
   final String? paymentReference;
@@ -25,6 +26,8 @@ class OrderModel {
   final DateTime? deliveredAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? buyerPhoto;
+  final bool refundRequested;
 
   OrderModel({
     required this.id,
@@ -51,6 +54,8 @@ class OrderModel {
     this.deliveredAt,
     required this.createdAt,
     required this.updatedAt,
+    this.buyerPhoto,
+    this.refundRequested = false,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -61,9 +66,11 @@ class OrderModel {
       buyerName: json['buyer_name'] as String,
       buyerPhone: json['buyer_phone'] as String?,
       buyerAddress: json['buyer_address'] as String?,
-      items: (json['items'] as List<dynamic>?)
-          ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
+      items:
+          (json['items'] as List<dynamic>?)
+              ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       subtotal: (json['subtotal'] as num).toDouble(),
       deliveryFee: (json['delivery_fee'] as num).toDouble(),
       totalAmount: (json['total_amount'] as num).toDouble(),
@@ -74,21 +81,27 @@ class OrderModel {
       deliveryAddress: json['delivery_address'] as String?,
       deliveryRegion: json['delivery_region'] as String?,
       deliveryDistrict: json['delivery_district'] as String?,
-      deliveryLatitude: json['delivery_latitude'] != null
-          ? (json['delivery_latitude'] as num).toDouble()
-          : null,
-      deliveryLongitude: json['delivery_longitude'] != null
-          ? (json['delivery_longitude'] as num).toDouble()
-          : null,
+      deliveryLatitude:
+          json['delivery_latitude'] != null
+              ? (json['delivery_latitude'] as num).toDouble()
+              : null,
+      deliveryLongitude:
+          json['delivery_longitude'] != null
+              ? (json['delivery_longitude'] as num).toDouble()
+              : null,
       deliveryNotes: json['delivery_notes'] as String?,
-      estimatedDelivery: json['estimated_delivery'] != null
-          ? DateTime.parse(json['estimated_delivery'] as String)
-          : null,
-      deliveredAt: json['delivered_at'] != null
-          ? DateTime.parse(json['delivered_at'] as String)
-          : null,
+      estimatedDelivery:
+          json['estimated_delivery'] != null
+              ? DateTime.parse(json['estimated_delivery'] as String)
+              : null,
+      deliveredAt:
+          json['delivered_at'] != null
+              ? DateTime.parse(json['delivered_at'] as String)
+              : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      buyerPhoto: json['buyer_photo'] as String?,
+      refundRequested: json['refund_requested'] as bool? ?? false,
     );
   }
 
@@ -118,6 +131,8 @@ class OrderModel {
       'delivered_at': deliveredAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'buyer_photo': buyerPhoto,
+      'refund_requested': refundRequested,
     };
   }
 
@@ -128,6 +143,66 @@ class OrderModel {
   bool get isDelivered => status == 'delivered';
   bool get isCancelled => status == 'cancelled';
   bool get isPaid => paymentStatus == 'paid';
+
+  double get total => totalAmount;
+
+  OrderModel copyWith({
+    String? id,
+    String? orderNumber,
+    String? buyerId,
+    String? buyerName,
+    String? buyerPhone,
+    String? buyerAddress,
+    List<OrderItem>? items,
+    double? subtotal,
+    double? deliveryFee,
+    double? totalAmount,
+    String? status,
+    String? paymentStatus,
+    String? paymentMethod,
+    String? paymentReference,
+    String? deliveryAddress,
+    String? deliveryRegion,
+    String? deliveryDistrict,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
+    String? deliveryNotes,
+    DateTime? estimatedDelivery,
+    DateTime? deliveredAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? buyerPhoto,
+    bool? refundRequested,
+  }) {
+    return OrderModel(
+      id: id ?? this.id,
+      orderNumber: orderNumber ?? this.orderNumber,
+      buyerId: buyerId ?? this.buyerId,
+      buyerName: buyerName ?? this.buyerName,
+      buyerPhone: buyerPhone ?? this.buyerPhone,
+      buyerAddress: buyerAddress ?? this.buyerAddress,
+      items: items ?? this.items,
+      subtotal: subtotal ?? this.subtotal,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
+      totalAmount: totalAmount ?? this.totalAmount,
+      status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentReference: paymentReference ?? this.paymentReference,
+      deliveryAddress: deliveryAddress ?? this.deliveryAddress,
+      deliveryRegion: deliveryRegion ?? this.deliveryRegion,
+      deliveryDistrict: deliveryDistrict ?? this.deliveryDistrict,
+      deliveryLatitude: deliveryLatitude ?? this.deliveryLatitude,
+      deliveryLongitude: deliveryLongitude ?? this.deliveryLongitude,
+      deliveryNotes: deliveryNotes ?? this.deliveryNotes,
+      estimatedDelivery: estimatedDelivery ?? this.estimatedDelivery,
+      deliveredAt: deliveredAt ?? this.deliveredAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      buyerPhoto: buyerPhoto ?? this.buyerPhoto,
+      refundRequested: refundRequested ?? this.refundRequested,
+    );
+  }
 
   String get statusDisplay {
     switch (status) {
@@ -215,6 +290,8 @@ class OrderItem {
       'farmer_notes': farmerNotes,
     };
   }
+
+  double get subtotal => totalPrice;
 }
 
 class OrderStatus {
@@ -227,14 +304,14 @@ class OrderStatus {
   static const String cancelled = 'cancelled';
 
   static List<String> get all => [
-        pending,
-        confirmed,
-        processing,
-        shipped,
-        inTransit,
-        delivered,
-        cancelled,
-      ];
+    pending,
+    confirmed,
+    processing,
+    shipped,
+    inTransit,
+    delivered,
+    cancelled,
+  ];
 }
 
 class PaymentStatus {

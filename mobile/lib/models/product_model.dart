@@ -24,6 +24,8 @@ class ProductModel {
   final int totalSold;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String status;
+  final int views;
 
   ProductModel({
     required this.id,
@@ -51,6 +53,8 @@ class ProductModel {
     this.totalSold = 0,
     required this.createdAt,
     required this.updatedAt,
+    this.status = 'active',
+    this.views = 0,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -82,6 +86,8 @@ class ProductModel {
       totalSold: json['total_sold'] as int? ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      status: json['status'] as String? ?? 'active',
+      views: json['views'] as int? ?? 0,
     );
   }
 
@@ -112,6 +118,8 @@ class ProductModel {
       'total_sold': totalSold,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'status': status,
+      'views': views,
     };
   }
 
@@ -144,6 +152,8 @@ class ProductModel {
     int? totalSold,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? status,
+    int? views,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -171,6 +181,8 @@ class ProductModel {
       totalSold: totalSold ?? this.totalSold,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      status: status ?? this.status,
+      views: views ?? this.views,
     );
   }
 
