@@ -12,6 +12,12 @@ enum AuthStatus {
   error,
 }
 
+enum UserRole {
+  farmer,
+  buyer,
+  admin,
+}
+
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
@@ -22,12 +28,13 @@ class AuthProvider extends ChangeNotifier {
 
   AuthStatus get status => _status;
   UserModel? get user => _user;
+  UserModel? get currentUser => _user;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
-  bool get isFarmer => _user?.role == UserRole.farmer;
-  bool get isBuyer => _user?.role == UserRole.buyer;
-  bool get isAdmin => _user?.role == UserRole.admin;
+  bool get isFarmer => _user?.userType == 'farmer';
+  bool get isBuyer => _user?.userType == 'buyer';
+  bool get isAdmin => _user?.userType == 'admin';
   bool get isPremium => _user?.isPremium ?? false;
 
   AuthProvider() {
@@ -311,6 +318,10 @@ class AuthProvider extends ChangeNotifier {
     }
     
     _setLoading(false);
+  }
+
+  Future<void> logout() async {
+    await signOut();
   }
 
   Future<void> refreshUser() async {
