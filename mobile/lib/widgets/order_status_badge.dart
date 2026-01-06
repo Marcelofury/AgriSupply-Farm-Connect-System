@@ -4,7 +4,7 @@ import '../config/theme.dart';
 import '../models/order_model.dart';
 
 class OrderStatusBadge extends StatelessWidget {
-  final OrderStatus status;
+  final String status;
   final bool isLarge;
   final bool showIcon;
 
@@ -55,56 +55,61 @@ class OrderStatusBadge extends StatelessWidget {
     );
   }
 
-  _StatusInfo _getStatusInfo(OrderStatus status) {
-    switch (status) {
-      case OrderStatus.pending:
-        return _StatusInfo(
-          label: 'Pending',
-          color: AppColors.warning,
-          icon: Icons.schedule,
-        );
-      case OrderStatus.confirmed:
-        return _StatusInfo(
-          label: 'Confirmed',
-          color: AppColors.info,
-          icon: Icons.check_circle_outline,
-        );
-      case OrderStatus.processing:
-        return _StatusInfo(
-          label: 'Processing',
-          color: AppColors.secondaryOrange,
-          icon: Icons.autorenew,
-        );
-      case OrderStatus.shipped:
-        return _StatusInfo(
-          label: 'Shipped',
-          color: AppColors.primaryGreen,
-          icon: Icons.local_shipping,
-        );
-      case OrderStatus.inTransit:
-        return _StatusInfo(
-          label: 'In Transit',
-          color: AppColors.primaryGreen,
-          icon: Icons.delivery_dining,
-        );
-      case OrderStatus.delivered:
-        return _StatusInfo(
-          label: 'Delivered',
-          color: AppColors.success,
-          icon: Icons.check_circle,
-        );
-      case OrderStatus.cancelled:
-        return _StatusInfo(
-          label: 'Cancelled',
-          color: AppColors.error,
-          icon: Icons.cancel,
-        );
-      case OrderStatus.refunded:
-        return _StatusInfo(
-          label: 'Refunded',
-          color: AppColors.grey600,
-          icon: Icons.undo,
-        );
+  _StatusInfo _getStatusInfo(String status) {
+    if (status == OrderStatus.pending) {
+      return _StatusInfo(
+        label: 'Pending',
+        color: AppColors.warning,
+        icon: Icons.schedule,
+      );
+    } else if (status == OrderStatus.confirmed) {
+      return _StatusInfo(
+        label: 'Confirmed',
+        color: AppColors.info,
+        icon: Icons.check_circle_outline,
+      );
+    } else if (status == OrderStatus.processing) {
+      return _StatusInfo(
+        label: 'Processing',
+        color: AppColors.secondaryOrange,
+        icon: Icons.autorenew,
+      );
+    } else if (status == OrderStatus.shipped) {
+      return _StatusInfo(
+        label: 'Shipped',
+        color: AppColors.primaryGreen,
+        icon: Icons.local_shipping,
+      );
+    } else if (status == OrderStatus.inTransit) {
+      return _StatusInfo(
+        label: 'In Transit',
+        color: AppColors.primaryGreen,
+        icon: Icons.delivery_dining,
+      );
+    } else if (status == OrderStatus.delivered) {
+      return _StatusInfo(
+        label: 'Delivered',
+        color: AppColors.success,
+        icon: Icons.check_circle,
+      );
+    } else if (status == OrderStatus.cancelled) {
+      return _StatusInfo(
+        label: 'Cancelled',
+        color: AppColors.error,
+        icon: Icons.cancel,
+      );
+    } else if (status == OrderStatus.refunded) {
+      return _StatusInfo(
+        label: 'Refunded',
+        color: AppColors.grey600,
+        icon: Icons.undo,
+      );
+    } else {
+      return _StatusInfo(
+        label: status,
+        color: AppColors.grey600,
+        icon: Icons.help_outline,
+      );
     }
   }
 }
