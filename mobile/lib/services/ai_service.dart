@@ -143,7 +143,7 @@ conversation back to farming-related topics.
         'temperature': 0.7,
       });
 
-      return response['content'] ?? response['message'] ?? 'I apologize, but I couldn\'t generate a response. Please try again.';
+      return (response['content'] ?? response['message'] ?? 'I apologize, but I couldn\'t generate a response. Please try again.') as String;
     } catch (e) {
       throw Exception('Failed to get AI response: $e');
     }
@@ -185,7 +185,7 @@ conversation back to farming-related topics.
       if (region != null) params['region'] = region;
 
       final response = await _apiService.get('/ai/farming-tips', queryParams: params);
-      return List<String>.from(response['tips'] ?? []);
+      return List<String>.from((response['tips'] as List?) ?? []);
     } catch (e) {
       throw Exception('Failed to get farming tips: $e');
     }
@@ -225,7 +225,7 @@ conversation back to farming-related topics.
         'lon': longitude.toString(),
       });
 
-      return List<String>.from(response['recommendations'] ?? []);
+      return List<String>.from((response['recommendations'] as List?) ?? []);
     } catch (e) {
       throw Exception('Failed to get weather recommendations: $e');
     }

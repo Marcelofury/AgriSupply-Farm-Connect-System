@@ -215,7 +215,7 @@ class PaymentService {
   }
 
   // Check payment status
-  Future<PaymentStatus> checkPaymentStatus(String transactionId) async {
+  Future<String> checkPaymentStatus(String transactionId) async {
     try {
       final response = await _apiService.get('/payments/$transactionId/status');
       
