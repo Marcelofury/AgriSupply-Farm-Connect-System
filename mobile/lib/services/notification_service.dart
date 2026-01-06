@@ -90,7 +90,7 @@ class NotificationService {
   // Create notification
   Future<NotificationModel> createNotification({
     required String userId,
-    required NotificationType type,
+    required String type,
     required String title,
     required String body,
     Map<String, dynamic>? data,
@@ -98,7 +98,7 @@ class NotificationService {
     try {
       final notificationData = await _apiService.insert('notifications', {
         'user_id': userId,
-        'type': type.toString().split('.').last,
+        'type': type,
         'title': title,
         'body': body,
         'data': data,
@@ -115,7 +115,7 @@ class NotificationService {
   // Send notification to multiple users
   Future<void> sendBulkNotification({
     required List<String> userIds,
-    required NotificationType type,
+    required String type,
     required String title,
     required String body,
     Map<String, dynamic>? data,
