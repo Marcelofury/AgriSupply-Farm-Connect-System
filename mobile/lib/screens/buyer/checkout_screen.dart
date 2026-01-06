@@ -78,34 +78,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      final result = await orderProvider.createOrder(
+      final deliveryFee = _calculateDeliveryFee();
+      final order = await orderProvider.createOrder(
         buyerId: authProvider.currentUser!.id,
-        buyerName: authProvider.currentUser!.fullName,
-        buyerPhone: _phoneController.text.trim(),
-        items: cartProvider.items,
-        subtotal: cartProvider.subtotal,
-        deliveryFee: _calculateDeliveryFee(),
+        deliveryAddress: '${_addressController.text.trim()}, $_selectedDistrict, $_selectedRegion',
         paymentMethod: _selectedPaymentMethod,
-        deliveryAddress: _addressController.text.trim(),
-        deliveryRegion: _selectedRegion,
-        deliveryDistrict: _selectedDistrict,
-        deliveryNotes: _notesController.text.trim(),
+        items: cartProvider.toOrderItems(),
+        subtotal: cartProvider.subtotal,
+        deliveryFee: deliveryFee,
+        total: cartProvider.subtotal + deliveryFee,
+        notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
       );
 
       if (!mounted) return;
 
-      if (result.success) {
+      if (order != null) {
         cartProvider.clearCart();
         
         if (_selectedPaymentMethod == PaymentMethod.mobileMoney) {
           // Navigate to payment screen
-          _showPaymentDialog(result.orderId!);
+          _showPaymentDialog(order.id);
         } else {
           // Cash on delivery - go to success
-          _showSuccessDialog(result.orderId!);
+          _showSuccessDialog(order.id);
         }
       } else {
-        _showError(result.message ?? 'Failed to place order');
+        _showError(orderProvider.errorMessage ?? 'Failed to place order');
       }
     } catch (e) {
       _showError('An unexpected error occurred');

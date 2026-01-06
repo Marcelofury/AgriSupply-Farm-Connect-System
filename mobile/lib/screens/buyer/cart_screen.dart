@@ -5,7 +5,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../providers/cart_provider.dart';
-import '../../models/cart_model.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/quantity_selector.dart';
 
@@ -90,14 +89,14 @@ class CartScreen extends StatelessWidget {
 
   Widget _buildCartContent(BuildContext context, CartProvider cartProvider) {
     final items = cartProvider.items;
-    final farmerIds = cartProvider.farmerIds;
+    final farmerIds = cartProvider.farmerIds.toList();
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 200),
       itemCount: farmerIds.length,
       itemBuilder: (context, index) {
         final farmerId = farmerIds[index];
-        final farmerItems = items.where((item) => item.farmerId == farmerId).toList();
+        final farmerItems = items.where((item) => item.product.farmerId == farmerId).toList();
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +109,7 @@ class CartScreen extends StatelessWidget {
                   const Icon(Icons.store, size: 20, color: AppColors.primaryGreen),
                   const SizedBox(width: 8),
                   Text(
-                    farmerItems.first.farmerName,
+                    farmerItems.first.product.farmerName,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -128,7 +127,8 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, CartItem item, CartProvider cartProvider) {
+  Widget _buildCartItem(BuildContext context, dynamic item, CartProvider cartProvider) {
+    final product = item.product;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -148,9 +148,9 @@ class CartScreen extends StatelessWidget {
           // Product Image
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: item.productImage != null
+            child: product.primaryImage != null
                 ? CachedNetworkImage(
-                    imageUrl: item.productImage!,
+                    imageUrl: product.primaryImage!,
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
@@ -177,14 +177,14 @@ class CartScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.productName,
+                  product.name,
                   style: Theme.of(context).textTheme.titleMedium,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'UGX ${item.price.toStringAsFixed(0)} / ${item.unit}',
+                  'UGX ${product.price.toStringAsFixed(0)} / ${product.unit}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.grey600,
                       ),
@@ -201,7 +201,7 @@ class CartScreen extends StatelessWidget {
                           onPressed: () {
                             if (item.quantity > 1) {
                               cartProvider.updateQuantity(
-                                item.productId,
+                                product.id,
                                 item.quantity - 1,
                               );
                             }
@@ -210,16 +210,16 @@ class CartScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
-                            '${item.quantity.toStringAsFixed(0)} ${item.unit}',
+                            '${item.quantity} ${product.unit}',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
                         _buildQuantityButton(
                           icon: Icons.add,
                           onPressed: () {
-                            if (item.quantity < item.availableQuantity) {
+                            if (item.quantity < product.availableQuantity) {
                               cartProvider.updateQuantity(
-                                item.productId,
+                                product.id,
                                 item.quantity + 1,
                               );
                             }
@@ -243,7 +243,7 @@ class CartScreen extends StatelessWidget {
           // Delete Button
           IconButton(
             icon: const Icon(Icons.delete_outline, color: AppColors.error),
-            onPressed: () => cartProvider.removeItem(item.productId),
+            onPressed: () => cartProvider.removeItem(product.id),
           ),
         ],
       ),

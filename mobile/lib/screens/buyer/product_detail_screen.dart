@@ -22,7 +22,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
-  double _quantity = 1;
+  int _quantity = 1;
   bool _isLoading = true;
   ProductModel? _product;
 
@@ -443,7 +443,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         QuantitySelector(
           quantity: _quantity,
           unit: _product!.unit,
-          maxQuantity: _product!.availableQuantity,
+          maxQuantity: _product!.availableQuantity.toInt(),
           onChanged: (value) {
             setState(() => _quantity = value);
           },
