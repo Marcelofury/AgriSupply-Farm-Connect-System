@@ -29,6 +29,7 @@ class OrderProvider extends ChangeNotifier {
 
   // Getters
   OrdersStatus get status => _status;
+  List<OrderModel> get orders => [..._buyerOrders, ..._farmerOrders, ..._allOrders];
   List<OrderModel> get buyerOrders => _buyerOrders;
   List<OrderModel> get farmerOrders => _farmerOrders;
   List<OrderModel> get allOrders => _allOrders;
@@ -110,6 +111,29 @@ class OrderProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  // Get order by ID from local lists or fetch from service
+  Future<OrderModel?> getOrderById(String orderId) async {
+    // First check local lists
+    OrderModel? order = _buyerOrders.where((o) => o.id == orderId).firstOrNull;
+    order ??= _farmerOrders.where((o) => o.id == orderId).firstOrNull;
+    order ??= _allOrders.where((o) => o.id == orderId).firstOrNull;
+    
+    if (order != null) return order;
+    
+    // If not found locally, fetch from service
+    try {
+      return await _orderService.getOrderById(orderId);
+    } catch (e) {
+      _errorMessage = e.toString();
+      return null;
+    }
+  }
+
+  // Load farmer orders (alias for fetchFarmerOrders)
+  Future<void> loadFarmerOrders(String farmerId) async {
+    await fetchFarmerOrders(farmerId);
   }
 
   // Create new order
@@ -321,7 +345,7 @@ class OrderProvider extends ChangeNotifier {
   // Filter orders by status
   List<OrderModel> getOrdersByStatus(
     List<OrderModel> orders,
-    OrderStatus status,
+    String status,
   ) {
     return orders.where((order) => order.status == status).toList();
   }
@@ -337,12 +361,12 @@ class OrderProvider extends ChangeNotifier {
   List<OrderModel> get activeBuyerOrders => _buyerOrders.where((order) =>
       order.status != OrderStatus.delivered &&
       order.status != OrderStatus.cancelled &&
-      order.status != OrderStatus.refunded).toList();
+      order.status != 'refunded').toList();
 
   List<OrderModel> get activeFarmerOrders => _farmerOrders.where((order) =>
       order.status != OrderStatus.delivered &&
       order.status != OrderStatus.cancelled &&
-      order.status != OrderStatus.refunded).toList();
+      order.status != 'refunded').toList();
 
   // Calculate statistics
   void _calculateBuyerStats() {

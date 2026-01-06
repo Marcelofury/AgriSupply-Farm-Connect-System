@@ -349,4 +349,42 @@ class ProductProvider extends ChangeNotifier {
   List<ProductModel> getFarmerProductsByStatus(ProductStatus status) {
     return _farmerProducts.where((p) => p.status == status).toList();
   }
+
+  // Get product by ID from local lists or fetch from service
+  Future<ProductModel?> getProductById(String productId) async {
+    // First check local lists
+    ProductModel? product = _products.where((p) => p.id == productId).firstOrNull;
+    product ??= _farmerProducts.where((p) => p.id == productId).firstOrNull;
+    product ??= _featuredProducts.where((p) => p.id == productId).firstOrNull;
+    
+    if (product != null) return product;
+    
+    // If not found locally, fetch from service
+    try {
+      return await _productService.getProductById(productId);
+    } catch (e) {
+      _errorMessage = e.toString();
+      return null;
+    }
+  }
+
+  // Load farmer products (alias for fetchFarmerProducts)
+  Future<void> loadFarmerProducts(String farmerId) async {
+    await fetchFarmerProducts(farmerId);
+  }
+
+  // Fetch products by category
+  Future<List<ProductModel>> fetchProductsByCategory(String category) async {
+    try {
+      final products = await _productService.getProducts(
+        page: 1,
+        pageSize: 50,
+        category: category,
+      );
+      return products;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return [];
+    }
+  }
 }
