@@ -222,6 +222,7 @@ class OrderStatus {
   static const String confirmed = 'confirmed';
   static const String processing = 'processing';
   static const String shipped = 'shipped';
+  static const String inTransit = 'in_transit';
   static const String delivered = 'delivered';
   static const String cancelled = 'cancelled';
 
@@ -230,6 +231,7 @@ class OrderStatus {
         confirmed,
         processing,
         shipped,
+        inTransit,
         delivered,
         cancelled,
       ];
