@@ -80,7 +80,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
 
       if (!mounted) return;
 
-      if (result.success) {
+      if (result) {
         setState(() => _isEditing = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -90,7 +90,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
           ),
         );
       } else {
-        _showError(result.message ?? 'Failed to update profile');
+        _showError('Failed to update profile. Please try again.');
       }
     } catch (e) {
       _showError('An unexpected error occurred');

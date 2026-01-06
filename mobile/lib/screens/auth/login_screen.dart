@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      if (result.success) {
+      if (result) {
         final userType = authProvider.currentUser?.userType ?? 'buyer';
 
         switch (userType) {
@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(context, AppRoutes.buyerHome);
         }
       } else {
-        _showError(result.message ?? 'Login failed. Please try again.');
+        _showError('Login failed. Please try again.');
       }
     } catch (e) {
       _showError('An unexpected error occurred. Please try again.');

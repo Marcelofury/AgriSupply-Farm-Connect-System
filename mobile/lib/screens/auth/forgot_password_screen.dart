@@ -39,10 +39,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       if (!mounted) return;
 
-      if (result.success) {
+      if (result) {
         setState(() => _emailSent = true);
       } else {
-        _showError(result.message ?? 'Failed to send reset email');
+        _showError('Failed to send reset email. Please try again.');
       }
     } catch (e) {
       _showError('An unexpected error occurred');
