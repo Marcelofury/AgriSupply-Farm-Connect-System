@@ -308,20 +308,7 @@ class OrderProvider extends ChangeNotifier {
     try {
       await _orderService.addRating(orderId, rating, review: review);
 
-      _updateOrderInList(_buyerOrders, orderId, (order) {
-        return order.copyWith(
-          rating: rating,
-          review: review,
-        );
-      });
-
-      if (_selectedOrder?.id == orderId) {
-        _selectedOrder = _selectedOrder!.copyWith(
-          rating: rating,
-          review: review,
-        );
-      }
-
+      // Rating is stored in the backend; just refresh local data if needed
       notifyListeners();
       return true;
     } catch (e) {
