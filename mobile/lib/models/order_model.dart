@@ -2,6 +2,7 @@ import 'product_model.dart';
 
 class OrderModel {
   final String id;
+  final String? orderNumber;
   final String buyerId;
   final String buyerName;
   final String? buyerPhone;
@@ -27,6 +28,7 @@ class OrderModel {
 
   OrderModel({
     required this.id,
+    this.orderNumber,
     required this.buyerId,
     required this.buyerName,
     this.buyerPhone,
@@ -54,13 +56,14 @@ class OrderModel {
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: json['id'] as String,
+      orderNumber: json['order_number'] as String?,
       buyerId: json['buyer_id'] as String,
       buyerName: json['buyer_name'] as String,
       buyerPhone: json['buyer_phone'] as String?,
       buyerAddress: json['buyer_address'] as String?,
-      items: (json['items'] as List<dynamic>)
-          .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      items: (json['items'] as List<dynamic>?)
+          ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
       subtotal: (json['subtotal'] as num).toDouble(),
       deliveryFee: (json['delivery_fee'] as num).toDouble(),
       totalAmount: (json['total_amount'] as num).toDouble(),
@@ -92,6 +95,7 @@ class OrderModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'order_number': orderNumber,
       'buyer_id': buyerId,
       'buyer_name': buyerName,
       'buyer_phone': buyerPhone,
