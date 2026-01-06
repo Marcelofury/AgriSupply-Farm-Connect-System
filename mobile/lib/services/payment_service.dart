@@ -73,20 +73,20 @@ class PaymentService {
           orderId: orderId,
           amount: amount,
           provider: 'mtn_mobile',
-          transactionId: response['transaction_id'],
+          transactionId: response['transaction_id'] as String?,
           status: 'pending',
         );
 
         return PaymentResult(
           success: true,
-          transactionId: response['transaction_id'],
+          transactionId: response['transaction_id'] as String?,
           message: 'Please confirm payment on your phone',
         );
       } else {
         return PaymentResult(
           success: false,
-          message: response['message'] ?? 'Payment failed',
-          errorCode: response['error_code'],
+          message: (response['message'] as String?) ?? 'Payment failed',
+          errorCode: response['error_code'] as String?,
         );
       }
     } catch (e) {
@@ -117,20 +117,20 @@ class PaymentService {
           orderId: orderId,
           amount: amount,
           provider: 'airtel_money',
-          transactionId: response['transaction_id'],
+          transactionId: response['transaction_id'] as String?,
           status: 'pending',
         );
 
         return PaymentResult(
           success: true,
-          transactionId: response['transaction_id'],
+          transactionId: response['transaction_id'] as String?,
           message: 'Please confirm payment on your phone',
         );
       } else {
         return PaymentResult(
           success: false,
-          message: response['message'] ?? 'Payment failed',
-          errorCode: response['error_code'],
+          message: (response['message'] as String?) ?? 'Payment failed',
+          errorCode: response['error_code'] as String?,
         );
       }
     } catch (e) {
@@ -159,19 +159,19 @@ class PaymentService {
           orderId: orderId,
           amount: amount,
           provider: 'card',
-          transactionId: response['reference'],
+          transactionId: response['reference'] as String?,
           status: 'pending',
         );
 
         return PaymentResult(
           success: true,
-          transactionId: response['reference'],
-          message: response['payment_url'], // Return URL for webview
+          transactionId: response['reference'] as String?,
+          message: response['payment_url'] as String?, // Return URL for webview
         );
       } else {
         return PaymentResult(
           success: false,
-          message: response['message'] ?? 'Card payment initialization failed',
+          message: (response['message'] as String?) ?? 'Card payment initialization failed',
         );
       }
     } catch (e) {
@@ -291,13 +291,13 @@ class PaymentService {
 
         return PaymentResult(
           success: true,
-          transactionId: response['refund_transaction_id'],
+          transactionId: response['refund_transaction_id'] as String?,
           message: 'Refund processed successfully',
         );
       } else {
         return PaymentResult(
           success: false,
-          message: response['message'] ?? 'Refund failed',
+          message: (response['message'] as String?) ?? 'Refund failed',
         );
       }
     } catch (e) {

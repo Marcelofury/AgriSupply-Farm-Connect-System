@@ -131,37 +131,36 @@ class _AddProductScreenState extends State<AddProductScreen> {
       final productProvider =
           Provider.of<ProductProvider>(context, listen: false);
 
-      final productData = {
-        'name': _nameController.text.trim(),
-        'description': _descriptionController.text.trim(),
-        'category': _selectedCategory,
-        'price': double.parse(_priceController.text.trim()),
-        'unit': _selectedUnit,
-        'quantity': double.parse(_quantityController.text.trim()),
-        'available_quantity': double.parse(_quantityController.text.trim()),
-        'is_organic': _isOrganic,
-        'harvest_date': _harvestDate.toIso8601String(),
-        'expiry_date': _expiryDate?.toIso8601String(),
-        'farmer_id': authProvider.currentUser!.id,
-      };
+      final now = DateTime.now();
+      final product = ProductModel(
+        id: _isEditing ? widget.productId! : '',
+        farmerId: authProvider.currentUser!.id,
+        farmerName: authProvider.currentUser!.fullName,
+        name: _nameController.text.trim(),
+        description: _descriptionController.text.trim(),
+        category: _selectedCategory,
+        price: double.parse(_priceController.text.trim()),
+        unit: _selectedUnit,
+        quantity: double.parse(_quantityController.text.trim()),
+        availableQuantity: double.parse(_quantityController.text.trim()),
+        images: _existingImages,
+        isOrganic: _isOrganic,
+        harvestDate: _harvestDate,
+        expiryDate: _expiryDate,
+        createdAt: _existingProduct?.createdAt ?? now,
+        updatedAt: now,
+      );
 
-      bool success;
+      dynamic result;
       if (_isEditing) {
-        success = await productProvider.updateProduct(
-          widget.productId!,
-          productData,
-          _selectedImages,
-          _existingImages,
-        );
+        result = await productProvider.updateProduct(product);
       } else {
-        success = await productProvider.createProduct(
-          productData,
-          _selectedImages,
-        );
+        result = await productProvider.createProduct(product);
       }
 
       if (!mounted) return;
 
+      final success = result != null && result != false;
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

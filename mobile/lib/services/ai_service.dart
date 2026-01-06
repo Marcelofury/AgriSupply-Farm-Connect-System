@@ -23,10 +23,10 @@ class AIMessage {
   };
 
   factory AIMessage.fromJson(Map<String, dynamic> json) => AIMessage(
-    role: json['role'],
-    content: json['content'],
-    timestamp: DateTime.parse(json['timestamp']),
-    imageUrl: json['image_url'],
+    role: json['role'] as String,
+    content: json['content'] as String,
+    timestamp: DateTime.parse(json['timestamp'] as String),
+    imageUrl: json['image_url'] as String?,
   );
 }
 
@@ -57,14 +57,14 @@ class ChatSession {
   };
 
   factory ChatSession.fromJson(Map<String, dynamic> json) => ChatSession(
-    id: json['id'],
-    userId: json['user_id'],
-    title: json['title'],
+    id: json['id'] as String,
+    userId: json['user_id'] as String,
+    title: json['title'] as String,
     messages: (json['messages'] as List? ?? [])
-        .map((m) => AIMessage.fromJson(m))
+        .map((m) => AIMessage.fromJson(m as Map<String, dynamic>))
         .toList(),
-    createdAt: DateTime.parse(json['created_at']),
-    updatedAt: DateTime.parse(json['updated_at']),
+    createdAt: DateTime.parse(json['created_at'] as String),
+    updatedAt: DateTime.parse(json['updated_at'] as String),
   );
 }
 

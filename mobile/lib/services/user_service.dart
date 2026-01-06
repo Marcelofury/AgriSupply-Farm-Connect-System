@@ -75,8 +75,8 @@ class UserService {
         queryParams: {'q': query},
       );
 
-      final List<dynamic> data = response['data'] ?? response;
-      return data.map((json) => UserModel.fromJson(json)).toList();
+      final List<dynamic> data = (response['data'] ?? response) as List<dynamic>;
+      return data.map((json) => UserModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to search users: $e');
     }
@@ -303,7 +303,7 @@ class UserService {
       );
 
       if (followers.isNotEmpty) {
-        await _apiService.deleteRecord('farmer_followers', followers[0]['id']);
+        await _apiService.deleteRecord('farmer_followers', followers[0]['id'] as String);
       }
     } catch (e) {
       throw Exception('Failed to unfollow farmer: $e');
@@ -345,7 +345,7 @@ class UserService {
       filters: {'farmer_id': userId},
     );
     for (final product in products) {
-      await _apiService.deleteRecord('products', product['id']);
+      await _apiService.deleteRecord('products', product['id'] as String);
     }
 
     // Delete notifications
@@ -354,7 +354,7 @@ class UserService {
       filters: {'user_id': userId},
     );
     for (final notification in notifications) {
-      await _apiService.deleteRecord('notifications', notification['id']);
+      await _apiService.deleteRecord('notifications', notification['id'] as String);
     }
 
     // Delete chat sessions
@@ -363,7 +363,7 @@ class UserService {
       filters: {'user_id': userId},
     );
     for (final session in sessions) {
-      await _apiService.deleteRecord('ai_chat_sessions', session['id']);
+      await _apiService.deleteRecord('ai_chat_sessions', session['id'] as String);
     }
   }
 

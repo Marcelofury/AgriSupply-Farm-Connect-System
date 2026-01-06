@@ -323,7 +323,7 @@ class OrderService {
       if (endDate != null) params['end_date'] = endDate.toIso8601String();
 
       final response = await _apiService.get('/orders/stats', queryParams: params);
-      return response;
+      return response as Map<String, dynamic>;
     } catch (e) {
       throw Exception('Failed to fetch order stats: $e');
     }
@@ -341,7 +341,7 @@ class OrderService {
     final Map<String, List<Map<String, dynamic>>> farmerItems = {};
     
     for (final item in items) {
-      final farmerId = item['farmer_id'];
+      final farmerId = item['farmer_id'] as String;
       if (farmerItems.containsKey(farmerId)) {
         farmerItems[farmerId]!.add(item);
       } else {

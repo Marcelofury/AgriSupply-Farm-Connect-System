@@ -146,7 +146,7 @@ class ApiService {
     try {
       final response = await _supabase.storage.from(bucket).uploadBinary(
         path,
-        fileBytes as dynamic,
+        fileBytes is Uint8List ? fileBytes : Uint8List.fromList(fileBytes),
         fileOptions: FileOptions(
           contentType: contentType ?? 'application/octet-stream',
         ),

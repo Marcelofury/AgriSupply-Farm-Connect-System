@@ -205,7 +205,7 @@ class ProductService {
   Future<Map<String, int>> getCategoryCounts() async {
     try {
       final response = await _apiService.get('/products/categories');
-      return Map<String, int>.from(response);
+      return Map<String, int>.from(response as Map);
     } catch (e) {
       throw Exception('Failed to fetch category counts: $e');
     }
