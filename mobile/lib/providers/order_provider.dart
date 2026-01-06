@@ -176,7 +176,7 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Update order status (for farmer)
-  Future<bool> updateOrderStatus(String orderId, OrderStatus newStatus) async {
+  Future<bool> updateOrderStatus(String orderId, String newStatus) async {
     _errorMessage = null;
 
     try {
@@ -186,13 +186,6 @@ class OrderProvider extends ChangeNotifier {
       _updateOrderInList(_farmerOrders, orderId, (order) {
         return order.copyWith(
           status: newStatus,
-          statusHistory: [
-            ...order.statusHistory,
-            OrderStatusHistory(
-              status: newStatus,
-              timestamp: DateTime.now(),
-            ),
-          ],
         );
       });
 
@@ -234,7 +227,6 @@ class OrderProvider extends ChangeNotifier {
       _updateOrderInList(_farmerOrders, orderId, (order) {
         return order.copyWith(
           status: OrderStatus.shipped,
-          trackingNumber: trackingNumber,
         );
       });
 
@@ -263,21 +255,18 @@ class OrderProvider extends ChangeNotifier {
       _updateOrderInList(_buyerOrders, orderId, (order) {
         return order.copyWith(
           status: OrderStatus.cancelled,
-          cancellationReason: reason,
         );
       });
 
       _updateOrderInList(_farmerOrders, orderId, (order) {
         return order.copyWith(
           status: OrderStatus.cancelled,
-          cancellationReason: reason,
         );
       });
 
       if (_selectedOrder?.id == orderId) {
         _selectedOrder = _selectedOrder!.copyWith(
           status: OrderStatus.cancelled,
-          cancellationReason: reason,
         );
       }
 
