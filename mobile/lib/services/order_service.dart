@@ -362,40 +362,33 @@ class OrderService {
     }
   }
 
-  Future<void> _notifyBuyerStatusChange(String orderId, OrderStatus status) async {
+  Future<void> _notifyBuyerStatusChange(String orderId, String status) async {
     try {
       final order = await getOrderById(orderId);
       
       String title;
       String body;
 
-      switch (status) {
-        case OrderStatus.confirmed:
-          title = 'Order Confirmed';
-          body = 'Your order #${order.orderNumber} has been confirmed by the farmer';
-          break;
-        case OrderStatus.processing:
-          title = 'Order Processing';
-          body = 'Your order #${order.orderNumber} is being prepared';
-          break;
-        case OrderStatus.shipped:
-          title = 'Order Shipped';
-          body = 'Your order #${order.orderNumber} has been shipped';
-          break;
-        case OrderStatus.inTransit:
-          title = 'Order In Transit';
-          body = 'Your order #${order.orderNumber} is on the way';
-          break;
-        case OrderStatus.delivered:
-          title = 'Order Delivered';
-          body = 'Your order #${order.orderNumber} has been delivered';
-          break;
-        case OrderStatus.cancelled:
-          title = 'Order Cancelled';
-          body = 'Your order #${order.orderNumber} has been cancelled';
-          break;
-        default:
-          return;
+      if (status == OrderStatus.confirmed) {
+        title = 'Order Confirmed';
+        body = 'Your order #${order.orderNumber} has been confirmed by the farmer';
+      } else if (status == OrderStatus.processing) {
+        title = 'Order Processing';
+        body = 'Your order #${order.orderNumber} is being prepared';
+      } else if (status == OrderStatus.shipped) {
+        title = 'Order Shipped';
+        body = 'Your order #${order.orderNumber} has been shipped';
+      } else if (status == OrderStatus.inTransit) {
+        title = 'Order In Transit';
+        body = 'Your order #${order.orderNumber} is on the way';
+      } else if (status == OrderStatus.delivered) {
+        title = 'Order Delivered';
+        body = 'Your order #${order.orderNumber} has been delivered';
+      } else if (status == OrderStatus.cancelled) {
+        title = 'Order Cancelled';
+        body = 'Your order #${order.orderNumber} has been cancelled';
+      } else {
+        return;
       }
 
       await _apiService.insert('notifications', {
