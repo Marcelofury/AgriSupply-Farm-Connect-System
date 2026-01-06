@@ -273,7 +273,7 @@ class OrderService {
   }) async {
     try {
       final updates = <String, dynamic>{
-        'payment_status': status.toString().split('.').last,
+        'payment_status': status,
         'updated_at': DateTime.now().toIso8601String(),
       };
 
@@ -281,7 +281,7 @@ class OrderService {
         updates['transaction_id'] = transactionId;
       }
 
-      if (status == PaymentStatus.completed) {
+      if (status == PaymentStatus.paid) {
         updates['paid_at'] = DateTime.now().toIso8601String();
       }
 
