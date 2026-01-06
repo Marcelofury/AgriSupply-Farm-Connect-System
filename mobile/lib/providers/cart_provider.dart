@@ -43,7 +43,12 @@ class CartProvider extends ChangeNotifier {
     return grouped;
   }
 
-  void addItem(ProductModel product, {int quantity = 1}) {
+  // Get unique farmer IDs from cart items
+  Set<String> get farmerIds {
+    return _items.map((item) => item.product.farmerId).toSet();
+  }
+
+  void addItem(ProductModel product, [int quantity = 1]) {
     final existingIndex = _items.indexWhere(
       (item) => item.product.id == product.id,
     );
@@ -160,6 +165,11 @@ class CartProvider extends ChangeNotifier {
     _deliveryNotes = null;
     _deliveryFee = 5000;
     notifyListeners();
+  }
+
+  // Alias for clear() - clears all cart items
+  void clearCart() {
+    clear();
   }
 
   // Calculate delivery fee based on region
