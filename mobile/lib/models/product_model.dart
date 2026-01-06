@@ -115,6 +115,9 @@ class ProductModel {
     };
   }
 
+  // Alias for farmerImage for backward compatibility
+  String? get farmerPhoto => farmerImage;
+
   ProductModel copyWith({
     String? id,
     String? farmerId,
