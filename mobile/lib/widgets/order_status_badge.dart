@@ -263,7 +263,7 @@ class OrderStatusTimeline extends StatelessWidget {
 }
 
 class _TimelineItem extends StatelessWidget {
-  final OrderStatus status;
+  final String status;
   final bool isCompleted;
   final bool isCurrent;
   final bool isLast;
@@ -364,56 +364,55 @@ class _TimelineItem extends StatelessWidget {
   }
 
   _StatusInfoExtended _getStatusInfo() {
-    switch (status) {
-      case OrderStatus.pending:
-        return _StatusInfoExtended(
-          label: 'Order Placed',
-          color: AppColors.warning,
-          icon: Icons.receipt_long,
-          description: 'Your order has been placed and is awaiting confirmation',
-        );
-      case OrderStatus.confirmed:
-        return _StatusInfoExtended(
-          label: 'Order Confirmed',
-          color: AppColors.info,
-          icon: Icons.check_circle_outline,
-          description: 'The farmer has confirmed your order',
-        );
-      case OrderStatus.processing:
-        return _StatusInfoExtended(
-          label: 'Processing',
-          color: AppColors.secondaryOrange,
-          icon: Icons.inventory,
-          description: 'Your order is being prepared for shipping',
-        );
-      case OrderStatus.shipped:
-        return _StatusInfoExtended(
-          label: 'Shipped',
-          color: AppColors.primaryGreen,
-          icon: Icons.local_shipping,
-          description: 'Your order has been shipped',
-        );
-      case OrderStatus.inTransit:
-        return _StatusInfoExtended(
-          label: 'In Transit',
-          color: AppColors.primaryGreen,
-          icon: Icons.delivery_dining,
-          description: 'Your order is on the way to the delivery address',
-        );
-      case OrderStatus.delivered:
-        return _StatusInfoExtended(
-          label: 'Delivered',
-          color: AppColors.success,
-          icon: Icons.check_circle,
-          description: 'Your order has been delivered successfully',
-        );
-      default:
-        return _StatusInfoExtended(
-          label: 'Unknown',
-          color: AppColors.grey400,
-          icon: Icons.help_outline,
-          description: '',
-        );
+    if (status == OrderStatus.pending) {
+      return _StatusInfoExtended(
+        label: 'Order Placed',
+        color: AppColors.warning,
+        icon: Icons.receipt_long,
+        description: 'Your order has been placed and is awaiting confirmation',
+      );
+    } else if (status == OrderStatus.confirmed) {
+      return _StatusInfoExtended(
+        label: 'Order Confirmed',
+        color: AppColors.info,
+        icon: Icons.check_circle_outline,
+        description: 'The farmer has confirmed your order',
+      );
+    } else if (status == OrderStatus.processing) {
+      return _StatusInfoExtended(
+        label: 'Processing',
+        color: AppColors.secondaryOrange,
+        icon: Icons.inventory,
+        description: 'Your order is being prepared for shipping',
+      );
+    } else if (status == OrderStatus.shipped) {
+      return _StatusInfoExtended(
+        label: 'Shipped',
+        color: AppColors.primaryGreen,
+        icon: Icons.local_shipping,
+        description: 'Your order has been shipped',
+      );
+    } else if (status == OrderStatus.inTransit) {
+      return _StatusInfoExtended(
+        label: 'In Transit',
+        color: AppColors.primaryGreen,
+        icon: Icons.delivery_dining,
+        description: 'Your order is on the way to the delivery address',
+      );
+    } else if (status == OrderStatus.delivered) {
+      return _StatusInfoExtended(
+        label: 'Delivered',
+        color: AppColors.success,
+        icon: Icons.check_circle,
+        description: 'Your order has been delivered successfully',
+      );
+    } else {
+      return _StatusInfoExtended(
+        label: 'Unknown',
+        color: AppColors.grey400,
+        icon: Icons.help_outline,
+        description: '',
+      );
     }
   }
 

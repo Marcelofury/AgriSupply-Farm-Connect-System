@@ -244,7 +244,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Update product status
-  Future<bool> updateProductStatus(String productId, ProductStatus status) async {
+  Future<bool> updateProductStatus(String productId, String status) async {
     _errorMessage = null;
 
     try {
@@ -346,7 +346,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Get filtered farmer products by status
-  List<ProductModel> getFarmerProductsByStatus(ProductStatus status) {
+  List<ProductModel> getFarmerProductsByStatus(String status) {
     return _farmerProducts.where((p) => p.status == status).toList();
   }
 

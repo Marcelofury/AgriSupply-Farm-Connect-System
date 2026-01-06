@@ -42,7 +42,7 @@ class ReviewModel {
       buyerImage: json['buyer_image'] as String?,
       rating: (json['rating'] as num).toDouble(),
       comment: json['comment'] as String?,
-      images: json['images'] != null ? List<String>.from(json['images']) : null,
+      images: json['images'] != null ? (json['images'] as List).cast<String>() : null,
       farmerReply: json['farmer_reply'] as String?,
       replyAt: json['reply_at'] != null
           ? DateTime.parse(json['reply_at'] as String)

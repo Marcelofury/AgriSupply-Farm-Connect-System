@@ -78,7 +78,9 @@ class NotificationType {
   static const String ai = 'ai';
   static const String orderUpdate = 'order_update';
   static const String farmingTip = 'farming_tip';
+  static const String delivery = 'delivery';
+  static const String message = 'message';
 
   static List<String> get all =>
-      [order, product, payment, promotion, system, review, ai, orderUpdate, farmingTip];
+      [order, product, payment, promotion, system, review, ai, orderUpdate, farmingTip, delivery, message];
 }

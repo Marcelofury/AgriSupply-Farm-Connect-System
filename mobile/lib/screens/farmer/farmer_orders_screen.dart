@@ -443,7 +443,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          order.deliveryAddress?.district ?? 'Unknown',
+                          order.deliveryAddress ?? 'Unknown',
                           style: const TextStyle(
                             color: AppColors.grey600,
                             fontSize: 13,

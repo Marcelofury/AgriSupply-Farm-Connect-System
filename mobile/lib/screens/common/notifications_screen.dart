@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../../config/theme.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../models/notification_model.dart';
 import '../../widgets/loading_overlay.dart';
@@ -28,7 +29,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     try {
       final notificationProvider =
           Provider.of<NotificationProvider>(context, listen: false);
-      await notificationProvider.loadNotifications();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.currentUser?.id;
+      if (userId != null) {
+        await notificationProvider.fetchNotifications(userId);
+      }
     } catch (e) {
       // Handle error
     } finally {
@@ -291,7 +296,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        notification.message,
+                        notification.body,
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.grey600,
@@ -383,18 +388,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     // Navigate based on notification type
-    if (notification.actionUrl != null) {
+    final actionUrl = notification.data?['action_url'] as String?;
+    if (actionUrl != null) {
       // Navigate to specific screen
-      Navigator.pushNamed(context, notification.actionUrl!);
+      Navigator.pushNamed(context, actionUrl);
     }
   }
 
   void _handleMenuAction(String action) async {
     final provider = Provider.of<NotificationProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.currentUser?.id ?? '';
 
     switch (action) {
       case 'read_all':
-        await provider.markAllAsRead();
+        await provider.markAllAsRead(userId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -430,7 +438,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Navigator.pop(context);
               final provider =
                   Provider.of<NotificationProvider>(context, listen: false);
-              await provider.clearAll();
+              final authProvider =
+                  Provider.of<AuthProvider>(context, listen: false);
+              final userId = authProvider.currentUser?.id ?? '';
+              await provider.clearAllNotifications(userId);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(

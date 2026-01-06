@@ -33,9 +33,9 @@ class ProductService {
       params['sort'] = sortBy;
 
       final response = await _apiService.get('/products', queryParams: params);
-      final List<dynamic> data = response['data'] ?? response;
+      final List<dynamic> data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json)).toList();
+      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to fetch products: $e');
     }
@@ -45,9 +45,9 @@ class ProductService {
   Future<List<ProductModel>> getFeaturedProducts() async {
     try {
       final response = await _apiService.get('/products/featured');
-      final List<dynamic> data = response['data'] ?? response;
+      final List<dynamic> data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json)).toList();
+      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to fetch featured products: $e');
     }
@@ -89,9 +89,9 @@ class ProductService {
         '/products/search',
         queryParams: {'q': query},
       );
-      final List<dynamic> data = response['data'] ?? response;
+      final List<dynamic> data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json)).toList();
+      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to search products: $e');
     }
@@ -252,9 +252,9 @@ class ProductService {
         '/products/$productId/similar',
         queryParams: {'category': category, 'limit': '6'},
       );
-      final List<dynamic> data = response['data'] ?? response;
+      final List<dynamic> data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json)).toList();
+      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to fetch similar products: $e');
     }

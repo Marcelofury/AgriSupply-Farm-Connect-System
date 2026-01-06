@@ -57,17 +57,29 @@ class _SearchScreenState extends State<SearchScreen> {
 
     try {
       final productProvider = Provider.of<ProductProvider>(context, listen: false);
-      final results = await productProvider.searchProducts(
-        query: query,
-        category: _selectedCategory,
-        region: _selectedRegion == 'All Regions' ? null : _selectedRegion,
-        minPrice: _minPrice > 0 ? _minPrice : null,
-        maxPrice: _maxPrice < 100000 ? _maxPrice : null,
-        organicOnly: _organicOnly,
-        sortBy: _sortBy,
-      );
-
-      setState(() => _searchResults = results);
+      
+      // Set filters on the provider
+      if (_selectedCategory != null) {
+        productProvider.setCategory(_selectedCategory);
+      }
+      if (_selectedRegion != null && _selectedRegion != 'All Regions') {
+        productProvider.setRegion(_selectedRegion);
+      }
+      if (_minPrice > 0 || _maxPrice < 100000) {
+        productProvider.setPriceRange(
+          _minPrice > 0 ? _minPrice : null,
+          _maxPrice < 100000 ? _maxPrice : null,
+        );
+      }
+      if (_organicOnly) {
+        productProvider.setOrganicOnly(true);
+      }
+      productProvider.setSortBy(_sortBy);
+      
+      // Perform search
+      await productProvider.searchProducts(query);
+      
+      setState(() => _searchResults = productProvider.searchResults);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

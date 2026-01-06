@@ -52,7 +52,7 @@ class NotificationService {
 
       // Update each notification
       for (final notification in notifications) {
-        await _apiService.update('notifications', notification['id'], {
+        await _apiService.update('notifications', notification['id'] as String, {
           'is_read': true,
           'read_at': DateTime.now().toIso8601String(),
         });
@@ -80,7 +80,7 @@ class NotificationService {
       );
 
       for (final notification in notifications) {
-        await _apiService.deleteRecord('notifications', notification['id']);
+        await _apiService.deleteRecord('notifications', notification['id'] as String);
       }
     } catch (e) {
       throw Exception('Failed to clear notifications: $e');
@@ -174,11 +174,11 @@ class NotificationService {
       
       if (data != null) {
         return {
-          'order_updates': data['order_updates'] ?? true,
-          'new_messages': data['new_messages'] ?? true,
-          'promotions': data['promotions'] ?? true,
-          'price_alerts': data['price_alerts'] ?? true,
-          'farming_tips': data['farming_tips'] ?? true,
+          'order_updates': (data['order_updates'] as bool?) ?? true,
+          'new_messages': (data['new_messages'] as bool?) ?? true,
+          'promotions': (data['promotions'] as bool?) ?? true,
+          'price_alerts': (data['price_alerts'] as bool?) ?? true,
+          'farming_tips': (data['farming_tips'] as bool?) ?? true,
         };
       }
 

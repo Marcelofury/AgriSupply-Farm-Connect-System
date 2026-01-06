@@ -22,8 +22,8 @@ import '../screens/farmer/ai_assistant_screen.dart';
 import '../screens/farmer/premium_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/user_management_screen.dart';
-import '../screens/admin/product_management_screen.dart';
-import '../screens/admin/order_management_screen.dart';
+// import '../screens/admin/product_management_screen.dart'; // TODO: Create this file
+// import '../screens/admin/order_management_screen.dart'; // TODO: Create this file
 import '../screens/admin/analytics_screen.dart';
 import '../screens/notifications_screen.dart';
 
@@ -90,14 +90,14 @@ class AppRoutes {
       case buyerHome:
         return _buildRoute(const BuyerHomeScreen(), settings);
       case productDetail:
-        final productId = settings.arguments as String;
+        final productId = settings.arguments?.toString() ?? '';
         return _buildRoute(ProductDetailScreen(productId: productId), settings);
       case cart:
         return _buildRoute(const CartScreen(), settings);
       case checkout:
         return _buildRoute(const CheckoutScreen(), settings);
       case orderTracking:
-        final orderId = settings.arguments as String;
+        final orderId = settings.arguments?.toString() ?? '';
         return _buildRoute(OrderTrackingScreen(orderId: orderId), settings);
       case buyerOrders:
         return _buildRoute(const BuyerOrdersScreen(), settings);
@@ -112,7 +112,7 @@ class AppRoutes {
       case addProduct:
         return _buildRoute(const AddProductScreen(), settings);
       case editProduct:
-        final productId = settings.arguments as String;
+        final productId = settings.arguments?.toString() ?? '';
         return _buildRoute(AddProductScreen(productId: productId), settings);
       case farmerOrders:
         return _buildRoute(const FarmerOrdersScreen(), settings);
@@ -131,9 +131,11 @@ class AppRoutes {
       case userManagement:
         return _buildRoute(const UserManagementScreen(), settings);
       case productManagement:
-        return _buildRoute(const ProductManagementScreen(), settings);
+        // TODO: Create ProductManagementScreen
+        return _buildRoute(const Scaffold(body: Center(child: Text('Product Management - Coming Soon'))), settings);
       case orderManagement:
-        return _buildRoute(const OrderManagementScreen(), settings);
+        // TODO: Create OrderManagementScreen
+        return _buildRoute(const Scaffold(body: Center(child: Text('Order Management - Coming Soon'))), settings);
       case analytics:
         return _buildRoute(const AnalyticsScreen(), settings);
 

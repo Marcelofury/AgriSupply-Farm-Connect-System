@@ -71,7 +71,7 @@ class ProductModel {
       unit: json['unit'] as String,
       quantity: (json['quantity'] as num).toDouble(),
       availableQuantity: (json['available_quantity'] as num).toDouble(),
-      images: List<String>.from(json['images'] ?? []),
+      images: (json['images'] as List?)?.cast<String>() ?? [],
       region: json['region'] as String?,
       district: json['district'] as String?,
       isOrganic: json['is_organic'] as bool? ?? false,
@@ -190,6 +190,27 @@ class ProductModel {
   String get displayPrice => 'UGX ${price.toStringAsFixed(0)}/$unit';
   bool get isAvailable => availableQuantity > 0 && isActive;
   String get primaryImage => images.isNotEmpty ? images.first : '';
+
+  /// Creates an empty ProductModel for use as a default value
+  factory ProductModel.empty() {
+    final now = DateTime.now();
+    return ProductModel(
+      id: '',
+      farmerId: '',
+      farmerName: '',
+      name: '',
+      description: '',
+      category: '',
+      price: 0,
+      unit: 'kg',
+      quantity: 0,
+      availableQuantity: 0,
+      images: [],
+      harvestDate: now,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
 }
 
 class ProductCategory {

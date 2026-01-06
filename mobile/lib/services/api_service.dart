@@ -183,7 +183,7 @@ class ApiService {
     int? offset,
   }) async {
     try {
-      var query = _supabase.from(table).select(select ?? '*');
+      dynamic query = _supabase.from(table).select(select ?? '*');
 
       // Apply filters
       if (filters != null) {
@@ -209,7 +209,7 @@ class ApiService {
       }
 
       final response = await query;
-      return List<Map<String, dynamic>>.from(response);
+      return List<Map<String, dynamic>>.from(response as List);
     } catch (e) {
       throw ApiException('Query failed: ${e.toString()}');
     }
