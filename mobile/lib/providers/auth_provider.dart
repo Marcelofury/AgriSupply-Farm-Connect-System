@@ -90,7 +90,7 @@ class AuthProvider extends ChangeNotifier {
     required String password,
     required String fullName,
     required String phone,
-    required UserRole role,
+    required String role,
     String? farmName,
     String? region,
     String? district,

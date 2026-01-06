@@ -71,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         fullName: _fullNameController.text.trim(),
         phone: _phoneController.text.trim(),
-        userType: _selectedUserType,
+        role: _selectedUserType,
       );
 
       if (!mounted) return;
