@@ -130,17 +130,17 @@ class OrderService {
   }
 
   // Update order status
-  Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
+  Future<void> updateOrderStatus(String orderId, String status) async {
     try {
       await _apiService.update('orders', orderId, {
-        'status': status.toString().split('.').last,
+        'status': status,
         'updated_at': DateTime.now().toIso8601String(),
       });
 
       // Add to status history
       await _apiService.insert('order_status_history', {
         'order_id': orderId,
-        'status': status.toString().split('.').last,
+        'status': status,
         'created_at': DateTime.now().toIso8601String(),
       });
 
