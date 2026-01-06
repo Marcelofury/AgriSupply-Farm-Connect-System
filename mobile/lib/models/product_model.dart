@@ -78,9 +78,10 @@ class ProductModel {
       isFeatured: json['is_featured'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
       harvestDate: DateTime.parse(json['harvest_date'] as String),
-      expiryDate: json['expiry_date'] != null
-          ? DateTime.parse(json['expiry_date'] as String)
-          : null,
+      expiryDate:
+          json['expiry_date'] != null
+              ? DateTime.parse(json['expiry_date'] as String)
+              : null,
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       totalRatings: json['total_ratings'] as int? ?? 0,
       totalSold: json['total_sold'] as int? ?? 0,
@@ -208,21 +209,21 @@ class ProductCategory {
   static const String other = 'Other';
 
   static List<String> get all => [
-        vegetables,
-        fruits,
-        grains,
-        legumes,
-        tubers,
-        dairy,
-        poultry,
-        meat,
-        fish,
-        herbs,
-        nuts,
-        honey,
-        beverages,
-        other,
-      ];
+    vegetables,
+    fruits,
+    grains,
+    legumes,
+    tubers,
+    dairy,
+    poultry,
+    meat,
+    fish,
+    herbs,
+    nuts,
+    honey,
+    beverages,
+    other,
+  ];
 
   static String getIcon(String category) {
     switch (category) {
@@ -271,17 +272,17 @@ class ProductUnit {
   static const String tray = 'tray';
 
   static List<String> get all => [
-        kg,
-        gram,
-        piece,
-        bunch,
-        basket,
-        bag,
-        crate,
-        liter,
-        dozen,
-        tray,
-      ];
+    kg,
+    gram,
+    piece,
+    bunch,
+    basket,
+    bag,
+    crate,
+    liter,
+    dozen,
+    tray,
+  ];
 }
 
 class ProductStatus {
@@ -292,10 +293,10 @@ class ProductStatus {
   static const String rejected = 'rejected';
 
   static List<String> get all => [
-        active,
-        inactive,
-        outOfStock,
-        pending,
-        rejected,
-      ];
+    active,
+    inactive,
+    outOfStock,
+    pending,
+    rejected,
+  ];
 }
