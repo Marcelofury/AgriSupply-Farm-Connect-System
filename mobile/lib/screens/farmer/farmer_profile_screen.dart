@@ -50,7 +50,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
 
   void _loadUserData() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    _user = authProvider.currentUser;
+    _user = authProvider.user;
 
     if (_user != null) {
       _nameController.text = _user!.fullName;
