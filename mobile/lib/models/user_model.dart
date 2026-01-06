@@ -5,9 +5,13 @@ class UserModel {
   final String fullName;
   final String userType; // 'farmer', 'buyer', 'admin'
   final String? profileImage;
+  final String? photoUrl;
   final String? address;
   final String? region;
   final String? district;
+  final String? farmName;
+  final String? farmDescription;
+  final String? bio;
   final double? latitude;
   final double? longitude;
   final bool isVerified;
@@ -15,6 +19,8 @@ class UserModel {
   final DateTime? premiumExpiresAt;
   final double rating;
   final int totalRatings;
+  final int? totalProducts;
+  final int? totalOrders;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -25,9 +31,13 @@ class UserModel {
     required this.fullName,
     required this.userType,
     this.profileImage,
+    this.photoUrl,
     this.address,
     this.region,
     this.district,
+    this.farmName,
+    this.farmDescription,
+    this.bio,
     this.latitude,
     this.longitude,
     this.isVerified = false,
@@ -35,6 +45,8 @@ class UserModel {
     this.premiumExpiresAt,
     this.rating = 0.0,
     this.totalRatings = 0,
+    this.totalProducts,
+    this.totalOrders,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -47,9 +59,13 @@ class UserModel {
       fullName: json['full_name'] as String,
       userType: json['user_type'] as String,
       profileImage: json['profile_image'] as String?,
+      photoUrl: json['photo_url'] as String? ?? json['profile_image'] as String?,
       address: json['address'] as String?,
       region: json['region'] as String?,
       district: json['district'] as String?,
+      farmName: json['farm_name'] as String?,
+      farmDescription: json['farm_description'] as String?,
+      bio: json['bio'] as String?,
       latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
       longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
       isVerified: json['is_verified'] as bool? ?? false,
@@ -59,6 +75,8 @@ class UserModel {
           : null,
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       totalRatings: json['total_ratings'] as int? ?? 0,
+      totalProducts: json['total_products'] as int?,
+      totalOrders: json['total_orders'] as int?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
@@ -72,9 +90,13 @@ class UserModel {
       'full_name': fullName,
       'user_type': userType,
       'profile_image': profileImage,
+      'photo_url': photoUrl,
       'address': address,
       'region': region,
       'district': district,
+      'farm_name': farmName,
+      'farm_description': farmDescription,
+      'bio': bio,
       'latitude': latitude,
       'longitude': longitude,
       'is_verified': isVerified,
@@ -82,6 +104,8 @@ class UserModel {
       'premium_expires_at': premiumExpiresAt?.toIso8601String(),
       'rating': rating,
       'total_ratings': totalRatings,
+      'total_products': totalProducts,
+      'total_orders': totalOrders,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -94,9 +118,13 @@ class UserModel {
     String? fullName,
     String? userType,
     String? profileImage,
+    String? photoUrl,
     String? address,
     String? region,
     String? district,
+    String? farmName,
+    String? farmDescription,
+    String? bio,
     double? latitude,
     double? longitude,
     bool? isVerified,
@@ -104,6 +132,8 @@ class UserModel {
     DateTime? premiumExpiresAt,
     double? rating,
     int? totalRatings,
+    int? totalProducts,
+    int? totalOrders,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -114,9 +144,13 @@ class UserModel {
       fullName: fullName ?? this.fullName,
       userType: userType ?? this.userType,
       profileImage: profileImage ?? this.profileImage,
+      photoUrl: photoUrl ?? this.photoUrl,
       address: address ?? this.address,
       region: region ?? this.region,
       district: district ?? this.district,
+      farmName: farmName ?? this.farmName,
+      farmDescription: farmDescription ?? this.farmDescription,
+      bio: bio ?? this.bio,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       isVerified: isVerified ?? this.isVerified,
@@ -124,6 +158,8 @@ class UserModel {
       premiumExpiresAt: premiumExpiresAt ?? this.premiumExpiresAt,
       rating: rating ?? this.rating,
       totalRatings: totalRatings ?? this.totalRatings,
+      totalProducts: totalProducts ?? this.totalProducts,
+      totalOrders: totalOrders ?? this.totalOrders,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -132,4 +168,11 @@ class UserModel {
   bool get isFarmer => userType == 'farmer';
   bool get isBuyer => userType == 'buyer';
   bool get isAdmin => userType == 'admin';
+}
+
+/// Enum for user types - can be used for type checking
+enum UserType {
+  farmer,
+  buyer,
+  admin,
 }
