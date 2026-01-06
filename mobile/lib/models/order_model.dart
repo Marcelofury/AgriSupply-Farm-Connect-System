@@ -302,6 +302,7 @@ class OrderStatus {
   static const String inTransit = 'in_transit';
   static const String delivered = 'delivered';
   static const String cancelled = 'cancelled';
+  static const String refunded = 'refunded';
 
   static List<String> get all => [
     pending,
@@ -311,16 +312,19 @@ class OrderStatus {
     inTransit,
     delivered,
     cancelled,
+    refunded,
   ];
 }
 
 class PaymentStatus {
   static const String pending = 'pending';
+  static const String processing = 'processing';
   static const String paid = 'paid';
+  static const String completed = 'completed';
   static const String failed = 'failed';
   static const String refunded = 'refunded';
 
-  static List<String> get all => [pending, paid, failed, refunded];
+  static List<String> get all => [pending, processing, paid, completed, failed, refunded];
 }
 
 class PaymentMethod {
