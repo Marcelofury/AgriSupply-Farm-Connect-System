@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -131,7 +132,7 @@ class ApiService {
     if (statusCode >= 200 && statusCode < 300) {
       return body;
     } else {
-      final message = body?['message'] ?? body?['error'] ?? 'Unknown error';
+      final message = (body?['message'] ?? body?['error'] ?? 'Unknown error') as String;
       throw ApiException(message, statusCode: statusCode);
     }
   }

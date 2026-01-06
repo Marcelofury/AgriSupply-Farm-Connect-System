@@ -274,7 +274,7 @@ conversation back to farming-related topics.
 
       return data.map((json) {
         if (json['messages'] is String) {
-          json['messages'] = jsonDecode(json['messages']);
+          json['messages'] = jsonDecode(json['messages'] as String);
         }
         return ChatSession.fromJson(json);
       }).toList();

@@ -249,7 +249,7 @@ class PaymentService {
         // Update order payment status
         final payment = await _getPaymentByTransactionId(transactionId);
         if (payment != null) {
-          await _apiService.update('orders', payment['order_id'], {
+          await _apiService.update('orders', payment['order_id'] as String, {
             'payment_status': 'completed',
             'paid_at': DateTime.now().toIso8601String(),
             'updated_at': DateTime.now().toIso8601String(),
@@ -352,7 +352,7 @@ class PaymentService {
       );
 
       if (payments.isNotEmpty) {
-        await _apiService.update('payments', payments[0]['id'], {
+        await _apiService.update('payments', payments[0]['id'] as String, {
           'status': status,
           'updated_at': DateTime.now().toIso8601String(),
         });

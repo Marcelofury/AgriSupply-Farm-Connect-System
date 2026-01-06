@@ -437,10 +437,10 @@ class OrderService {
       );
 
       for (final item in items) {
-        final product = await _apiService.getById('products', item['product_id']);
+        final product = await _apiService.getById('products', item['product_id'] as String);
         if (product != null) {
-          await _apiService.update('products', product['id'], {
-            'available_quantity': product['available_quantity'] + item['quantity'],
+          await _apiService.update('products', product['id'] as String, {
+            'available_quantity': (product['available_quantity'] as num) + (item['quantity'] as num),
             'status': 'active',
             'updated_at': DateTime.now().toIso8601String(),
           });
