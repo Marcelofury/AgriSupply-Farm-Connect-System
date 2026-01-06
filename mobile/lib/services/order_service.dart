@@ -268,7 +268,7 @@ class OrderService {
   // Update payment status
   Future<void> updatePaymentStatus(
     String orderId,
-    PaymentStatus status, {
+    String status, {
     String? transactionId,
   }) async {
     try {
@@ -292,7 +292,7 @@ class OrderService {
   }
 
   // Get order status history
-  Future<List<OrderStatusHistory>> getStatusHistory(String orderId) async {
+  Future<List<Map<String, dynamic>>> getStatusHistory(String orderId) async {
     try {
       final data = await _apiService.query(
         'order_status_history',
@@ -301,7 +301,7 @@ class OrderService {
         ascending: true,
       );
 
-      return data.map((json) => OrderStatusHistory.fromJson(json)).toList();
+      return data.map((json) => json as Map<String, dynamic>).toList();
     } catch (e) {
       throw Exception('Failed to fetch status history: $e');
     }
