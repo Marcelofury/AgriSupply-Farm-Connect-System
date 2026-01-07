@@ -70,12 +70,6 @@ class _DashboardTab extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final currencyFormat = NumberFormat.currency(
-      locale: 'en_UG',
-      symbol: 'UGX ',
-      decimalDigits: 0,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
