@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
 import '../../config/theme.dart';
-import '../../providers/product_provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../models/product_model.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/product_provider.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
 
 class AddProductScreen extends StatefulWidget {

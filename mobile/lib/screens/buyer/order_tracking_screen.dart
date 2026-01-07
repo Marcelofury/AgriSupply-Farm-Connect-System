@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
-import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
+import '../../providers/order_provider.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
 

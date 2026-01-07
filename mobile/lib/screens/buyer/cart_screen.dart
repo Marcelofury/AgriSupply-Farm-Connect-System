@@ -154,13 +154,13 @@ class CartScreen extends StatelessWidget {
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
-                    placeholder: (final context, final url) => ColoredBox(
+                    placeholder: (final context, final url) => const ColoredBox(
                       color: AppColors.grey200,
-                      child: const Center(child: CircularProgressIndicator()),
+                      child: Center(child: CircularProgressIndicator()),
                     ),
-                    errorWidget: (final context, final url, final error) => ColoredBox(
+                    errorWidget: (final context, final url, final error) => const ColoredBox(
                       color: AppColors.grey200,
-                      child: const Icon(Icons.image),
+                      child: Icon(Icons.image),
                     ),
                   ),
           ),

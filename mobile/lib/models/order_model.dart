@@ -1,4 +1,3 @@
-import 'product_model.dart';
 
 class OrderModel {
 

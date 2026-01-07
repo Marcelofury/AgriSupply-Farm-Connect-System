@@ -659,10 +659,25 @@ CREATE TRIGGER update_followers_count_trigger
 
 -- Function to handle new user profile creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public, auth
+LANGUAGE plpgsql
+AS $$
 BEGIN
-    -- Insert a row into public.users if it doesn't exist
-    INSERT INTO public.users (id, email, full_name, phone, role, created_at, updated_at)
+    -- Log the trigger execution for debugging
+    RAISE LOG 'Creating user profile for user_id: %, email: %', NEW.id, NEW.email;
+    
+    -- Insert a row into public.users
+    INSERT INTO public.users (
+        id,
+        email,
+        full_name,
+        phone,
+        role,
+        created_at,
+        updated_at
+    )
     VALUES (
         NEW.id,
         NEW.email,
@@ -672,10 +687,23 @@ BEGIN
         NOW(),
         NOW()
     )
-    ON CONFLICT (id) DO NOTHING;
+    ON CONFLICT (id) DO UPDATE SET
+        email = EXCLUDED.email,
+        full_name = COALESCE(EXCLUDED.full_name, users.full_name),
+        phone = COALESCE(EXCLUDED.phone, users.phone),
+        role = COALESCE(EXCLUDED.role, users.role),
+        updated_at = NOW();
+    
+    RAISE LOG 'User profile created successfully for user_id: %', NEW.id;
     RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Log the error but don't fail the auth creation
+        RAISE LOG 'Error in handle_new_user for user_id %, error: %', NEW.id, SQLERRM;
+        RAISE WARNING 'Failed to create user profile: %', SQLERRM;
+        RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Trigger to automatically create user profile on auth.users insert
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -709,7 +737,10 @@ CREATE POLICY "Users can view public profiles"
 
 CREATE POLICY "Users can insert own profile during signup"
     ON users FOR INSERT
-    WITH CHECK (auth.uid() = id);
+    WITH CHECK (
+        auth.uid() = id OR
+        auth.role() = 'service_role'
+    );
 
 CREATE POLICY "Users can update own profile"
     ON users FOR UPDATE

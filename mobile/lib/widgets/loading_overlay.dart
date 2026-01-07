@@ -287,9 +287,7 @@ class ListItemShimmer extends StatelessWidget {
 class AnimatedBuilder extends AnimatedWidget {
 
   const AnimatedBuilder({
-    super.key,
-    required final Animation<double> animation,
-    required this.builder,
+    required final Animation<double> animation, required this.builder, super.key,
   }) : super(listenable: animation);
   final TransitionBuilder builder;
 

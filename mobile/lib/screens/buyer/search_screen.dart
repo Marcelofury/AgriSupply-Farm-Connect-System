@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../config/routes.dart';
 import '../../config/theme.dart';
-import '../../providers/product_provider.dart';
 import '../../models/product_model.dart';
+import '../../providers/product_provider.dart';
 import '../../widgets/product_card.dart';
 
 class SearchScreen extends StatefulWidget {
