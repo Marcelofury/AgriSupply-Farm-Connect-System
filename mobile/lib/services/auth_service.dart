@@ -33,7 +33,7 @@ class AuthService {
     String? district,
   }) async {
     try {
-      // Create auth user
+      // Create auth user - the database trigger will automatically create the profile
       final authResponse = await _supabase.auth.signUp(
         email: email,
         password: password,
@@ -41,6 +41,9 @@ class AuthService {
           'full_name': fullName,
           'phone': phone,
           'role': role,
+          'farm_name': farmName,
+          'region': region,
+          'district': district,
         },
       );
 
@@ -48,24 +51,23 @@ class AuthService {
         throw Exception('Failed to create account');
       }
 
-      // Create user profile in database
-      final userData = {
-        'id': authResponse.user!.id,
-        'email': email,
-        'full_name': fullName,
-        'phone': phone,
-        'role': role,
-        'farm_name': farmName,
-        'region': region,
-        'district': district,
-        'is_verified': false,
-        'is_premium': false,
-        'created_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      };
+      // Wait a moment for the trigger to create the profile
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      final profileData = await _apiService.insert('users', userData);
-      return UserModel.fromJson(profileData);
+      // Update additional profile fields if provided
+      if (farmName != null || region != null || district != null) {
+        final updateData = <String, dynamic>{};
+        if (farmName != null) updateData['farm_name'] = farmName;
+        if (region != null) updateData['region'] = region;
+        if (district != null) updateData['district'] = district;
+        
+        if (updateData.isNotEmpty) {
+          await _apiService.update('users', authResponse.user!.id, updateData);
+        }
+      }
+
+      // Get the created profile
+      return await getUserProfile(authResponse.user!.id);
     } on AuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {

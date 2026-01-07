@@ -657,6 +657,32 @@ CREATE TRIGGER update_followers_count_trigger
     AFTER INSERT OR DELETE ON farmer_followers
     FOR EACH ROW EXECUTE FUNCTION update_followers_count();
 
+-- Function to handle new user profile creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert a row into public.users if it doesn't exist
+    INSERT INTO public.users (id, email, full_name, phone, role, created_at, updated_at)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
+        COALESCE(NEW.phone, NEW.raw_user_meta_data->>'phone'),
+        COALESCE(NEW.raw_user_meta_data->>'role', 'buyer'),
+        NOW(),
+        NOW()
+    )
+    ON CONFLICT (id) DO NOTHING;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to automatically create user profile on auth.users insert
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
 -- ============================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================
@@ -680,6 +706,10 @@ ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view public profiles"
     ON users FOR SELECT
     USING (is_deleted = FALSE AND is_suspended = FALSE);
+
+CREATE POLICY "Users can insert own profile during signup"
+    ON users FOR INSERT
+    WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile"
     ON users FOR UPDATE
