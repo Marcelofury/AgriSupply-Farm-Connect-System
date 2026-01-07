@@ -36,7 +36,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -49,7 +49,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (final index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -108,7 +108,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: ProductCategory.all.length,
-                  itemBuilder: (context, index) {
+                  itemBuilder: (final context, final index) {
                     final category = ProductCategory.all[index];
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
@@ -195,7 +195,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
               icon: const Icon(Icons.notifications_outlined),
             ),
             Consumer<CartProvider>(
-              builder: (context, cartProvider, child) {
+              builder: (final context, final cartProvider, final child) {
                 return Stack(
                   children: [
                     IconButton(
@@ -233,7 +233,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, {VoidCallback? onViewAll}) {
+  Widget _buildSectionHeader(final String title, {final VoidCallback? onViewAll}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -255,7 +255,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
 
   Widget _buildFeaturedProducts() {
     return Consumer<ProductProvider>(
-      builder: (context, productProvider, child) {
+      builder: (final context, final productProvider, final child) {
         if (productProvider.isLoading) {
           return const SliverToBoxAdapter(
             child: Center(child: CircularProgressIndicator()),
@@ -277,7 +277,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: products.length,
-              itemBuilder: (context, index) {
+              itemBuilder: (final context, final index) {
                 return Padding(
                   padding: const EdgeInsets.only(right: 16),
                   child: SizedBox(
@@ -302,7 +302,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
 
   Widget _buildProductGrid() {
     return Consumer<ProductProvider>(
-      builder: (context, productProvider, child) {
+      builder: (final context, final productProvider, final child) {
         if (productProvider.isLoading) {
           return const SliverToBoxAdapter(
             child: Center(child: CircularProgressIndicator()),
@@ -344,7 +344,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
               mainAxisSpacing: 16,
             ),
             delegate: SliverChildBuilderDelegate(
-              (context, index) {
+              (final context, final index) {
                 return ProductCard(
                   product: products[index],
                   onTap: () => Navigator.pushNamed(
@@ -383,7 +383,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
                   mainAxisSpacing: 16,
                 ),
                 itemCount: ProductCategory.all.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (final context, final index) {
                   final category = ProductCategory.all[index];
                   return _buildCategoryCard(
                     category,
@@ -398,7 +398,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
     );
   }
 
-  Widget _buildCategoryCard(String category, String icon) {
+  Widget _buildCategoryCard(final String category, final String icon) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -408,7 +408,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
         Provider.of<ProductProvider>(context, listen: false)
             .fetchProductsByCategory(category);
       },
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
@@ -456,7 +456,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.receipt_long_outlined,
                       size: 80,
                       color: AppColors.grey400,
@@ -567,10 +567,10 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
   }
 
   Widget _buildProfileMenuItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool isDestructive = false,
+    required final IconData icon,
+    required final String title,
+    required final VoidCallback onTap,
+    final bool isDestructive = false,
   }) {
     return ListTile(
       leading: Icon(

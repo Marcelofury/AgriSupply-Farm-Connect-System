@@ -3,18 +3,6 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
 class CustomButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool isOutlined;
-  final bool isFullWidth;
-  final Color? backgroundColor;
-  final Color? textColor;
-  final IconData? icon;
-  final double? height;
-  final double? fontSize;
-  final EdgeInsetsGeometry? padding;
-  final BorderRadius? borderRadius;
 
   const CustomButton({
     super.key,
@@ -31,9 +19,21 @@ class CustomButton extends StatelessWidget {
     this.padding,
     this.borderRadius,
   });
+  final String text;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool isOutlined;
+  final bool isFullWidth;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final IconData? icon;
+  final double? height;
+  final double? fontSize;
+  final EdgeInsetsGeometry? padding;
+  final BorderRadius? borderRadius;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final buttonStyle = isOutlined
         ? OutlinedButton.styleFrom(
             foregroundColor: textColor ?? AppColors.primaryGreen,
@@ -118,15 +118,6 @@ class CustomButton extends StatelessWidget {
 }
 
 class CustomIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final Color? backgroundColor;
-  final Color? iconColor;
-  final double size;
-  final double iconSize;
-  final String? tooltip;
-  final bool isLoading;
-  final Widget? badge;
 
   const CustomIconButton({
     super.key,
@@ -140,9 +131,18 @@ class CustomIconButton extends StatelessWidget {
     this.isLoading = false,
     this.badge,
   });
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? iconColor;
+  final double size;
+  final double iconSize;
+  final String? tooltip;
+  final bool isLoading;
+  final Widget? badge;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     Widget button = Container(
       width: size,
       height: size,
@@ -193,7 +193,7 @@ class CustomIconButton extends StatelessWidget {
 
     if (tooltip != null) {
       return Tooltip(
-        message: tooltip!,
+        message: tooltip,
         child: button,
       );
     }
@@ -203,12 +203,6 @@ class CustomIconButton extends StatelessWidget {
 }
 
 class CustomTextButton extends StatelessWidget {
-  final String text;
-  final VoidCallback? onPressed;
-  final Color? textColor;
-  final IconData? icon;
-  final bool isLoading;
-  final double? fontSize;
 
   const CustomTextButton({
     super.key,
@@ -219,9 +213,15 @@ class CustomTextButton extends StatelessWidget {
     this.isLoading = false,
     this.fontSize,
   });
+  final String text;
+  final VoidCallback? onPressed;
+  final Color? textColor;
+  final IconData? icon;
+  final bool isLoading;
+  final double? fontSize;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return TextButton(
       onPressed: isLoading ? null : onPressed,
       child: isLoading
@@ -261,10 +261,6 @@ class CustomTextButton extends StatelessWidget {
 }
 
 class SocialButton extends StatelessWidget {
-  final String text;
-  final String iconAsset;
-  final VoidCallback? onPressed;
-  final bool isLoading;
 
   const SocialButton({
     super.key,
@@ -273,9 +269,13 @@ class SocialButton extends StatelessWidget {
     this.onPressed,
     this.isLoading = false,
   });
+  final String text;
+  final String iconAsset;
+  final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -301,7 +301,7 @@ class SocialButton extends StatelessWidget {
                     iconAsset,
                     width: 24,
                     height: 24,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.login),
+                    errorBuilder: (_, final __, final ___) => const Icon(Icons.login),
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -319,11 +319,6 @@ class SocialButton extends StatelessWidget {
 }
 
 class FloatingActionButtonExtended extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
 
   const FloatingActionButtonExtended({
     super.key,
@@ -333,9 +328,14 @@ class FloatingActionButtonExtended extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
   });
+  final String text;
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return FloatingActionButton.extended(
       onPressed: onPressed,
       backgroundColor: backgroundColor ?? AppColors.primaryGreen,

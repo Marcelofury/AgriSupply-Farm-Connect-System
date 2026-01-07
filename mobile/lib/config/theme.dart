@@ -48,7 +48,6 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: AppColors.primaryGreen,
       secondary: AppColors.secondaryOrange,
-      surface: AppColors.surfaceLight,
       error: AppColors.error,
     ),
     textTheme: GoogleFonts.poppinsTextTheme().copyWith(
@@ -168,7 +167,7 @@ class AppTheme {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.error, width: 1),
+        borderSide: const BorderSide(color: AppColors.error),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       hintStyle: GoogleFonts.poppins(

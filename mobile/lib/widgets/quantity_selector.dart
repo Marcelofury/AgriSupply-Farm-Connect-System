@@ -4,13 +4,6 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 
 class QuantitySelector extends StatelessWidget {
-  final int quantity;
-  final int minQuantity;
-  final int maxQuantity;
-  final ValueChanged<int> onChanged;
-  final String? unit;
-  final bool isCompact;
-  final bool showLabel;
 
   const QuantitySelector({
     super.key,
@@ -22,9 +15,16 @@ class QuantitySelector extends StatelessWidget {
     this.isCompact = false,
     this.showLabel = false,
   });
+  final int quantity;
+  final int minQuantity;
+  final int maxQuantity;
+  final ValueChanged<int> onChanged;
+  final String? unit;
+  final bool isCompact;
+  final bool showLabel;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -34,14 +34,14 @@ class QuantitySelector extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               'Quantity${unit != null ? ' ($unit)' : ''}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: AppColors.grey700,
               ),
             ),
           ),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(isCompact ? 8 : 12),
@@ -71,7 +71,7 @@ class QuantitySelector extends StatelessWidget {
                   horizontal: isCompact ? 8 : 12,
                   vertical: isCompact ? 4 : 8,
                 ),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border.symmetric(
                     vertical: BorderSide(color: AppColors.grey300),
                   ),
@@ -105,7 +105,7 @@ class QuantitySelector extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               unit!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.grey500,
               ),
@@ -117,18 +117,18 @@ class QuantitySelector extends StatelessWidget {
 }
 
 class _QuantityButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback? onPressed;
-  final bool isCompact;
 
   const _QuantityButton({
     required this.icon,
     this.onPressed,
     this.isCompact = false,
   });
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final bool isCompact;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       onTap: onPressed,
       borderRadius: BorderRadius.circular(8),
@@ -145,12 +145,6 @@ class _QuantityButton extends StatelessWidget {
 }
 
 class QuantitySelectorWithInput extends StatefulWidget {
-  final int quantity;
-  final int minQuantity;
-  final int maxQuantity;
-  final ValueChanged<int> onChanged;
-  final String? unit;
-  final String? label;
 
   const QuantitySelectorWithInput({
     super.key,
@@ -161,6 +155,12 @@ class QuantitySelectorWithInput extends StatefulWidget {
     this.unit,
     this.label,
   });
+  final int quantity;
+  final int minQuantity;
+  final int maxQuantity;
+  final ValueChanged<int> onChanged;
+  final String? unit;
+  final String? label;
 
   @override
   State<QuantitySelectorWithInput> createState() =>
@@ -185,7 +185,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
   }
 
   @override
-  void didUpdateWidget(QuantitySelectorWithInput oldWidget) {
+  void didUpdateWidget(final QuantitySelectorWithInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.quantity != oldWidget.quantity && !_focusNode.hasFocus) {
       _controller.text = widget.quantity.toString();
@@ -210,7 +210,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -220,7 +220,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               widget.label!,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: AppColors.grey700,
@@ -230,7 +230,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
         Row(
           children: [
             // Decrease Button
-            Container(
+            DecoratedBox(
               decoration: BoxDecoration(
                 color: AppColors.grey100,
                 borderRadius: BorderRadius.circular(8),
@@ -271,14 +271,14 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.grey300),
+                    borderSide: const BorderSide(color: AppColors.grey300),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: AppColors.primaryGreen),
+                    borderSide: const BorderSide(color: AppColors.primaryGreen),
                   ),
                   suffixText: widget.unit,
-                  suffixStyle: TextStyle(
+                  suffixStyle: const TextStyle(
                     fontSize: 12,
                     color: AppColors.grey500,
                   ),
@@ -289,7 +289,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
             const SizedBox(width: 8),
 
             // Increase Button
-            Container(
+            DecoratedBox(
               decoration: BoxDecoration(
                 color: AppColors.grey100,
                 borderRadius: BorderRadius.circular(8),
@@ -313,7 +313,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               'per ${widget.unit}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 color: AppColors.grey500,
               ),
@@ -325,10 +325,6 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
 }
 
 class CartQuantitySelector extends StatelessWidget {
-  final int quantity;
-  final int maxQuantity;
-  final ValueChanged<int> onChanged;
-  final VoidCallback? onRemove;
 
   const CartQuantitySelector({
     super.key,
@@ -337,10 +333,14 @@ class CartQuantitySelector extends StatelessWidget {
     this.maxQuantity = 99,
     this.onRemove,
   });
+  final int quantity;
+  final int maxQuantity;
+  final ValueChanged<int> onChanged;
+  final VoidCallback? onRemove;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(final BuildContext context) {
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.grey100,
         borderRadius: BorderRadius.circular(20),
@@ -405,9 +405,6 @@ class CartQuantitySelector extends StatelessWidget {
 }
 
 class QuantityBadge extends StatelessWidget {
-  final int count;
-  final Color? color;
-  final double size;
 
   const QuantityBadge({
     super.key,
@@ -415,9 +412,12 @@ class QuantityBadge extends StatelessWidget {
     this.color,
     this.size = 18,
   });
+  final int count;
+  final Color? color;
+  final double size;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (count <= 0) return const SizedBox.shrink();
 
     return Container(

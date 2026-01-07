@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Search failed: ${e.toString()}'),
+          content: Text('Search failed: ${e}'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -104,7 +104,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -116,7 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
         title: TextField(
           controller: _searchController,
           focusNode: _focusNode,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Search products...',
             border: InputBorder.none,
             filled: false,
@@ -183,7 +183,7 @@ class _SearchScreenState extends State<SearchScreen> {
               _buildFilterChip('All', _selectedCategory == null, () {
                 setState(() => _selectedCategory = null);
               }),
-              ...ProductCategory.all.take(6).map((category) {
+              ...ProductCategory.all.take(6).map((final category) {
                 return _buildFilterChip(
                   category,
                   _selectedCategory == category,
@@ -213,10 +213,10 @@ class _SearchScreenState extends State<SearchScreen> {
                         value: _selectedRegion ?? 'All Regions',
                         isExpanded: true,
                         underline: const SizedBox.shrink(),
-                        items: _regions.map((region) {
+                        items: _regions.map((final region) {
                           return DropdownMenuItem(value: region, child: Text(region));
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: (final value) {
                           setState(() => _selectedRegion = value);
                         },
                       ),
@@ -241,13 +241,13 @@ class _SearchScreenState extends State<SearchScreen> {
                         value: _sortBy,
                         isExpanded: true,
                         underline: const SizedBox.shrink(),
-                        items: _sortOptions.map((option) {
+                        items: _sortOptions.map((final option) {
                           return DropdownMenuItem(
                             value: option,
                             child: Text(_getSortLabel(option)),
                           );
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: (final value) {
                           setState(() => _sortBy = value!);
                         },
                       ),
@@ -264,7 +264,6 @@ class _SearchScreenState extends State<SearchScreen> {
           const SizedBox(height: 8),
           RangeSlider(
             values: RangeValues(_minPrice, _maxPrice),
-            min: 0,
             max: 100000,
             divisions: 20,
             labels: RangeLabels(
@@ -272,7 +271,7 @@ class _SearchScreenState extends State<SearchScreen> {
               _maxPrice.toStringAsFixed(0),
             ),
             activeColor: AppColors.primaryGreen,
-            onChanged: (values) {
+            onChanged: (final values) {
               setState(() {
                 _minPrice = values.start;
                 _maxPrice = values.end;
@@ -295,8 +294,8 @@ class _SearchScreenState extends State<SearchScreen> {
               Text('Organic Only', style: Theme.of(context).textTheme.titleMedium),
               Switch(
                 value: _organicOnly,
-                onChanged: (value) => setState(() => _organicOnly = value),
-                activeColor: AppColors.primaryGreen,
+                onChanged: (final value) => setState(() => _organicOnly = value),
+                activeThumbColor: AppColors.primaryGreen,
               ),
             ],
           ),
@@ -328,7 +327,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
+  Widget _buildFilterChip(final String label, final bool isSelected, final VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -362,7 +361,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 80, color: AppColors.grey400),
+            const Icon(Icons.search_off, size: 80, color: AppColors.grey400),
             const SizedBox(height: 16),
             Text(
               'No products found',
@@ -402,7 +401,7 @@ class _SearchScreenState extends State<SearchScreen> {
               mainAxisSpacing: 16,
             ),
             itemCount: _searchResults.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (final context, final index) {
               return ProductCard(
                 product: _searchResults[index],
                 onTap: () => Navigator.pushNamed(
@@ -432,7 +431,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: ProductCategory.all.take(8).map((category) {
+            children: ProductCategory.all.take(8).map((final category) {
               return GestureDetector(
                 onTap: () {
                   setState(() => _selectedCategory = category);
@@ -464,7 +463,7 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  String _getSortLabel(String sortBy) {
+  String _getSortLabel(final String sortBy) {
     switch (sortBy) {
       case 'relevance':
         return 'Relevance';

@@ -10,24 +10,23 @@ class NotificationService {
   RealtimeChannel? _subscription;
 
   // Get all notifications for user
-  Future<List<NotificationModel>> getNotifications(String userId) async {
+  Future<List<NotificationModel>> getNotifications(final String userId) async {
     try {
       final data = await _apiService.query(
         'notifications',
         filters: {'user_id': userId},
         orderBy: 'created_at',
-        ascending: false,
         limit: 100,
       );
 
-      return data.map((json) => NotificationModel.fromJson(json)).toList();
+      return data.map(NotificationModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch notifications: $e');
     }
   }
 
   // Mark single notification as read
-  Future<void> markAsRead(String notificationId) async {
+  Future<void> markAsRead(final String notificationId) async {
     try {
       await _apiService.update('notifications', notificationId, {
         'is_read': true,
@@ -39,7 +38,7 @@ class NotificationService {
   }
 
   // Mark all notifications as read
-  Future<void> markAllAsRead(String userId) async {
+  Future<void> markAllAsRead(final String userId) async {
     try {
       // Get all unread notifications
       final notifications = await _apiService.query(
@@ -63,7 +62,7 @@ class NotificationService {
   }
 
   // Delete notification
-  Future<void> deleteNotification(String notificationId) async {
+  Future<void> deleteNotification(final String notificationId) async {
     try {
       await _apiService.deleteRecord('notifications', notificationId);
     } catch (e) {
@@ -72,7 +71,7 @@ class NotificationService {
   }
 
   // Clear all notifications
-  Future<void> clearAllNotifications(String userId) async {
+  Future<void> clearAllNotifications(final String userId) async {
     try {
       final notifications = await _apiService.query(
         'notifications',
@@ -89,11 +88,11 @@ class NotificationService {
 
   // Create notification
   Future<NotificationModel> createNotification({
-    required String userId,
-    required String type,
-    required String title,
-    required String body,
-    Map<String, dynamic>? data,
+    required final String userId,
+    required final String type,
+    required final String title,
+    required final String body,
+    final Map<String, dynamic>? data,
   }) async {
     try {
       final notificationData = await _apiService.insert('notifications', {
@@ -114,11 +113,11 @@ class NotificationService {
 
   // Send notification to multiple users
   Future<void> sendBulkNotification({
-    required List<String> userIds,
-    required String type,
-    required String title,
-    required String body,
-    Map<String, dynamic>? data,
+    required final List<String> userIds,
+    required final String type,
+    required final String title,
+    required final String body,
+    final Map<String, dynamic>? data,
   }) async {
     try {
       for (final userId in userIds) {
@@ -137,8 +136,8 @@ class NotificationService {
 
   // Subscribe to real-time notifications
   void subscribeToNotifications(
-    String userId, {
-    required Function(NotificationModel) onNewNotification,
+    final String userId, {
+    required final Function(NotificationModel) onNewNotification,
   }) {
     _subscription = Supabase.instance.client
         .channel('notifications:$userId')
@@ -151,7 +150,7 @@ class NotificationService {
             column: 'user_id',
             value: userId,
           ),
-          callback: (payload) {
+          callback: (final payload) {
             final notification = NotificationModel.fromJson(payload.newRecord);
             onNewNotification(notification);
           },
@@ -168,7 +167,7 @@ class NotificationService {
   }
 
   // Get notification preferences
-  Future<Map<String, bool>> getPreferences(String userId) async {
+  Future<Map<String, bool>> getPreferences(final String userId) async {
     try {
       final data = await _apiService.getById('notification_preferences', userId);
       
@@ -204,12 +203,12 @@ class NotificationService {
 
   // Update notification preferences
   Future<void> updatePreferences({
-    required String userId,
-    bool? orderUpdates,
-    bool? newMessages,
-    bool? promotions,
-    bool? priceAlerts,
-    bool? farmingTips,
+    required final String userId,
+    final bool? orderUpdates,
+    final bool? newMessages,
+    final bool? promotions,
+    final bool? priceAlerts,
+    final bool? farmingTips,
   }) async {
     try {
       final updates = <String, dynamic>{
@@ -244,10 +243,10 @@ class NotificationService {
 
   // Send order notification
   Future<void> sendOrderNotification({
-    required String userId,
-    required String orderId,
-    required String orderNumber,
-    required String status,
+    required final String userId,
+    required final String orderId,
+    required final String orderNumber,
+    required final String status,
   }) async {
     String title;
     String body;
@@ -285,11 +284,11 @@ class NotificationService {
 
   // Send promotion notification
   Future<void> sendPromotionNotification({
-    required List<String> userIds,
-    required String title,
-    required String body,
-    String? imageUrl,
-    String? actionUrl,
+    required final List<String> userIds,
+    required final String title,
+    required final String body,
+    final String? imageUrl,
+    final String? actionUrl,
   }) async {
     await sendBulkNotification(
       userIds: userIds,
@@ -305,9 +304,9 @@ class NotificationService {
 
   // Send farming tip notification
   Future<void> sendFarmingTip({
-    required List<String> farmerIds,
-    required String title,
-    required String tip,
+    required final List<String> farmerIds,
+    required final String title,
+    required final String tip,
   }) async {
     await sendBulkNotification(
       userIds: farmerIds,
@@ -318,7 +317,7 @@ class NotificationService {
   }
 
   // Get unread count
-  Future<int> getUnreadCount(String userId) async {
+  Future<int> getUnreadCount(final String userId) async {
     try {
       final notifications = await _apiService.query(
         'notifications',

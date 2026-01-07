@@ -9,7 +9,7 @@ class AuthService {
   final ApiService _apiService = ApiService();
 
   // Get current user profile
-  Future<UserModel?> getUserProfile(String userId) async {
+  Future<UserModel?> getUserProfile(final String userId) async {
     try {
       final data = await _apiService.getById('users', userId);
       if (data != null) {
@@ -23,16 +23,18 @@ class AuthService {
 
   // Sign up with email and password
   Future<UserModel?> signUp({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    String? farmName,
-    String? region,
-    String? district,
+    required final String email,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? farmName,
+    final String? region,
+    final String? district,
   }) async {
     try {
+      print('[AuthService] Starting signup for email: $email');
+      
       // Create auth user - the database trigger will automatically create the profile
       final authResponse = await _supabase.auth.signUp(
         email: email,
@@ -47,12 +49,47 @@ class AuthService {
         },
       );
 
+      print('[AuthService] Auth response: ${authResponse.user?.id}');
+
       if (authResponse.user == null) {
-        throw Exception('Failed to create account');
+        print('[AuthService] ERROR: No user in auth response');
+        throw Exception('Failed to create account - No user returned');
       }
 
       // Wait a moment for the trigger to create the profile
-      await Future.delayed(const Duration(milliseconds: 500));
+      print('[AuthService] Waiting for trigger to create profile...');
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      // Try to get the profile - if it fails, the trigger didn't work
+      print('[AuthService] Attempting to fetch user profile...');
+      UserModel? profile;
+      try {
+        profile = await getUserProfile(authResponse.user!.id);
+        print('[AuthService] Profile fetched successfully: ${profile?.id}');
+      } catch (profileError) {
+        print('[AuthService] ERROR fetching profile: $profileError');
+        // Profile doesn't exist - trigger might not be working
+        // Try to manually create the profile
+        print('[AuthService] Attempting manual profile creation...');
+        try {
+          final manualProfile = await _supabase.from('users').insert({
+            'id': authResponse.user!.id,
+            'email': email,
+            'full_name': fullName,
+            'phone': phone,
+            'role': role,
+            'farm_name': farmName,
+            'region': region,
+            'district': district,
+          }).select().single();
+          
+          profile = UserModel.fromJson(manualProfile);
+          print('[AuthService] Manual profile creation successful');
+        } catch (manualError) {
+          print('[AuthService] ERROR in manual profile creation: $manualError');
+          throw Exception('Failed to create user profile. Please check database permissions and triggers. Error: $manualError');
+        }
+      }
 
       // Update additional profile fields if provided
       if (farmName != null || region != null || district != null) {
@@ -62,23 +99,28 @@ class AuthService {
         if (district != null) updateData['district'] = district;
         
         if (updateData.isNotEmpty) {
-          await _apiService.update('users', authResponse.user!.id, updateData);
+          try {
+            await _apiService.update('users', authResponse.user!.id, updateData);
+          } catch (updateError) {
+            print('[AuthService] Warning: Failed to update profile fields: $updateError');
+          }
         }
       }
 
-      // Get the created profile
-      return await getUserProfile(authResponse.user!.id);
+      return profile;
     } on AuthException catch (e) {
+      print('[AuthService] AuthException: ${e.message}');
       throw Exception(e.message);
     } catch (e) {
+      print('[AuthService] General Exception: $e');
       throw Exception('Failed to sign up: $e');
     }
   }
 
   // Sign in with email and password
   Future<UserModel?> signIn({
-    required String email,
-    required String password,
+    required final String email,
+    required final String password,
   }) async {
     try {
       final authResponse = await _supabase.auth.signInWithPassword(
@@ -99,7 +141,7 @@ class AuthService {
   }
 
   // Sign in with phone (OTP)
-  Future<bool> signInWithPhone({required String phone}) async {
+  Future<bool> signInWithPhone({required final String phone}) async {
     try {
       await _supabase.auth.signInWithOtp(
         phone: phone,
@@ -114,8 +156,8 @@ class AuthService {
 
   // Verify OTP
   Future<UserModel?> verifyOtp({
-    required String phone,
-    required String otp,
+    required final String phone,
+    required final String otp,
   }) async {
     try {
       final authResponse = await _supabase.auth.verifyOTP(
@@ -161,7 +203,7 @@ class AuthService {
       const webClientId = 'YOUR_GOOGLE_WEB_CLIENT_ID';
       const iosClientId = 'YOUR_GOOGLE_IOS_CLIENT_ID';
 
-      final GoogleSignIn googleSignIn = GoogleSignIn(
+      final googleSignIn = GoogleSignIn(
         clientId: iosClientId,
         serverClientId: webClientId,
       );
@@ -217,7 +259,7 @@ class AuthService {
   }
 
   // Reset password
-  Future<void> resetPassword({required String email}) async {
+  Future<void> resetPassword({required final String email}) async {
     try {
       await _supabase.auth.resetPasswordForEmail(email);
     } on AuthException catch (e) {
@@ -228,7 +270,7 @@ class AuthService {
   }
 
   // Update password
-  Future<void> updatePassword({required String newPassword}) async {
+  Future<void> updatePassword({required final String newPassword}) async {
     try {
       await _supabase.auth.updateUser(
         UserAttributes(password: newPassword),
@@ -242,15 +284,15 @@ class AuthService {
 
   // Update user profile
   Future<UserModel?> updateProfile({
-    required String userId,
-    String? fullName,
-    String? phone,
-    String? photoUrl,
-    String? farmName,
-    String? region,
-    String? district,
-    String? address,
-    String? bio,
+    required final String userId,
+    final String? fullName,
+    final String? phone,
+    final String? photoUrl,
+    final String? farmName,
+    final String? region,
+    final String? district,
+    final String? address,
+    final String? bio,
   }) async {
     try {
       final updates = <String, dynamic>{
@@ -274,7 +316,7 @@ class AuthService {
   }
 
   // Upload profile photo
-  Future<String> uploadProfilePhoto(String userId, List<int> imageBytes) async {
+  Future<String> uploadProfilePhoto(final String userId, final List<int> imageBytes) async {
     try {
       final path = 'profiles/$userId/avatar.jpg';
       return await _apiService.uploadFile(
@@ -289,7 +331,7 @@ class AuthService {
   }
 
   // Upgrade to premium
-  Future<void> upgradeToPremium({required String userId}) async {
+  Future<void> upgradeToPremium({required final String userId}) async {
     try {
       await _apiService.update('users', userId, {
         'is_premium': true,
@@ -311,7 +353,7 @@ class AuthService {
   }
 
   // Delete account
-  Future<void> deleteAccount(String userId) async {
+  Future<void> deleteAccount(final String userId) async {
     try {
       // Delete user data
       await _apiService.deleteRecord('users', userId);
@@ -326,7 +368,7 @@ class AuthService {
   }
 
   // Check if email exists
-  Future<bool> emailExists(String email) async {
+  Future<bool> emailExists(final String email) async {
     try {
       final result = await _apiService.query(
         'users',
@@ -340,7 +382,7 @@ class AuthService {
   }
 
   // Check if phone exists
-  Future<bool> phoneExists(String phone) async {
+  Future<bool> phoneExists(final String phone) async {
     try {
       final result = await _apiService.query(
         'users',

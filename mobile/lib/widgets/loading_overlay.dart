@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
 class LoadingOverlay extends StatelessWidget {
-  final Widget child;
-  final bool isLoading;
-  final String? message;
-  final Color? backgroundColor;
-  final Color? progressColor;
 
   const LoadingOverlay({
     super.key,
@@ -17,14 +12,19 @@ class LoadingOverlay extends StatelessWidget {
     this.backgroundColor,
     this.progressColor,
   });
+  final Widget child;
+  final bool isLoading;
+  final String? message;
+  final Color? backgroundColor;
+  final Color? progressColor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Stack(
       children: [
         child,
         if (isLoading)
-          Container(
+          ColoredBox(
             color: backgroundColor ?? Colors.black.withOpacity(0.3),
             child: Center(
               child: Container(
@@ -69,9 +69,6 @@ class LoadingOverlay extends StatelessWidget {
 }
 
 class LoadingIndicator extends StatelessWidget {
-  final double size;
-  final Color? color;
-  final double strokeWidth;
 
   const LoadingIndicator({
     super.key,
@@ -79,9 +76,12 @@ class LoadingIndicator extends StatelessWidget {
     this.color,
     this.strokeWidth = 3,
   });
+  final double size;
+  final Color? color;
+  final double strokeWidth;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return SizedBox(
       width: size,
       height: size,
@@ -96,12 +96,12 @@ class LoadingIndicator extends StatelessWidget {
 }
 
 class LoadingScreen extends StatelessWidget {
-  final String? message;
 
   const LoadingScreen({super.key, this.message});
+  final String? message;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
@@ -125,9 +125,6 @@ class LoadingScreen extends StatelessWidget {
 }
 
 class ShimmerLoading extends StatefulWidget {
-  final double width;
-  final double height;
-  final BorderRadius? borderRadius;
 
   const ShimmerLoading({
     super.key,
@@ -135,6 +132,9 @@ class ShimmerLoading extends StatefulWidget {
     required this.height,
     this.borderRadius,
   });
+  final double width;
+  final double height;
+  final BorderRadius? borderRadius;
 
   @override
   State<ShimmerLoading> createState() => _ShimmerLoadingState();
@@ -165,10 +165,10 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return AnimatedBuilder(
       animation: _animation,
-      builder: (context, child) {
+      builder: (final context, final child) {
         return Container(
           width: widget.width,
           height: widget.height,
@@ -194,8 +194,8 @@ class ProductCardShimmer extends StatelessWidget {
   const ProductCardShimmer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(final BuildContext context) {
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -243,7 +243,7 @@ class ListItemShimmer extends StatelessWidget {
   const ListItemShimmer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -289,16 +289,16 @@ class ListItemShimmer extends StatelessWidget {
 }
 
 class AnimatedBuilder extends AnimatedWidget {
-  final TransitionBuilder builder;
 
   const AnimatedBuilder({
     super.key,
     required Animation<double> animation,
     required this.builder,
   }) : super(listenable: animation);
+  final TransitionBuilder builder;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return builder(context, null);
   }
 }

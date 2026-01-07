@@ -12,7 +12,7 @@ class CartProvider extends ChangeNotifier {
 
   List<CartItemModel> get items => List.unmodifiable(_items);
   int get itemCount => _items.length;
-  int get totalItems => _items.fold(0, (sum, item) => sum + item.quantity);
+  int get totalItems => _items.fold(0, (final sum, final item) => sum + item.quantity);
   bool get isEmpty => _items.isEmpty;
   String? get selectedPaymentMethod => _selectedPaymentMethod;
   String? get deliveryAddress => _deliveryAddress;
@@ -20,7 +20,7 @@ class CartProvider extends ChangeNotifier {
   double get deliveryFee => _deliveryFee;
 
   double get subtotal {
-    return _items.fold(0.0, (sum, item) => sum + item.totalPrice);
+    return _items.fold(0, (final sum, final item) => sum + item.totalPrice);
   }
 
   double get total {
@@ -29,7 +29,7 @@ class CartProvider extends ChangeNotifier {
 
   // Group items by farmer
   Map<String, List<CartItemModel>> get itemsByFarmer {
-    final Map<String, List<CartItemModel>> grouped = {};
+    final grouped = <String, List<CartItemModel>>{};
     
     for (final item in _items) {
       final farmerId = item.product.farmerId;
@@ -45,12 +45,12 @@ class CartProvider extends ChangeNotifier {
 
   // Get unique farmer IDs from cart items
   Set<String> get farmerIds {
-    return _items.map((item) => item.product.farmerId).toSet();
+    return _items.map((final item) => item.product.farmerId).toSet();
   }
 
-  void addItem(ProductModel product, [int quantity = 1]) {
+  void addItem(final ProductModel product, [final int quantity = 1]) {
     final existingIndex = _items.indexWhere(
-      (item) => item.product.id == product.id,
+      (final item) => item.product.id == product.id,
     );
 
     if (existingIndex >= 0) {
@@ -75,13 +75,13 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removeItem(String productId) {
-    _items.removeWhere((item) => item.product.id == productId);
+  void removeItem(final String productId) {
+    _items.removeWhere((final item) => item.product.id == productId);
     notifyListeners();
   }
 
-  void updateQuantity(String productId, int quantity) {
-    final index = _items.indexWhere((item) => item.product.id == productId);
+  void updateQuantity(final String productId, final int quantity) {
+    final index = _items.indexWhere((final item) => item.product.id == productId);
     
     if (index >= 0) {
       final item = _items[index];
@@ -96,8 +96,8 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  void incrementQuantity(String productId) {
-    final index = _items.indexWhere((item) => item.product.id == productId);
+  void incrementQuantity(final String productId) {
+    final index = _items.indexWhere((final item) => item.product.id == productId);
     
     if (index >= 0) {
       final item = _items[index];
@@ -108,8 +108,8 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  void decrementQuantity(String productId) {
-    final index = _items.indexWhere((item) => item.product.id == productId);
+  void decrementQuantity(final String productId) {
+    final index = _items.indexWhere((final item) => item.product.id == productId);
     
     if (index >= 0) {
       final item = _items[index];
@@ -122,13 +122,13 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  bool isInCart(String productId) {
-    return _items.any((item) => item.product.id == productId);
+  bool isInCart(final String productId) {
+    return _items.any((final item) => item.product.id == productId);
   }
 
-  int getQuantity(String productId) {
+  int getQuantity(final String productId) {
     final item = _items.firstWhere(
-      (item) => item.product.id == productId,
+      (final item) => item.product.id == productId,
       orElse: () => CartItemModel(
         id: '',
         product: ProductModel.empty(),
@@ -138,22 +138,22 @@ class CartProvider extends ChangeNotifier {
     return item.quantity;
   }
 
-  void setPaymentMethod(String method) {
+  void setPaymentMethod(final String method) {
     _selectedPaymentMethod = method;
     notifyListeners();
   }
 
-  void setDeliveryAddress(String address) {
+  void setDeliveryAddress(final String address) {
     _deliveryAddress = address;
     notifyListeners();
   }
 
-  void setDeliveryNotes(String notes) {
+  void setDeliveryNotes(final String notes) {
     _deliveryNotes = notes;
     notifyListeners();
   }
 
-  void setDeliveryFee(double fee) {
+  void setDeliveryFee(final double fee) {
     _deliveryFee = fee;
     notifyListeners();
   }
@@ -173,7 +173,7 @@ class CartProvider extends ChangeNotifier {
   }
 
   // Calculate delivery fee based on region
-  double calculateDeliveryFee(String region) {
+  double calculateDeliveryFee(final String region) {
     switch (region.toLowerCase()) {
       case 'central':
         _deliveryFee = 5000;
@@ -196,7 +196,7 @@ class CartProvider extends ChangeNotifier {
 
   // Convert cart to order items for submission
   List<Map<String, dynamic>> toOrderItems() {
-    return _items.map((item) => {
+    return _items.map((final item) => {
       'product_id': item.product.id,
       'quantity': item.quantity,
       'price': item.product.price,
@@ -208,7 +208,7 @@ class CartProvider extends ChangeNotifier {
   // Save cart to local storage
   Map<String, dynamic> toJson() {
     return {
-      'items': _items.map((item) => item.toJson()).toList(),
+      'items': _items.map((final item) => item.toJson()).toList(),
       'payment_method': _selectedPaymentMethod,
       'delivery_address': _deliveryAddress,
       'delivery_notes': _deliveryNotes,
@@ -217,7 +217,7 @@ class CartProvider extends ChangeNotifier {
   }
 
   // Load cart from local storage
-  void fromJson(Map<String, dynamic> json) {
+  void fromJson(final Map<String, dynamic> json) {
     _items.clear();
     
     if (json['items'] != null) {

@@ -12,9 +12,9 @@ import '../../widgets/quantity_selector.dart';
 import '../../widgets/rating_stars.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final String productId;
 
   const ProductDetailScreen({super.key, required this.productId});
+  final String productId;
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();
@@ -67,7 +67,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -158,18 +158,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             PageView.builder(
               itemCount: images.length,
-              onPageChanged: (index) {
+              onPageChanged: (final index) {
                 setState(() => _currentImageIndex = index);
               },
-              itemBuilder: (context, index) {
+              itemBuilder: (final context, final index) {
                 return CachedNetworkImage(
                   imageUrl: images[index],
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
+                  placeholder: (final context, final url) => ColoredBox(
                     color: AppColors.grey200,
                     child: const Center(child: CircularProgressIndicator()),
                   ),
-                  errorWidget: (context, url, error) => Container(
+                  errorWidget: (final context, final url, final error) => ColoredBox(
                     color: AppColors.grey200,
                     child: const Icon(Icons.image, size: 64),
                   ),
@@ -185,7 +185,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     images.length,
-                    (index) => Container(
+                    (final index) => Container(
                       width: 8,
                       height: 8,
                       margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -409,7 +409,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(final String label, final String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -444,7 +444,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           quantity: _quantity,
           unit: _product!.unit,
           maxQuantity: _product!.availableQuantity.toInt(),
-          onChanged: (value) {
+          onChanged: (final value) {
             setState(() => _quantity = value);
           },
         ),
@@ -499,7 +499,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(final DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
 }

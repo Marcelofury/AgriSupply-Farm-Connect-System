@@ -17,7 +17,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
   bool _isTyping = false;
 
   final List<String> _quickQuestions = [
@@ -72,7 +72,7 @@ How can I help you today?''',
     super.dispose();
   }
 
-  Future<void> _sendMessage(String message) async {
+  Future<void> _sendMessage(final String message) async {
     if (message.trim().isEmpty) return;
 
     setState(() {
@@ -130,7 +130,7 @@ How can I help you today?''',
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -173,7 +173,7 @@ How can I help you today?''',
             tooltip: 'New Chat',
           ),
           PopupMenuButton<String>(
-            onSelected: (value) {
+            onSelected: (final value) {
               switch (value) {
                 case 'history':
                   _showChatHistory();
@@ -183,7 +183,7 @@ How can I help you today?''',
                   break;
               }
             },
-            itemBuilder: (context) => [
+            itemBuilder: (final context) => [
               const PopupMenuItem(
                 value: 'history',
                 child: Row(
@@ -218,7 +218,7 @@ How can I help you today?''',
                     controller: _scrollController,
                     padding: const EdgeInsets.all(16),
                     itemCount: _messages.length + (_isTyping ? 1 : 0),
-                    itemBuilder: (context, index) {
+                    itemBuilder: (final context, final index) {
                       if (index == _messages.length && _isTyping) {
                         return _buildTypingIndicator();
                       }
@@ -245,7 +245,7 @@ How can I help you today?''',
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: _quickQuestions.map((question) {
+                    children: _quickQuestions.map((final question) {
                       return GestureDetector(
                         onTap: () => _sendMessage(question),
                         child: Container(
@@ -348,7 +348,7 @@ How can I help you today?''',
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.smart_toy,
             size: 80,
             color: AppColors.grey300,
@@ -370,7 +370,7 @@ How can I help you today?''',
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
+  Widget _buildMessageBubble(final ChatMessage message) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -439,10 +439,10 @@ How can I help you today?''',
           ),
           if (message.isUser) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.grey200,
-              child: const Icon(Icons.person, size: 18, color: AppColors.grey600),
+              child: Icon(Icons.person, size: 18, color: AppColors.grey600),
             ),
           ],
         ],
@@ -471,9 +471,9 @@ How can I help you today?''',
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.grey100,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
                 bottomLeft: Radius.circular(4),
@@ -496,16 +496,16 @@ How can I help you today?''',
     );
   }
 
-  Widget _buildDot(int index) {
+  Widget _buildDot(final int index) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 600),
       curve: Curves.easeInOut,
-      builder: (context, value, child) {
+      builder: (final context, final value, final child) {
         return Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.grey400,
             shape: BoxShape.circle,
           ),
@@ -514,7 +514,7 @@ How can I help you today?''',
     );
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(final DateTime time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
@@ -523,7 +523,7 @@ How can I help you today?''',
   void _clearChat() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('New Chat'),
         content: const Text('Start a new conversation?'),
         actions: [
@@ -552,21 +552,21 @@ How can I help you today?''',
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
+      builder: (final context) => Container(
         padding: const EdgeInsets.all(24),
-        child: Column(
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Chat History',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
-            const Center(
+            SizedBox(height: 16),
+            Center(
               child: Column(
                 children: [
                   Icon(Icons.history, size: 48, color: AppColors.grey400),
@@ -578,7 +578,7 @@ How can I help you today?''',
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
           ],
         ),
       ),
@@ -591,7 +591,7 @@ How can I help you today?''',
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
+      builder: (final context) => Container(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -609,13 +609,13 @@ How can I help you today?''',
               title: const Text('Voice Messages'),
               subtitle: const Text('Enable voice input and output'),
               value: false,
-              onChanged: (value) {},
+              onChanged: (final value) {},
             ),
             SwitchListTile(
               title: const Text('Auto-save Chats'),
               subtitle: const Text('Save conversation history'),
               value: true,
-              onChanged: (value) {},
+              onChanged: (final value) {},
             ),
             ListTile(
               leading: const Icon(Icons.language),
@@ -637,7 +637,7 @@ How can I help you today?''',
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
+      builder: (final context) => Container(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -690,10 +690,10 @@ How can I help you today?''',
   }
 
   Widget _buildAttachmentOption({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
+    required final IconData icon,
+    required final String label,
+    required final Color color,
+    required final VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -722,10 +722,6 @@ How can I help you today?''',
 }
 
 class ChatMessage {
-  final String content;
-  final bool isUser;
-  final DateTime timestamp;
-  final bool isError;
 
   ChatMessage({
     required this.content,
@@ -733,4 +729,8 @@ class ChatMessage {
     required this.timestamp,
     this.isError = false,
   });
+  final String content;
+  final bool isUser;
+  final DateTime timestamp;
+  final bool isError;
 }

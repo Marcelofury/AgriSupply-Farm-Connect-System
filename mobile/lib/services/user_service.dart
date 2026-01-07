@@ -10,17 +10,16 @@ class UserService {
       final data = await _apiService.query(
         'users',
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => UserModel.fromJson(json)).toList();
+      return data.map(UserModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch users: $e');
     }
   }
 
   // Get farmers
-  Future<List<UserModel>> getFarmers({String? region}) async {
+  Future<List<UserModel>> getFarmers({final String? region}) async {
     try {
       final filters = <String, dynamic>{'role': 'farmer'};
       if (region != null) filters['region'] = region;
@@ -29,10 +28,9 @@ class UserService {
         'users',
         filters: filters,
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => UserModel.fromJson(json)).toList();
+      return data.map(UserModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch farmers: $e');
     }
@@ -45,17 +43,16 @@ class UserService {
         'users',
         filters: {'role': 'buyer'},
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => UserModel.fromJson(json)).toList();
+      return data.map(UserModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch buyers: $e');
     }
   }
 
   // Get user by ID
-  Future<UserModel?> getUserById(String userId) async {
+  Future<UserModel?> getUserById(final String userId) async {
     try {
       final data = await _apiService.getById('users', userId);
       if (data != null) {
@@ -68,22 +65,22 @@ class UserService {
   }
 
   // Search users
-  Future<List<UserModel>> searchUsers(String query) async {
+  Future<List<UserModel>> searchUsers(final String query) async {
     try {
       final response = await _apiService.get(
         '/users/search',
         queryParams: {'q': query},
       );
 
-      final List<dynamic> data = (response['data'] ?? response) as List<dynamic>;
-      return data.map((json) => UserModel.fromJson(json as Map<String, dynamic>)).toList();
+      final data = (response['data'] ?? response) as List<dynamic>;
+      return data.map((final json) => UserModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to search users: $e');
     }
   }
 
   // Verify user (admin)
-  Future<void> verifyUser(String userId) async {
+  Future<void> verifyUser(final String userId) async {
     try {
       await _apiService.update('users', userId, {
         'is_verified': true,
@@ -99,7 +96,7 @@ class UserService {
   }
 
   // Suspend user (admin)
-  Future<void> suspendUser(String userId, {String? reason}) async {
+  Future<void> suspendUser(final String userId, {final String? reason}) async {
     try {
       await _apiService.update('users', userId, {
         'is_suspended': true,
@@ -116,7 +113,7 @@ class UserService {
   }
 
   // Unsuspend user (admin)
-  Future<void> unsuspendUser(String userId) async {
+  Future<void> unsuspendUser(final String userId) async {
     try {
       await _apiService.update('users', userId, {
         'is_suspended': false,
@@ -133,7 +130,7 @@ class UserService {
   }
 
   // Delete user (admin)
-  Future<void> deleteUser(String userId) async {
+  Future<void> deleteUser(final String userId) async {
     try {
       // Delete related data first
       await _deleteUserData(userId);
@@ -146,7 +143,7 @@ class UserService {
   }
 
   // Update user role (admin)
-  Future<void> updateUserRole(String userId, String newRole) async {
+  Future<void> updateUserRole(final String userId, final String newRole) async {
     try {
       await _apiService.update('users', userId, {
         'role': newRole,
@@ -158,7 +155,7 @@ class UserService {
   }
 
   // Upgrade user to premium
-  Future<void> upgradeToPremium(String userId) async {
+  Future<void> upgradeToPremium(final String userId) async {
     try {
       await _apiService.update('users', userId, {
         'is_premium': true,
@@ -174,7 +171,7 @@ class UserService {
   }
 
   // Downgrade from premium
-  Future<void> downgradeFromPremium(String userId) async {
+  Future<void> downgradeFromPremium(final String userId) async {
     try {
       await _apiService.update('users', userId, {
         'is_premium': false,
@@ -192,15 +189,15 @@ class UserService {
       final users = await getAllUsers();
 
       final totalUsers = users.length;
-      final farmers = users.where((u) => u.role == UserRole.farmer).length;
-      final buyers = users.where((u) => u.role == UserRole.buyer).length;
-      final admins = users.where((u) => u.role == UserRole.admin).length;
-      final verified = users.where((u) => u.isVerified).length;
-      final premium = users.where((u) => u.isPremium).length;
-      final suspended = users.where((u) => u.isSuspended).length;
+      final farmers = users.where((final u) => u.role == UserRole.farmer).length;
+      final buyers = users.where((final u) => u.role == UserRole.buyer).length;
+      final admins = users.where((final u) => u.role == UserRole.admin).length;
+      final verified = users.where((final u) => u.isVerified).length;
+      final premium = users.where((final u) => u.isPremium).length;
+      final suspended = users.where((final u) => u.isSuspended).length;
 
       // Users by region
-      final Map<String, int> byRegion = {};
+      final byRegion = <String, int>{};
       for (final user in users) {
         if (user.region != null) {
           byRegion[user.region!] = (byRegion[user.region!] ?? 0) + 1;
@@ -209,9 +206,9 @@ class UserService {
 
       // New users this month
       final now = DateTime.now();
-      final thisMonth = DateTime(now.year, now.month, 1);
+      final thisMonth = DateTime(now.year, now.month);
       final newThisMonth = users
-          .where((u) => u.createdAt.isAfter(thisMonth))
+          .where((final u) => u.createdAt.isAfter(thisMonth))
           .length;
 
       return {
@@ -231,7 +228,7 @@ class UserService {
   }
 
   // Get farmer profile with products and ratings
-  Future<Map<String, dynamic>> getFarmerProfile(String farmerId) async {
+  Future<Map<String, dynamic>> getFarmerProfile(final String farmerId) async {
     try {
       final user = await getUserById(farmerId);
       if (user == null) throw Exception('Farmer not found');
@@ -258,12 +255,12 @@ class UserService {
 
       // Calculate average rating
       final ratings = reviews
-          .where((r) => r['rating'] != null)
-          .map((r) => (r['rating'] as num).toDouble())
+          .where((final r) => r['rating'] != null)
+          .map((final r) => (r['rating'] as num).toDouble())
           .toList();
       
       final avgRating = ratings.isNotEmpty
-          ? ratings.reduce((a, b) => a + b) / ratings.length
+          ? ratings.reduce((final a, final b) => a + b) / ratings.length
           : 0.0;
 
       return {
@@ -281,7 +278,7 @@ class UserService {
   }
 
   // Follow farmer
-  Future<void> followFarmer(String userId, String farmerId) async {
+  Future<void> followFarmer(final String userId, final String farmerId) async {
     try {
       await _apiService.insert('farmer_followers', {
         'user_id': userId,
@@ -294,7 +291,7 @@ class UserService {
   }
 
   // Unfollow farmer
-  Future<void> unfollowFarmer(String userId, String farmerId) async {
+  Future<void> unfollowFarmer(final String userId, final String farmerId) async {
     try {
       final followers = await _apiService.query(
         'farmer_followers',
@@ -311,7 +308,7 @@ class UserService {
   }
 
   // Check if following farmer
-  Future<bool> isFollowingFarmer(String userId, String farmerId) async {
+  Future<bool> isFollowingFarmer(final String userId, final String farmerId) async {
     try {
       final followers = await _apiService.query(
         'farmer_followers',
@@ -325,7 +322,7 @@ class UserService {
   }
 
   // Get followers count
-  Future<int> getFollowersCount(String farmerId) async {
+  Future<int> getFollowersCount(final String farmerId) async {
     try {
       final followers = await _apiService.query(
         'farmer_followers',
@@ -338,7 +335,7 @@ class UserService {
   }
 
   // Helper methods
-  Future<void> _deleteUserData(String userId) async {
+  Future<void> _deleteUserData(final String userId) async {
     // Delete products
     final products = await _apiService.query(
       'products',
@@ -367,7 +364,7 @@ class UserService {
     }
   }
 
-  Future<void> _sendVerificationNotification(String userId) async {
+  Future<void> _sendVerificationNotification(final String userId) async {
     try {
       await _apiService.insert('notifications', {
         'user_id': userId,
@@ -382,7 +379,7 @@ class UserService {
     }
   }
 
-  Future<void> _sendSuspensionNotification(String userId, String? reason) async {
+  Future<void> _sendSuspensionNotification(final String userId, final String? reason) async {
     try {
       await _apiService.insert('notifications', {
         'user_id': userId,
@@ -397,7 +394,7 @@ class UserService {
     }
   }
 
-  Future<void> _sendUnsuspensionNotification(String userId) async {
+  Future<void> _sendUnsuspensionNotification(final String userId) async {
     try {
       await _apiService.insert('notifications', {
         'user_id': userId,
@@ -412,7 +409,7 @@ class UserService {
     }
   }
 
-  Future<void> _sendPremiumNotification(String userId) async {
+  Future<void> _sendPremiumNotification(final String userId) async {
     try {
       await _apiService.insert('notifications', {
         'user_id': userId,

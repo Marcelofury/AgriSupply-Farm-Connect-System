@@ -76,7 +76,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Fetch farmers
-  Future<void> fetchFarmers({String? region}) async {
+  Future<void> fetchFarmers({final String? region}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -110,7 +110,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Get user by ID
-  Future<void> fetchUserById(String userId) async {
+  Future<void> fetchUserById(final String userId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -127,7 +127,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Search users
-  Future<void> searchUsers(String query) async {
+  Future<void> searchUsers(final String query) async {
     _searchQuery = query;
     
     if (query.isEmpty) {
@@ -151,13 +151,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Verify user (admin)
-  Future<bool> verifyUser(String userId) async {
+  Future<bool> verifyUser(final String userId) async {
     _errorMessage = null;
 
     try {
       await _userService.verifyUser(userId);
 
-      final index = _users.indexWhere((u) => u.id == userId);
+      final index = _users.indexWhere((final u) => u.id == userId);
       if (index >= 0) {
         _users[index] = _users[index].copyWith(isVerified: true);
       }
@@ -166,7 +166,7 @@ class UserProvider extends ChangeNotifier {
         _selectedUser = _selectedUser!.copyWith(isVerified: true);
       }
 
-      _verifiedUsers = _users.where((u) => u.isVerified).length;
+      _verifiedUsers = _users.where((final u) => u.isVerified).length;
       notifyListeners();
       return true;
     } catch (e) {
@@ -177,13 +177,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Suspend user (admin)
-  Future<bool> suspendUser(String userId, {String? reason}) async {
+  Future<bool> suspendUser(final String userId, {final String? reason}) async {
     _errorMessage = null;
 
     try {
       await _userService.suspendUser(userId, reason: reason);
 
-      final index = _users.indexWhere((u) => u.id == userId);
+      final index = _users.indexWhere((final u) => u.id == userId);
       if (index >= 0) {
         _users[index] = _users[index].copyWith(isSuspended: true);
       }
@@ -202,13 +202,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Unsuspend user (admin)
-  Future<bool> unsuspendUser(String userId) async {
+  Future<bool> unsuspendUser(final String userId) async {
     _errorMessage = null;
 
     try {
       await _userService.unsuspendUser(userId);
 
-      final index = _users.indexWhere((u) => u.id == userId);
+      final index = _users.indexWhere((final u) => u.id == userId);
       if (index >= 0) {
         _users[index] = _users[index].copyWith(isSuspended: false);
       }
@@ -227,15 +227,15 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Delete user (admin)
-  Future<bool> deleteUser(String userId) async {
+  Future<bool> deleteUser(final String userId) async {
     _errorMessage = null;
 
     try {
       await _userService.deleteUser(userId);
 
-      _users.removeWhere((u) => u.id == userId);
-      _farmers.removeWhere((u) => u.id == userId);
-      _buyers.removeWhere((u) => u.id == userId);
+      _users.removeWhere((final u) => u.id == userId);
+      _farmers.removeWhere((final u) => u.id == userId);
+      _buyers.removeWhere((final u) => u.id == userId);
 
       if (_selectedUser?.id == userId) {
         _selectedUser = null;
@@ -252,13 +252,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Update user role (admin)
-  Future<bool> updateUserRole(String userId, String newRole) async {
+  Future<bool> updateUserRole(final String userId, final String newRole) async {
     _errorMessage = null;
 
     try {
       await _userService.updateUserRole(userId, newRole);
 
-      final index = _users.indexWhere((u) => u.id == userId);
+      final index = _users.indexWhere((final u) => u.id == userId);
       if (index >= 0) {
         _users[index] = _users[index].copyWith(userType: newRole);
       }
@@ -278,13 +278,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Upgrade user to premium
-  Future<bool> upgradeToPremium(String userId) async {
+  Future<bool> upgradeToPremium(final String userId) async {
     _errorMessage = null;
 
     try {
       await _userService.upgradeToPremium(userId);
 
-      final index = _users.indexWhere((u) => u.id == userId);
+      final index = _users.indexWhere((final u) => u.id == userId);
       if (index >= 0) {
         _users[index] = _users[index].copyWith(isPremium: true);
       }
@@ -293,7 +293,7 @@ class UserProvider extends ChangeNotifier {
         _selectedUser = _selectedUser!.copyWith(isPremium: true);
       }
 
-      _premiumUsers = _users.where((u) => u.isPremium).length;
+      _premiumUsers = _users.where((final u) => u.isPremium).length;
       notifyListeners();
       return true;
     } catch (e) {
@@ -304,33 +304,33 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Filter users based on current filters
-  List<UserModel> _filterUsers(List<UserModel> users) {
+  List<UserModel> _filterUsers(final List<UserModel> users) {
     var filtered = users;
 
     // Filter by role
     if (_selectedRole != null) {
-      filtered = filtered.where((u) => u.role == _selectedRole).toList();
+      filtered = filtered.where((final u) => u.role == _selectedRole).toList();
     }
 
     // Filter by region
     if (_selectedRegion != null && _selectedRegion!.isNotEmpty) {
-      filtered = filtered.where((u) => u.region == _selectedRegion).toList();
+      filtered = filtered.where((final u) => u.region == _selectedRegion).toList();
     }
 
     // Filter by verified status
-    if (_verifiedOnly == true) {
-      filtered = filtered.where((u) => u.isVerified).toList();
+    if (_verifiedOnly ?? false) {
+      filtered = filtered.where((final u) => u.isVerified).toList();
     }
 
     // Filter by premium status
-    if (_premiumOnly == true) {
-      filtered = filtered.where((u) => u.isPremium).toList();
+    if (_premiumOnly ?? false) {
+      filtered = filtered.where((final u) => u.isPremium).toList();
     }
 
     // Filter by search query
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
-      filtered = filtered.where((u) {
+      filtered = filtered.where((final u) {
         return u.fullName.toLowerCase().contains(query) ||
             u.email.toLowerCase().contains(query) ||
             (u.phone?.toLowerCase().contains(query) ?? false) ||
@@ -342,27 +342,27 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Set filters
-  void setRoleFilter(String? role) {
+  void setRoleFilter(final String? role) {
     _selectedRole = role;
     notifyListeners();
   }
 
-  void setRegionFilter(String? region) {
+  void setRegionFilter(final String? region) {
     _selectedRegion = region;
     notifyListeners();
   }
 
-  void setVerifiedFilter(bool? verified) {
+  void setVerifiedFilter(final bool? verified) {
     _verifiedOnly = verified;
     notifyListeners();
   }
 
-  void setPremiumFilter(bool? premium) {
+  void setPremiumFilter(final bool? premium) {
     _premiumOnly = premium;
     notifyListeners();
   }
 
-  void setSearchQuery(String query) {
+  void setSearchQuery(final String query) {
     _searchQuery = query;
     notifyListeners();
   }
@@ -378,14 +378,14 @@ class UserProvider extends ChangeNotifier {
 
   void _calculateStats() {
     _totalUsers = _users.length;
-    _totalFarmers = _users.where((u) => u.role == UserRole.farmer).length;
-    _totalBuyers = _users.where((u) => u.role == UserRole.buyer).length;
-    _totalAdmins = _users.where((u) => u.role == UserRole.admin).length;
-    _verifiedUsers = _users.where((u) => u.isVerified).length;
-    _premiumUsers = _users.where((u) => u.isPremium).length;
+    _totalFarmers = _users.where((final u) => u.role == UserRole.farmer).length;
+    _totalBuyers = _users.where((final u) => u.role == UserRole.buyer).length;
+    _totalAdmins = _users.where((final u) => u.role == UserRole.admin).length;
+    _verifiedUsers = _users.where((final u) => u.isVerified).length;
+    _premiumUsers = _users.where((final u) => u.isPremium).length;
   }
 
-  void setSelectedUser(UserModel? user) {
+  void setSelectedUser(final UserModel? user) {
     _selectedUser = user;
     notifyListeners();
   }
@@ -396,13 +396,13 @@ class UserProvider extends ChangeNotifier {
   }
 
   // Get users by role
-  List<UserModel> getUsersByRole(String role) {
-    return _users.where((u) => u.role == role).toList();
+  List<UserModel> getUsersByRole(final String role) {
+    return _users.where((final u) => u.role == role).toList();
   }
 
   // Get user statistics by region
   Map<String, int> getUsersByRegion() {
-    final Map<String, int> regionCounts = {};
+    final regionCounts = <String, int>{};
     
     for (final user in _users) {
       if (user.region != null) {

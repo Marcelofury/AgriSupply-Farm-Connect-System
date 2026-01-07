@@ -8,14 +8,14 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/loading_overlay.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
-  final String email;
-  final String phone;
 
   const OtpVerificationScreen({
     super.key,
     required this.email,
     required this.phone,
   });
+  final String email;
+  final String phone;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -40,10 +40,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   void dispose() {
-    for (var controller in _controllers) {
+    for (final controller in _controllers) {
       controller.dispose();
     }
-    for (var node in _focusNodes) {
+    for (final node in _focusNodes) {
       node.dispose();
     }
     _timer?.cancel();
@@ -53,7 +53,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   void _startResendTimer() {
     _timer?.cancel();
     setState(() => _resendSeconds = 60);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (final timer) {
       if (_resendSeconds > 0) {
         setState(() => _resendSeconds--);
       } else {
@@ -62,7 +62,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     });
   }
 
-  String get _otp => _controllers.map((c) => c.text).join();
+  String get _otp => _controllers.map((final c) => c.text).join();
 
   Future<void> _verifyOtp() async {
     if (_otp.length != 6) {
@@ -113,7 +113,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -124,7 +124,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -177,7 +177,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 // OTP Input Fields
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(6, (index) {
+                  children: List.generate(6, (final index) {
                     return SizedBox(
                       width: 48,
                       height: 56,
@@ -210,7 +210,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],
-                        onChanged: (value) {
+                        onChanged: (final value) {
                           if (value.isNotEmpty && index < 5) {
                             _focusNodes[index + 1].requestFocus();
                           }

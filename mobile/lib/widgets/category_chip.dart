@@ -4,13 +4,6 @@ import '../config/theme.dart';
 import '../models/product_model.dart';
 
 class CategoryChip extends StatelessWidget {
-  final String? category;
-  final String? label;
-  final String? icon;
-  final bool isSelected;
-  final VoidCallback? onTap;
-  final bool showIcon;
-  final bool isLarge;
 
   const CategoryChip({
     super.key,
@@ -22,12 +15,19 @@ class CategoryChip extends StatelessWidget {
     this.showIcon = true,
     this.isLarge = false,
   }) : assert(category != null || label != null, 'Either category or label must be provided');
+  final String? category;
+  final String? label;
+  final String? icon;
+  final bool isSelected;
+  final VoidCallback? onTap;
+  final bool showIcon;
+  final bool isLarge;
 
   String get _displayText => label ?? category!;
   String get _iconText => icon ?? ProductCategory.getIcon(_displayText);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -79,13 +79,6 @@ class CategoryChip extends StatelessWidget {
 }
 
 class CategoryChipList extends StatelessWidget {
-  final List<String> categories;
-  final String? selectedCategory;
-  final ValueChanged<String>? onCategorySelected;
-  final bool showAllOption;
-  final bool showIcons;
-  final bool isLarge;
-  final EdgeInsets padding;
 
   const CategoryChipList({
     super.key,
@@ -97,9 +90,16 @@ class CategoryChipList extends StatelessWidget {
     this.isLarge = false,
     this.padding = const EdgeInsets.symmetric(horizontal: 16),
   });
+  final List<String> categories;
+  final String? selectedCategory;
+  final ValueChanged<String>? onCategorySelected;
+  final bool showAllOption;
+  final bool showIcons;
+  final bool isLarge;
+  final EdgeInsets padding;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final allCategories = showAllOption ? ['All', ...categories] : categories;
 
     return SizedBox(
@@ -108,8 +108,8 @@ class CategoryChipList extends StatelessWidget {
         padding: padding,
         scrollDirection: Axis.horizontal,
         itemCount: allCategories.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
+        separatorBuilder: (final context, final index) => const SizedBox(width: 8),
+        itemBuilder: (final context, final index) {
           final category = allCategories[index];
           final isSelected = category == selectedCategory ||
               (selectedCategory == null && category == 'All');
@@ -128,9 +128,6 @@ class CategoryChipList extends StatelessWidget {
 }
 
 class CategoryCard extends StatelessWidget {
-  final String category;
-  final VoidCallback? onTap;
-  final int productCount;
 
   const CategoryCard({
     super.key,
@@ -138,9 +135,12 @@ class CategoryCard extends StatelessWidget {
     this.onTap,
     this.productCount = 0,
   });
+  final String category;
+  final VoidCallback? onTap;
+  final int productCount;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -186,7 +186,7 @@ class CategoryCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '$productCount products',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.grey500,
                 ),
@@ -200,11 +200,6 @@ class CategoryCard extends StatelessWidget {
 }
 
 class CategoryGrid extends StatelessWidget {
-  final List<String> categories;
-  final ValueChanged<String>? onCategorySelected;
-  final Map<String, int>? productCounts;
-  final int crossAxisCount;
-  final double spacing;
 
   const CategoryGrid({
     super.key,
@@ -214,9 +209,14 @@ class CategoryGrid extends StatelessWidget {
     this.crossAxisCount = 3,
     this.spacing = 12,
   });
+  final List<String> categories;
+  final ValueChanged<String>? onCategorySelected;
+  final Map<String, int>? productCounts;
+  final int crossAxisCount;
+  final double spacing;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -227,7 +227,7 @@ class CategoryGrid extends StatelessWidget {
         childAspectRatio: 0.9,
       ),
       itemCount: categories.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (final context, final index) {
         final category = categories[index];
         return CategoryCard(
           category: category,
@@ -240,11 +240,6 @@ class CategoryGrid extends StatelessWidget {
 }
 
 class FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback? onTap;
-  final IconData? icon;
-  final Color? selectedColor;
 
   const FilterChip({
     super.key,
@@ -254,9 +249,14 @@ class FilterChip extends StatelessWidget {
     this.icon,
     this.selectedColor,
   });
+  final String label;
+  final bool isSelected;
+  final VoidCallback? onTap;
+  final IconData? icon;
+  final Color? selectedColor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final color = selectedColor ?? AppColors.primaryGreen;
 
     return GestureDetector(
@@ -306,10 +306,6 @@ class FilterChip extends StatelessWidget {
 }
 
 class TagChip extends StatelessWidget {
-  final String label;
-  final Color? color;
-  final IconData? icon;
-  final VoidCallback? onRemove;
 
   const TagChip({
     super.key,
@@ -318,9 +314,13 @@ class TagChip extends StatelessWidget {
     this.icon,
     this.onRemove,
   });
+  final String label;
+  final Color? color;
+  final IconData? icon;
+  final VoidCallback? onRemove;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final chipColor = color ?? AppColors.primaryGreen;
 
     return Container(

@@ -4,9 +4,6 @@ import '../config/theme.dart';
 import '../models/order_model.dart';
 
 class OrderStatusBadge extends StatelessWidget {
-  final String status;
-  final bool isLarge;
-  final bool showIcon;
 
   const OrderStatusBadge({
     super.key,
@@ -14,9 +11,12 @@ class OrderStatusBadge extends StatelessWidget {
     this.isLarge = false,
     this.showIcon = true,
   });
+  final String status;
+  final bool isLarge;
+  final bool showIcon;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final statusInfo = _getStatusInfo(status);
 
     return Container(
@@ -55,7 +55,7 @@ class OrderStatusBadge extends StatelessWidget {
     );
   }
 
-  _StatusInfo _getStatusInfo(String status) {
+  _StatusInfo _getStatusInfo(final String status) {
     if (status == OrderStatus.pending) {
       return _StatusInfo(
         label: 'Pending',
@@ -115,21 +115,18 @@ class OrderStatusBadge extends StatelessWidget {
 }
 
 class _StatusInfo {
-  final String label;
-  final Color color;
-  final IconData icon;
 
   _StatusInfo({
     required this.label,
     required this.color,
     required this.icon,
   });
+  final String label;
+  final Color color;
+  final IconData icon;
 }
 
 class OrderStatusTimeline extends StatelessWidget {
-  final String currentStatus;
-  final Map<String, DateTime>? statusDates;
-  final bool isVertical;
 
   const OrderStatusTimeline({
     super.key,
@@ -137,6 +134,9 @@ class OrderStatusTimeline extends StatelessWidget {
     this.statusDates,
     this.isVertical = true,
   });
+  final String currentStatus;
+  final Map<String, DateTime>? statusDates;
+  final bool isVertical;
 
   static final List<String> _normalFlow = [
     OrderStatus.pending,
@@ -148,7 +148,7 @@ class OrderStatusTimeline extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (currentStatus == OrderStatus.cancelled ||
         currentStatus == OrderStatus.refunded) {
       return _buildCancelledTimeline(context);
@@ -158,7 +158,7 @@ class OrderStatusTimeline extends StatelessWidget {
 
     if (isVertical) {
       return Column(
-        children: List.generate(_normalFlow.length, (index) {
+        children: List.generate(_normalFlow.length, (final index) {
           final status = _normalFlow[index];
           final isCompleted = index <= currentIndex;
           final isCurrent = index == currentIndex;
@@ -178,7 +178,7 @@ class OrderStatusTimeline extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: List.generate(_normalFlow.length, (index) {
+        children: List.generate(_normalFlow.length, (final index) {
           final status = _normalFlow[index];
           final isCompleted = index <= currentIndex;
           final isCurrent = index == currentIndex;
@@ -196,7 +196,7 @@ class OrderStatusTimeline extends StatelessWidget {
     );
   }
 
-  Widget _buildCancelledTimeline(BuildContext context) {
+  Widget _buildCancelledTimeline(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -234,7 +234,7 @@ class OrderStatusTimeline extends StatelessWidget {
                 if (statusDates?[currentStatus] != null)
                   Text(
                     _formatDate(statusDates![currentStatus]!),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.grey500,
                     ),
@@ -247,7 +247,7 @@ class OrderStatusTimeline extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(final DateTime date) {
     final months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -255,7 +255,7 @@ class OrderStatusTimeline extends StatelessWidget {
     return '${months[date.month - 1]} ${date.day}, ${date.year} at ${_formatTime(date)}';
   }
 
-  String _formatTime(DateTime date) {
+  String _formatTime(final DateTime date) {
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
     final period = date.hour >= 12 ? 'PM' : 'AM';
     return '$hour:${date.minute.toString().padLeft(2, '0')} $period';
@@ -263,11 +263,6 @@ class OrderStatusTimeline extends StatelessWidget {
 }
 
 class _TimelineItem extends StatelessWidget {
-  final String status;
-  final bool isCompleted;
-  final bool isCurrent;
-  final bool isLast;
-  final DateTime? date;
 
   const _TimelineItem({
     required this.status,
@@ -276,9 +271,14 @@ class _TimelineItem extends StatelessWidget {
     required this.isLast,
     this.date,
   });
+  final String status;
+  final bool isCompleted;
+  final bool isCurrent;
+  final bool isLast;
+  final DateTime? date;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final statusInfo = _getStatusInfo();
 
     return IntrinsicHeight(
@@ -338,7 +338,7 @@ class _TimelineItem extends StatelessWidget {
                   if (date != null)
                     Text(
                       _formatDate(date!),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.grey500,
                       ),
@@ -348,7 +348,7 @@ class _TimelineItem extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
                         statusInfo.description,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.grey600,
                         ),
@@ -416,7 +416,7 @@ class _TimelineItem extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(final DateTime date) {
     final months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -424,7 +424,7 @@ class _TimelineItem extends StatelessWidget {
     return '${months[date.month - 1]} ${date.day} at ${_formatTime(date)}';
   }
 
-  String _formatTime(DateTime date) {
+  String _formatTime(final DateTime date) {
     final hour = date.hour > 12 ? date.hour - 12 : date.hour;
     final period = date.hour >= 12 ? 'PM' : 'AM';
     return '$hour:${date.minute.toString().padLeft(2, '0')} $period';
@@ -432,10 +432,6 @@ class _TimelineItem extends StatelessWidget {
 }
 
 class _StatusInfoExtended {
-  final String label;
-  final Color color;
-  final IconData icon;
-  final String description;
 
   _StatusInfoExtended({
     required this.label,
@@ -443,14 +439,13 @@ class _StatusInfoExtended {
     required this.icon,
     required this.description,
   });
+  final String label;
+  final Color color;
+  final IconData icon;
+  final String description;
 }
 
 class _HorizontalTimelineItem extends StatelessWidget {
-  final String status;
-  final bool isCompleted;
-  final bool isCurrent;
-  final bool isLast;
-  final DateTime? date;
 
   const _HorizontalTimelineItem({
     required this.status,
@@ -459,9 +454,14 @@ class _HorizontalTimelineItem extends StatelessWidget {
     required this.isLast,
     this.date,
   });
+  final String status;
+  final bool isCompleted;
+  final bool isCurrent;
+  final bool isLast;
+  final DateTime? date;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final statusInfo = _getStatusInfo();
 
     return Row(
@@ -565,17 +565,17 @@ class _HorizontalTimelineItem extends StatelessWidget {
 }
 
 class PaymentStatusBadge extends StatelessWidget {
-  final PaymentStatus status;
-  final bool isLarge;
 
   const PaymentStatusBadge({
     super.key,
     required this.status,
     this.isLarge = false,
   });
+  final PaymentStatus status;
+  final bool isLarge;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final statusInfo = _getStatusInfo(status);
 
     return Container(
@@ -609,7 +609,7 @@ class PaymentStatusBadge extends StatelessWidget {
     );
   }
 
-  _StatusInfo _getStatusInfo(PaymentStatus status) {
+  _StatusInfo _getStatusInfo(final PaymentStatus status) {
     switch (status) {
       case PaymentStatus.pending:
         return _StatusInfo(

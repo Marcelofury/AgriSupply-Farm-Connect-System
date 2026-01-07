@@ -3,12 +3,6 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
 class RatingStars extends StatelessWidget {
-  final double rating;
-  final double size;
-  final Color? activeColor;
-  final Color? inactiveColor;
-  final bool showValue;
-  final int? reviewCount;
 
   const RatingStars({
     super.key,
@@ -19,13 +13,19 @@ class RatingStars extends StatelessWidget {
     this.showValue = false,
     this.reviewCount,
   });
+  final double rating;
+  final double size;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final bool showValue;
+  final int? reviewCount;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ...List.generate(5, (index) {
+        ...List.generate(5, (final index) {
           final starValue = index + 1;
           IconData icon;
           Color color;
@@ -70,12 +70,6 @@ class RatingStars extends StatelessWidget {
 }
 
 class RatingInput extends StatelessWidget {
-  final double rating;
-  final ValueChanged<double> onRatingChanged;
-  final double size;
-  final Color? activeColor;
-  final Color? inactiveColor;
-  final bool allowHalf;
 
   const RatingInput({
     super.key,
@@ -86,12 +80,18 @@ class RatingInput extends StatelessWidget {
     this.inactiveColor,
     this.allowHalf = false,
   });
+  final double rating;
+  final ValueChanged<double> onRatingChanged;
+  final double size;
+  final Color? activeColor;
+  final Color? inactiveColor;
+  final bool allowHalf;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (index) {
+      children: List.generate(5, (final index) {
         final starValue = index + 1.0;
         final isActive = rating >= starValue;
         final isHalf = allowHalf && rating >= starValue - 0.5 && rating < starValue;
@@ -99,7 +99,7 @@ class RatingInput extends StatelessWidget {
         return GestureDetector(
           onTap: () => onRatingChanged(starValue),
           onHorizontalDragUpdate: allowHalf
-              ? (details) {
+              ? (final details) {
                   final halfWidth = size / 2;
                   final isLeftHalf = details.localPosition.dx < halfWidth;
                   onRatingChanged(isLeftHalf ? starValue - 0.5 : starValue);
@@ -126,10 +126,6 @@ class RatingInput extends StatelessWidget {
 }
 
 class RatingBar extends StatelessWidget {
-  final int starNumber;
-  final double percentage;
-  final int count;
-  final Color? barColor;
 
   const RatingBar({
     super.key,
@@ -138,16 +134,20 @@ class RatingBar extends StatelessWidget {
     this.count = 0,
     this.barColor,
   });
+  final int starNumber;
+  final double percentage;
+  final int count;
+  final Color? barColor;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       children: [
         SizedBox(
           width: 16,
           child: Text(
             '$starNumber',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.grey600,
             ),
@@ -183,7 +183,7 @@ class RatingBar extends StatelessWidget {
           width: 40,
           child: Text(
             count.toString(),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.grey600,
             ),
@@ -196,9 +196,6 @@ class RatingBar extends StatelessWidget {
 }
 
 class RatingBreakdown extends StatelessWidget {
-  final double averageRating;
-  final int totalReviews;
-  final Map<int, int> ratingCounts;
 
   const RatingBreakdown({
     super.key,
@@ -206,9 +203,12 @@ class RatingBreakdown extends StatelessWidget {
     required this.totalReviews,
     required this.ratingCounts,
   });
+  final double averageRating;
+  final int totalReviews;
+  final Map<int, int> ratingCounts;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -226,7 +226,7 @@ class RatingBreakdown extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '$totalReviews reviews',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.grey500,
               ),
@@ -238,7 +238,7 @@ class RatingBreakdown extends StatelessWidget {
         // Breakdown Bars
         Expanded(
           child: Column(
-            children: List.generate(5, (index) {
+            children: List.generate(5, (final index) {
               final starNumber = 5 - index;
               final count = ratingCounts[starNumber] ?? 0;
               final percentage = totalReviews > 0 ? count / totalReviews : 0.0;
@@ -260,13 +260,6 @@ class RatingBreakdown extends StatelessWidget {
 }
 
 class RatingCard extends StatelessWidget {
-  final String userName;
-  final String? userPhoto;
-  final double rating;
-  final DateTime date;
-  final String? comment;
-  final List<String>? images;
-  final VoidCallback? onReport;
 
   const RatingCard({
     super.key,
@@ -278,9 +271,16 @@ class RatingCard extends StatelessWidget {
     this.images,
     this.onReport,
   });
+  final String userName;
+  final String? userPhoto;
+  final double rating;
+  final DateTime date;
+  final String? comment;
+  final List<String>? images;
+  final VoidCallback? onReport;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -322,7 +322,7 @@ class RatingCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           _formatDate(date),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.grey500,
                           ),
@@ -335,7 +335,7 @@ class RatingCard extends StatelessWidget {
               if (onReport != null)
                 IconButton(
                   onPressed: onReport,
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.more_vert,
                     color: AppColors.grey500,
                   ),
@@ -348,7 +348,7 @@ class RatingCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               comment!,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.grey700,
                 height: 1.4,
               ),
@@ -361,8 +361,8 @@ class RatingCard extends StatelessWidget {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: images!.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
+                separatorBuilder: (final context, final index) => const SizedBox(width: 8),
+                itemBuilder: (final context, final index) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
@@ -381,7 +381,7 @@ class RatingCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(final DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
@@ -405,9 +405,6 @@ class RatingCard extends StatelessWidget {
 }
 
 class QuickRating extends StatelessWidget {
-  final double rating;
-  final Color? color;
-  final bool showStar;
 
   const QuickRating({
     super.key,
@@ -415,9 +412,12 @@ class QuickRating extends StatelessWidget {
     this.color,
     this.showStar = true,
   });
+  final double rating;
+  final Color? color;
+  final bool showStar;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(

@@ -1,18 +1,4 @@
 class ReviewModel {
-  final String id;
-  final String orderId;
-  final String productId;
-  final String farmerId;
-  final String buyerId;
-  final String buyerName;
-  final String? buyerImage;
-  final double rating;
-  final String? comment;
-  final List<String>? images;
-  final String? farmerReply;
-  final DateTime? replyAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   ReviewModel({
     required this.id,
@@ -51,6 +37,20 @@ class ReviewModel {
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
   }
+  final String id;
+  final String orderId;
+  final String productId;
+  final String farmerId;
+  final String buyerId;
+  final String buyerName;
+  final String? buyerImage;
+  final double rating;
+  final String? comment;
+  final List<String>? images;
+  final String? farmerReply;
+  final DateTime? replyAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() {
     return {

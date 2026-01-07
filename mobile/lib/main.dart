@@ -35,7 +35,7 @@ class AgriSupplyApp extends StatelessWidget {
   const AgriSupplyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),

@@ -16,14 +16,14 @@ class NotificationProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasNewNotifications => _hasNewNotifications;
 
-  int get unreadCount => _notifications.where((n) => !n.isRead).length;
+  int get unreadCount => _notifications.where((final n) => !n.isRead).length;
 
   List<NotificationModel> get unreadNotifications =>
-      _notifications.where((n) => !n.isRead).toList();
+      _notifications.where((final n) => !n.isRead).toList();
 
   // Group notifications by date
   Map<String, List<NotificationModel>> get groupedNotifications {
-    final Map<String, List<NotificationModel>> grouped = {};
+    final grouped = <String, List<NotificationModel>>{};
     final now = DateTime.now();
 
     for (final notification in _notifications) {
@@ -53,14 +53,14 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Fetch notifications for user
-  Future<void> fetchNotifications(String userId) async {
+  Future<void> fetchNotifications(final String userId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       _notifications = await _notificationService.getNotifications(userId);
-      _hasNewNotifications = _notifications.any((n) => !n.isRead);
+      _hasNewNotifications = _notifications.any((final n) => !n.isRead);
       _isLoading = false;
     } catch (e) {
       _errorMessage = e.toString();
@@ -71,16 +71,16 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Mark single notification as read
-  Future<void> markAsRead(String notificationId) async {
+  Future<void> markAsRead(final String notificationId) async {
     try {
       await _notificationService.markAsRead(notificationId);
 
-      final index = _notifications.indexWhere((n) => n.id == notificationId);
+      final index = _notifications.indexWhere((final n) => n.id == notificationId);
       if (index >= 0) {
         _notifications[index] = _notifications[index].copyWith(isRead: true);
       }
 
-      _hasNewNotifications = _notifications.any((n) => !n.isRead);
+      _hasNewNotifications = _notifications.any((final n) => !n.isRead);
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
@@ -89,11 +89,11 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Mark all notifications as read
-  Future<void> markAllAsRead(String userId) async {
+  Future<void> markAllAsRead(final String userId) async {
     try {
       await _notificationService.markAllAsRead(userId);
 
-      _notifications = _notifications.map((n) {
+      _notifications = _notifications.map((final n) {
         return n.copyWith(isRead: true);
       }).toList();
 
@@ -106,11 +106,11 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Delete notification
-  Future<void> deleteNotification(String notificationId) async {
+  Future<void> deleteNotification(final String notificationId) async {
     try {
       await _notificationService.deleteNotification(notificationId);
-      _notifications.removeWhere((n) => n.id == notificationId);
-      _hasNewNotifications = _notifications.any((n) => !n.isRead);
+      _notifications.removeWhere((final n) => n.id == notificationId);
+      _hasNewNotifications = _notifications.any((final n) => !n.isRead);
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
@@ -119,7 +119,7 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Clear all notifications
-  Future<void> clearAllNotifications(String userId) async {
+  Future<void> clearAllNotifications(final String userId) async {
     try {
       await _notificationService.clearAllNotifications(userId);
       _notifications.clear();
@@ -132,7 +132,7 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Handle notification tap - navigate based on type
-  void onNotificationTap(NotificationModel notification) {
+  void onNotificationTap(final NotificationModel notification) {
     if (!notification.isRead) {
       markAsRead(notification.id);
     }
@@ -142,7 +142,7 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Add new notification (for real-time updates)
-  void addNotification(NotificationModel notification) {
+  void addNotification(final NotificationModel notification) {
     _notifications.insert(0, notification);
     _hasNewNotifications = true;
     notifyListeners();
@@ -150,12 +150,12 @@ class NotificationProvider extends ChangeNotifier {
 
   // Update notification preferences
   Future<void> updatePreferences({
-    required String userId,
-    bool? orderUpdates,
-    bool? newMessages,
-    bool? promotions,
-    bool? priceAlerts,
-    bool? farmingTips,
+    required final String userId,
+    final bool? orderUpdates,
+    final bool? newMessages,
+    final bool? promotions,
+    final bool? priceAlerts,
+    final bool? farmingTips,
   }) async {
     try {
       await _notificationService.updatePreferences(
@@ -174,15 +174,15 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   // Get notifications by type
-  List<NotificationModel> getByType(NotificationType type) {
-    return _notifications.where((n) => n.type == type).toList();
+  List<NotificationModel> getByType(final NotificationType type) {
+    return _notifications.where((final n) => n.type == type).toList();
   }
 
   // Subscribe to real-time notifications
-  void subscribeToNotifications(String userId) {
+  void subscribeToNotifications(final String userId) {
     _notificationService.subscribeToNotifications(
       userId,
-      onNewNotification: (notification) {
+      onNewNotification: (final notification) {
         addNotification(notification);
       },
     );

@@ -13,7 +13,7 @@ class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Cart'),
@@ -22,7 +22,7 @@ class CartScreen extends StatelessWidget {
         elevation: 0,
         actions: [
           Consumer<CartProvider>(
-            builder: (context, cartProvider, child) {
+            builder: (final context, final cartProvider, final child) {
               if (cartProvider.itemCount > 0) {
                 return TextButton(
                   onPressed: () => _showClearCartDialog(context, cartProvider),
@@ -38,7 +38,7 @@ class CartScreen extends StatelessWidget {
         ],
       ),
       body: Consumer<CartProvider>(
-        builder: (context, cartProvider, child) {
+        builder: (final context, final cartProvider, final child) {
           if (cartProvider.items.isEmpty) {
             return _buildEmptyCart(context);
           }
@@ -46,7 +46,7 @@ class CartScreen extends StatelessWidget {
         },
       ),
       bottomSheet: Consumer<CartProvider>(
-        builder: (context, cartProvider, child) {
+        builder: (final context, final cartProvider, final child) {
           if (cartProvider.items.isEmpty) {
             return const SizedBox.shrink();
           }
@@ -56,12 +56,12 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyCart(BuildContext context) {
+  Widget _buildEmptyCart(final BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.shopping_cart_outlined,
             size: 100,
             color: AppColors.grey400,
@@ -88,16 +88,16 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartContent(BuildContext context, CartProvider cartProvider) {
+  Widget _buildCartContent(final BuildContext context, final CartProvider cartProvider) {
     final items = cartProvider.items;
     final farmerIds = cartProvider.farmerIds.toList();
 
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 200),
       itemCount: farmerIds.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (final context, final index) {
         final farmerId = farmerIds[index];
-        final farmerItems = items.where((item) => item.product.farmerId == farmerId).toList();
+        final farmerItems = items.where((final item) => item.product.farmerId == farmerId).toList();
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +119,7 @@ class CartScreen extends StatelessWidget {
               ),
             ),
             // Items from this farmer
-            ...farmerItems.map((item) => _buildCartItem(context, item, cartProvider)),
+            ...farmerItems.map((final item) => _buildCartItem(context, item, cartProvider)),
             if (index < farmerIds.length - 1)
               const Divider(height: 32),
           ],
@@ -128,7 +128,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(BuildContext context, CartItemModel item, CartProvider cartProvider) {
+  Widget _buildCartItem(final BuildContext context, final CartItemModel item, final CartProvider cartProvider) {
     final product = item.product;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -149,8 +149,7 @@ class CartScreen extends StatelessWidget {
           // Product Image
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: product.primaryImage != null
-                ? CachedNetworkImage(
+            child: CachedNetworkImage(
                     imageUrl: product.primaryImage!,
                     width: 80,
                     height: 80,
@@ -163,12 +162,6 @@ class CartScreen extends StatelessWidget {
                       color: AppColors.grey200,
                       child: const Icon(Icons.image),
                     ),
-                  )
-                : Container(
-                    width: 80,
-                    height: 80,
-                    color: AppColors.grey200,
-                    child: const Icon(Icons.image),
                   ),
           ),
           const SizedBox(width: 12),
@@ -252,8 +245,8 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildQuantityButton({
-    required IconData icon,
-    required VoidCallback onPressed,
+    required final IconData icon,
+    required final VoidCallback onPressed,
   }) {
     return Container(
       width: 32,
@@ -270,7 +263,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, CartProvider cartProvider) {
+  Widget _buildBottomBar(final BuildContext context, final CartProvider cartProvider) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -331,11 +324,11 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildSummaryRow(
-    BuildContext context,
-    String label,
-    String value, {
-    bool isBold = false,
-    bool isSubtle = false,
+    final BuildContext context,
+    final String label,
+    final String value, {
+    final bool isBold = false,
+    final bool isSubtle = false,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -358,10 +351,10 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  void _showClearCartDialog(BuildContext context, CartProvider cartProvider) {
+  void _showClearCartDialog(final BuildContext context, final CartProvider cartProvider) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Clear Cart'),
         content: const Text('Are you sure you want to remove all items from your cart?'),
         actions: [

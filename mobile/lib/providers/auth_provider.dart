@@ -19,6 +19,10 @@ enum UserRole {
 }
 
 class AuthProvider extends ChangeNotifier {
+
+  AuthProvider() {
+    _initializeAuth();
+  }
   final AuthService _authService = AuthService();
 
   AuthStatus _status = AuthStatus.initial;
@@ -36,10 +40,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isBuyer => _user?.userType == 'buyer';
   bool get isAdmin => _user?.userType == 'admin';
   bool get isPremium => _user?.isPremium ?? false;
-
-  AuthProvider() {
-    _initializeAuth();
-  }
 
   Future<void> _initializeAuth() async {
     _setLoading(true);
@@ -60,7 +60,7 @@ class AuthProvider extends ChangeNotifier {
     _setLoading(false);
 
     // Listen to auth state changes
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    Supabase.instance.client.auth.onAuthStateChange.listen((final data) {
       final event = data.event;
       final session = data.session;
 
@@ -74,7 +74,7 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> _loadUserProfile(String userId) async {
+  Future<void> _loadUserProfile(final String userId) async {
     try {
       _user = await _authService.getUserProfile(userId);
       _status = AuthStatus.authenticated;
@@ -86,14 +86,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> signUp({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    String? farmName,
-    String? region,
-    String? district,
+    required final String email,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? farmName,
+    final String? region,
+    final String? district,
   }) async {
     _setLoading(true);
     _clearError();
@@ -127,8 +127,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> signIn({
-    required String email,
-    required String password,
+    required final String email,
+    required final String password,
   }) async {
     _setLoading(true);
     _clearError();
@@ -156,7 +156,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> signInWithPhone({
-    required String phone,
+    required final String phone,
   }) async {
     _setLoading(true);
     _clearError();
@@ -173,8 +173,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> verifyOtp({
-    required String phone,
-    required String otp,
+    required final String phone,
+    required final String otp,
   }) async {
     _setLoading(true);
     _clearError();
@@ -221,7 +221,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> resetPassword({required String email}) async {
+  Future<bool> resetPassword({required final String email}) async {
     _setLoading(true);
     _clearError();
 
@@ -236,7 +236,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updatePassword({required String newPassword}) async {
+  Future<bool> updatePassword({required final String newPassword}) async {
     _setLoading(true);
     _clearError();
 
@@ -252,14 +252,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> updateProfile({
-    String? fullName,
-    String? phone,
-    String? photoUrl,
-    String? farmName,
-    String? region,
-    String? district,
-    String? address,
-    String? bio,
+    final String? fullName,
+    final String? phone,
+    final String? photoUrl,
+    final String? farmName,
+    final String? region,
+    final String? district,
+    final String? address,
+    final String? bio,
   }) async {
     if (_user == null) return false;
 
@@ -336,7 +336,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  void _setLoading(bool value) {
+  void _setLoading(final bool value) {
     _isLoading = value;
     notifyListeners();
   }
@@ -345,7 +345,7 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
   }
 
-  String _parseError(dynamic error) {
+  String _parseError(final dynamic error) {
     if (error is AuthException) {
       switch (error.message) {
         case 'Invalid login credentials':

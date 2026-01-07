@@ -6,16 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 // Mock User model for testing
 class User {
-  final String id;
-  final String email;
-  final String fullName;
-  final String phone;
-  final String role;
-  final String? avatar;
-  final String? region;
-  final String? district;
-  final bool isVerified;
-  final DateTime createdAt;
 
   User({
     required this.id,
@@ -29,14 +19,24 @@ class User {
     this.isVerified = false,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
+  final String id;
+  final String email;
+  final String fullName;
+  final String phone;
+  final String role;
+  final String? avatar;
+  final String? region;
+  final String? district;
+  final bool isVerified;
+  final DateTime createdAt;
 
   User copyWith({
-    String? fullName,
-    String? phone,
-    String? avatar,
-    String? region,
-    String? district,
-    bool? isVerified,
+    final String? fullName,
+    final String? phone,
+    final String? avatar,
+    final String? region,
+    final String? district,
+    final bool? isVerified,
   }) {
     return User(
       id: id,
@@ -82,7 +82,7 @@ class AuthProvider {
   bool get isVerified => _user?.isVerified ?? false;
 
   // Simulate login
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(final String email, final String password) async {
     _state = AuthState.loading;
     _error = null;
 
@@ -163,13 +163,13 @@ class AuthProvider {
 
   // Simulate registration
   Future<bool> register({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    String? region,
-    String? district,
+    required final String email,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? region,
+    final String? district,
   }) async {
     _state = AuthState.loading;
     _error = null;
@@ -227,7 +227,6 @@ class AuthProvider {
       role: role,
       region: region,
       district: district,
-      isVerified: false,
     );
     _accessToken = 'mock-new-token';
     _refreshToken = 'mock-new-refresh';
@@ -246,10 +245,10 @@ class AuthProvider {
 
   // Update profile
   Future<bool> updateProfile({
-    String? fullName,
-    String? phone,
-    String? region,
-    String? district,
+    final String? fullName,
+    final String? phone,
+    final String? region,
+    final String? district,
   }) async {
     if (_user == null) {
       _error = 'Not authenticated';
@@ -278,7 +277,7 @@ class AuthProvider {
   }
 
   // Verify phone
-  Future<bool> verifyPhone(String otp) async {
+  Future<bool> verifyPhone(final String otp) async {
     if (_user == null) {
       _error = 'Not authenticated';
       return false;
@@ -300,7 +299,7 @@ class AuthProvider {
   }
 
   // Password reset
-  Future<bool> forgotPassword(String email) async {
+  Future<bool> forgotPassword(final String email) async {
     if (!_isValidEmail(email)) {
       _error = 'Invalid email format';
       return false;
@@ -335,18 +334,18 @@ class AuthProvider {
   }
 
   // Helpers
-  bool _isValidEmail(String email) {
+  bool _isValidEmail(final String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  bool _isValidPassword(String password) {
+  bool _isValidPassword(final String password) {
     return password.length >= 8 &&
-        RegExp(r'[A-Z]').hasMatch(password) &&
-        RegExp(r'[a-z]').hasMatch(password) &&
-        RegExp(r'[0-9]').hasMatch(password);
+        RegExp('[A-Z]').hasMatch(password) &&
+        RegExp('[a-z]').hasMatch(password) &&
+        RegExp('[0-9]').hasMatch(password);
   }
 
-  bool _isValidUgandanPhone(String phone) {
+  bool _isValidUgandanPhone(final String phone) {
     return RegExp(r'^\+256[0-9]{9}$').hasMatch(phone);
   }
 }

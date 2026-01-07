@@ -95,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -106,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -146,7 +146,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 12),
                   Row(
-                    children: _userTypes.map((type) {
+                    children: _userTypes.map((final type) {
                       final isSelected = _selectedUserType == (type['value'] as String);
                       return Expanded(
                         child: GestureDetector(
@@ -216,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     label: 'Full Name',
                     hint: 'Enter your full name',
                     prefixIcon: Icons.person_outlined,
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your full name';
                       }
@@ -235,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: 'Enter your email',
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
@@ -255,7 +255,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: 'e.g., +256 700 123 456',
                     keyboardType: TextInputType.phone,
                     prefixIcon: Icons.phone_outlined,
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your phone number';
                       }
@@ -282,7 +282,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
                     ),
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter a password';
                       }
@@ -313,7 +313,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _obscureConfirmPassword = !_obscureConfirmPassword);
                       },
                     ),
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please confirm your password';
                       }
@@ -330,7 +330,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       Checkbox(
                         value: _agreeToTerms,
-                        onChanged: (value) {
+                        onChanged: (final value) {
                           setState(() => _agreeToTerms = value ?? false);
                         },
                         activeColor: AppColors.primaryGreen,
@@ -339,8 +339,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: RichText(
                           text: TextSpan(
                             style: Theme.of(context).textTheme.bodySmall,
-                            children: [
-                              const TextSpan(text: 'I agree to the '),
+                            children: const [
+                              TextSpan(text: 'I agree to the '),
                               TextSpan(
                                 text: 'Terms & Conditions',
                                 style: TextStyle(
@@ -348,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              const TextSpan(text: ' and '),
+                              TextSpan(text: ' and '),
                               TextSpan(
                                 text: 'Privacy Policy',
                                 style: TextStyle(

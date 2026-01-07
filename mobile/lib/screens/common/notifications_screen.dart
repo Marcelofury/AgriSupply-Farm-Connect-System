@@ -42,7 +42,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -53,8 +53,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           elevation: 0,
           actions: [
             PopupMenuButton<String>(
-              onSelected: (value) => _handleMenuAction(value),
-              itemBuilder: (context) => [
+              onSelected: _handleMenuAction,
+              itemBuilder: (final context) => [
                 const PopupMenuItem(
                   value: 'read_all',
                   child: Row(
@@ -90,7 +90,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ],
         ),
         body: Consumer<NotificationProvider>(
-          builder: (context, provider, child) {
+          builder: (final context, final provider, final child) {
             if (provider.notifications.isEmpty) {
               return _buildEmptyState();
             }
@@ -103,7 +103,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: grouped.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (final context, final index) {
                   final entry = grouped.entries.elementAt(index);
                   return _buildDateGroup(entry.key, entry.value);
                 },
@@ -122,7 +122,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.grey100,
               shape: BoxShape.circle,
             ),
@@ -141,7 +141,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'You\'re all caught up!',
+            "You're all caught up!",
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.grey500,
                 ),
@@ -152,8 +152,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Map<String, List<NotificationModel>> _groupNotificationsByDate(
-      List<NotificationModel> notifications) {
-    final Map<String, List<NotificationModel>> grouped = {};
+      final List<NotificationModel> notifications) {
+    final grouped = <String, List<NotificationModel>>{};
 
     for (final notification in notifications) {
       final dateKey = _getDateKey(notification.createdAt);
@@ -163,7 +163,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return grouped;
   }
 
-  String _getDateKey(DateTime date) {
+  String _getDateKey(final DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
@@ -180,7 +180,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Widget _buildDateGroup(String date, List<NotificationModel> notifications) {
+  Widget _buildDateGroup(final String date, final List<NotificationModel> notifications) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -194,13 +194,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
           ),
         ),
-        ...notifications.map((n) => _buildNotificationCard(n)),
+        ...notifications.map(_buildNotificationCard),
         const SizedBox(height: 8),
       ],
     );
   }
 
-  Widget _buildNotificationCard(NotificationModel notification) {
+  Widget _buildNotificationCard(final NotificationModel notification) {
     return Dismissible(
       key: Key(notification.id),
       direction: DismissDirection.endToStart,
@@ -214,7 +214,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      onDismissed: (direction) {
+      onDismissed: (final direction) {
         final provider =
             Provider.of<NotificationProvider>(context, listen: false);
         provider.deleteNotification(notification.id);
@@ -326,7 +326,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  IconData _getNotificationIcon(String type) {
+  IconData _getNotificationIcon(final String type) {
     switch (type) {
       case NotificationType.order:
         return Icons.shopping_bag;
@@ -345,7 +345,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Color _getNotificationColor(String type) {
+  Color _getNotificationColor(final String type) {
     switch (type) {
       case NotificationType.order:
         return AppColors.primaryGreen;
@@ -364,7 +364,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  String _formatTime(DateTime time) {
+  String _formatTime(final DateTime time) {
     final now = DateTime.now();
     final difference = now.difference(time);
 
@@ -379,7 +379,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  void _handleNotificationTap(NotificationModel notification) {
+  void _handleNotificationTap(final NotificationModel notification) {
     // Mark as read
     if (!notification.isRead) {
       final provider =
@@ -395,7 +395,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  void _handleMenuAction(String action) async {
+  Future<void> _handleMenuAction(final String action) async {
     final provider = Provider.of<NotificationProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userId = authProvider.currentUser?.id ?? '';
@@ -424,7 +424,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void _showClearAllDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Clear All Notifications'),
         content: const Text(
             'Are you sure you want to delete all notifications? This action cannot be undone.'),
@@ -465,7 +465,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
+      builder: (final context) => Container(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -507,9 +507,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildSettingsTile({
-    required String title,
-    required String subtitle,
-    required bool value,
+    required final String title,
+    required final String subtitle,
+    required final bool value,
   }) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
@@ -519,10 +519,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         style: const TextStyle(fontSize: 12, color: AppColors.grey600),
       ),
       value: value,
-      onChanged: (newValue) {
+      onChanged: (final newValue) {
         // Handle settings change
       },
-      activeColor: AppColors.primaryGreen,
+      activeThumbColor: AppColors.primaryGreen,
     );
   }
 }

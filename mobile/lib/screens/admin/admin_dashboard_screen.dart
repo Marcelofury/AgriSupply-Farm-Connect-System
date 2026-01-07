@@ -16,7 +16,7 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _currentIndex = 0;
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   final List<Widget> _screens = [
     const _DashboardTab(),
@@ -26,7 +26,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -36,7 +36,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: (final index) => setState(() => _currentIndex = index),
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primaryGreen,
           unselectedItemColor: AppColors.grey500,
@@ -69,7 +69,7 @@ class _DashboardTab extends StatelessWidget {
   const _DashboardTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -85,9 +85,9 @@ class _DashboardTab extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () => Navigator.pushNamed(context, '/notifications'),
-            icon: Badge(
-              label: const Text('3'),
-              child: const Icon(Icons.notifications_outlined),
+            icon: const Badge(
+              label: Text('3'),
+              child: Icon(Icons.notifications_outlined),
             ),
           ),
         ],
@@ -117,9 +117,9 @@ class _DashboardTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Welcome back, Admin!',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -222,15 +222,15 @@ class _DashboardTab extends StatelessWidget {
               ),
               child: LineChart(
                 LineChartData(
-                  gridData: FlGridData(show: false),
+                  gridData: const FlGridData(show: false),
                   titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: const AxisTitles(sideTitles: SideTitles()),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles()),
+                    topTitles: const AxisTitles(sideTitles: SideTitles()),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        getTitlesWidget: (value, meta) {
+                        getTitlesWidget: (final value, final meta) {
                           const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
                           if (value.toInt() < months.length) {
                             return Padding(
@@ -264,7 +264,7 @@ class _DashboardTab extends StatelessWidget {
                       color: AppColors.primaryGreen,
                       barWidth: 3,
                       isStrokeCapRound: true,
-                      dotData: FlDotData(show: false),
+                      dotData: const FlDotData(show: false),
                       belowBarData: BarAreaData(
                         show: true,
                         color: AppColors.primaryGreen.withOpacity(0.1),
@@ -370,13 +370,13 @@ class _DashboardTab extends StatelessWidget {
   }
 
   Widget _buildStatCard(
-    BuildContext context, {
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-    required String change,
-    required bool isPositive,
+    final BuildContext context, {
+    required final String title,
+    required final String value,
+    required final IconData icon,
+    required final Color color,
+    required final String change,
+    required final bool isPositive,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -454,11 +454,11 @@ class _DashboardTab extends StatelessWidget {
   }
 
   Widget _buildQuickAction(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
+    final BuildContext context, {
+    required final IconData icon,
+    required final String label,
+    required final Color color,
+    required final VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -487,11 +487,11 @@ class _DashboardTab extends StatelessWidget {
   }
 
   Widget _buildActivityItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String time,
-    required Color color,
+    required final IconData icon,
+    required final String title,
+    required final String subtitle,
+    required final String time,
+    required final Color color,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -542,7 +542,7 @@ class _UsersTab extends StatelessWidget {
   const _UsersTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Users'),
@@ -603,9 +603,7 @@ class _UsersTab extends StatelessWidget {
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: 10,
-              itemBuilder: (context, index) {
-                return _buildUserItem(context, index);
-              },
+              itemBuilder: _buildUserItem,
             ),
           ),
         ],
@@ -613,7 +611,7 @@ class _UsersTab extends StatelessWidget {
     );
   }
 
-  Widget _buildUserTypeChip(String label, bool isSelected) {
+  Widget _buildUserTypeChip(final String label, final bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -631,7 +629,7 @@ class _UsersTab extends StatelessWidget {
     );
   }
 
-  Widget _buildUserItem(BuildContext context, int index) {
+  Widget _buildUserItem(final BuildContext context, final int index) {
     final isEven = index % 2 == 0;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -647,8 +645,8 @@ class _UsersTab extends StatelessWidget {
         title: Text('User ${index + 1}'),
         subtitle: Text(isEven ? 'Farmer • Kampala' : 'Buyer • Jinja'),
         trailing: PopupMenuButton<String>(
-          onSelected: (value) {},
-          itemBuilder: (context) => [
+          onSelected: (final value) {},
+          itemBuilder: (final context) => [
             const PopupMenuItem(value: 'view', child: Text('View')),
             const PopupMenuItem(value: 'edit', child: Text('Edit')),
             const PopupMenuItem(value: 'suspend', child: Text('Suspend')),
@@ -668,7 +666,7 @@ class _OrdersTab extends StatelessWidget {
   const _OrdersTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Orders'),
@@ -701,7 +699,7 @@ class _OrdersTab extends StatelessWidget {
             ),
             Expanded(
               child: TabBarView(
-                children: List.generate(5, (index) => _buildOrdersList()),
+                children: List.generate(5, (final index) => _buildOrdersList()),
               ),
             ),
           ],
@@ -714,7 +712,7 @@ class _OrdersTab extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: 10,
-      itemBuilder: (context, index) {
+      itemBuilder: (final context, final index) {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -751,7 +749,7 @@ class _OrdersTab extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(
+                const Text(
                   'Buyer: John Doe • Farmer: Jane Smith',
                   style: TextStyle(
                     fontSize: 13,
@@ -759,12 +757,12 @@ class _OrdersTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'UGX 150,000',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryGreen,
                       ),
@@ -792,7 +790,7 @@ class _SettingsTab extends StatelessWidget {
   const _SettingsTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -863,7 +861,7 @@ class _SettingsTab extends StatelessWidget {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => AlertDialog(
+                    builder: (final context) => AlertDialog(
                       title: const Text('Logout'),
                       content: const Text('Are you sure you want to logout?'),
                       actions: [
@@ -879,7 +877,7 @@ class _SettingsTab extends StatelessWidget {
                             Navigator.pushNamedAndRemoveUntil(
                               context,
                               '/login',
-                              (route) => false,
+                              (final route) => false,
                             );
                           },
                           child: const Text('Logout',
@@ -898,9 +896,9 @@ class _SettingsTab extends StatelessWidget {
   }
 
   Widget _buildSettingsSection(
-    BuildContext context, {
-    required String title,
-    required List<Widget> items,
+    final BuildContext context, {
+    required final String title,
+    required final List<Widget> items,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -912,7 +910,7 @@ class _SettingsTab extends StatelessWidget {
               ),
         ),
         const SizedBox(height: 12),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -931,10 +929,10 @@ class _SettingsTab extends StatelessWidget {
   }
 
   Widget _buildSettingsItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool isDestructive = false,
+    required final IconData icon,
+    required final String title,
+    required final VoidCallback onTap,
+    final bool isDestructive = false,
   }) {
     return ListTile(
       leading: Icon(

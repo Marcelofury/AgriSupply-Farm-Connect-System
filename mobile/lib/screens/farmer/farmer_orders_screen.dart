@@ -48,7 +48,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Orders'),
@@ -84,7 +84,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
-                  onChanged: (value) => setState(() => _searchQuery = value),
+                  onChanged: (final value) => setState(() => _searchQuery = value),
                   decoration: const InputDecoration(
                     hintText: 'Search orders...',
                     prefixIcon: Icon(Icons.search),
@@ -122,15 +122,15 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
 
   Widget _buildOrderStats() {
     return Consumer<OrderProvider>(
-      builder: (context, provider, child) {
+      builder: (final context, final provider, final child) {
         final pending = provider.farmerOrders
-            .where((o) => o.status == OrderStatus.pending)
+            .where((final o) => o.status == OrderStatus.pending)
             .length;
         final confirmed = provider.farmerOrders
-            .where((o) => o.status == OrderStatus.confirmed)
+            .where((final o) => o.status == OrderStatus.confirmed)
             .length;
         final inTransit = provider.farmerOrders
-            .where((o) => o.status == OrderStatus.inTransit)
+            .where((final o) => o.status == OrderStatus.inTransit)
             .length;
 
         return Container(
@@ -168,7 +168,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Widget _buildStatItem(String label, int count, IconData icon) {
+  Widget _buildStatItem(final String label, final int count, final IconData icon) {
     return Column(
       children: [
         Icon(icon, color: Colors.white, size: 24),
@@ -192,12 +192,12 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Widget _buildOrderList(String status) {
+  Widget _buildOrderList(final String status) {
     return Consumer<OrderProvider>(
-      builder: (context, provider, child) {
-        List<OrderModel> orders = provider.farmerOrders
-            .where((o) => o.status == status)
-            .where((o) =>
+      builder: (final context, final provider, final child) {
+        final var orders = provider.farmerOrders
+            .where((final o) => o.status == status)
+            .where((final o) =>
                 (o.orderNumber?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
                 o.buyerName.toLowerCase().contains(_searchQuery.toLowerCase()))
             .toList();
@@ -211,7 +211,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: orders.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (final context, final index) {
               return _buildOrderCard(orders[index]);
             },
           ),
@@ -220,12 +220,12 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Widget _buildEmptyState(String status) {
+  Widget _buildEmptyState(final String status) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.receipt_long, size: 64, color: AppColors.grey400),
+          const Icon(Icons.receipt_long, size: 64, color: AppColors.grey400),
           const SizedBox(height: 16),
           Text(
             'No ${status.toLowerCase()} orders',
@@ -238,7 +238,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Widget _buildOrderCard(OrderModel order) {
+  Widget _buildOrderCard(final OrderModel order) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -372,7 +372,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                 const Divider(height: 24),
 
                 // Items
-                ...order.items.take(3).map((item) => Padding(
+                ...order.items.take(3).map((final item) => Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Row(
                         children: [
@@ -482,9 +482,9 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
               order.status == OrderStatus.confirmed)
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.grey50,
-                borderRadius: const BorderRadius.vertical(
+                borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(16),
                 ),
               ),
@@ -540,7 +540,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Color _getStatusColor(String status) {
+  Color _getStatusColor(final String status) {
     switch (status) {
       case OrderStatus.pending:
         return AppColors.warning;
@@ -557,7 +557,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     }
   }
 
-  IconData _getStatusIcon(String status) {
+  IconData _getStatusIcon(final String status) {
     switch (status) {
       case OrderStatus.pending:
         return Icons.schedule;
@@ -574,7 +574,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     }
   }
 
-  String _getStatusLabel(String status) {
+  String _getStatusLabel(final String status) {
     switch (status) {
       case OrderStatus.pending:
         return 'Pending';
@@ -591,7 +591,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     }
   }
 
-  void _callBuyer(String? phone) {
+  void _callBuyer(final String? phone) {
     if (phone == null) return;
     // Implement phone call functionality
     ScaffoldMessenger.of(context).showSnackBar(
@@ -599,7 +599,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Future<void> _updateOrderStatus(String orderId, String status) async {
+  Future<void> _updateOrderStatus(final String orderId, final String status) async {
     setState(() => _isLoading = true);
 
     try {

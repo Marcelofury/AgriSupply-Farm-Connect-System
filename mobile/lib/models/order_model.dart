@@ -1,33 +1,6 @@
 import 'product_model.dart';
 
 class OrderModel {
-  final String id;
-  final String? orderNumber;
-  final String buyerId;
-  final String buyerName;
-  final String? buyerPhone;
-  final String? buyerAddress;
-  final List<OrderItem> items;
-  final double subtotal;
-  final double deliveryFee;
-  final double totalAmount;
-  final String
-  status; // pending, confirmed, processing, shipped, delivered, cancelled
-  final String paymentStatus; // pending, paid, failed, refunded
-  final String paymentMethod; // mobile_money, cash_on_delivery
-  final String? paymentReference;
-  final String? deliveryAddress;
-  final String? deliveryRegion;
-  final String? deliveryDistrict;
-  final double? deliveryLatitude;
-  final double? deliveryLongitude;
-  final String? deliveryNotes;
-  final DateTime? estimatedDelivery;
-  final DateTime? deliveredAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? buyerPhoto;
-  final bool refundRequested;
 
   OrderModel({
     required this.id,
@@ -104,6 +77,33 @@ class OrderModel {
       refundRequested: json['refund_requested'] as bool? ?? false,
     );
   }
+  final String id;
+  final String? orderNumber;
+  final String buyerId;
+  final String buyerName;
+  final String? buyerPhone;
+  final String? buyerAddress;
+  final List<OrderItem> items;
+  final double subtotal;
+  final double deliveryFee;
+  final double totalAmount;
+  final String
+  status; // pending, confirmed, processing, shipped, delivered, cancelled
+  final String paymentStatus; // pending, paid, failed, refunded
+  final String paymentMethod; // mobile_money, cash_on_delivery
+  final String? paymentReference;
+  final String? deliveryAddress;
+  final String? deliveryRegion;
+  final String? deliveryDistrict;
+  final double? deliveryLatitude;
+  final double? deliveryLongitude;
+  final String? deliveryNotes;
+  final DateTime? estimatedDelivery;
+  final DateTime? deliveredAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? buyerPhoto;
+  final bool refundRequested;
 
   Map<String, dynamic> toJson() {
     return {
@@ -113,7 +113,7 @@ class OrderModel {
       'buyer_name': buyerName,
       'buyer_phone': buyerPhone,
       'buyer_address': buyerAddress,
-      'items': items.map((e) => e.toJson()).toList(),
+      'items': items.map((final e) => e.toJson()).toList(),
       'subtotal': subtotal,
       'delivery_fee': deliveryFee,
       'total_amount': totalAmount,
@@ -147,32 +147,32 @@ class OrderModel {
   double get total => totalAmount;
 
   OrderModel copyWith({
-    String? id,
-    String? orderNumber,
-    String? buyerId,
-    String? buyerName,
-    String? buyerPhone,
-    String? buyerAddress,
-    List<OrderItem>? items,
-    double? subtotal,
-    double? deliveryFee,
-    double? totalAmount,
-    String? status,
-    String? paymentStatus,
-    String? paymentMethod,
-    String? paymentReference,
-    String? deliveryAddress,
-    String? deliveryRegion,
-    String? deliveryDistrict,
-    double? deliveryLatitude,
-    double? deliveryLongitude,
-    String? deliveryNotes,
-    DateTime? estimatedDelivery,
-    DateTime? deliveredAt,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    String? buyerPhoto,
-    bool? refundRequested,
+    final String? id,
+    final String? orderNumber,
+    final String? buyerId,
+    final String? buyerName,
+    final String? buyerPhone,
+    final String? buyerAddress,
+    final List<OrderItem>? items,
+    final double? subtotal,
+    final double? deliveryFee,
+    final double? totalAmount,
+    final String? status,
+    final String? paymentStatus,
+    final String? paymentMethod,
+    final String? paymentReference,
+    final String? deliveryAddress,
+    final String? deliveryRegion,
+    final String? deliveryDistrict,
+    final double? deliveryLatitude,
+    final double? deliveryLongitude,
+    final String? deliveryNotes,
+    final DateTime? estimatedDelivery,
+    final DateTime? deliveredAt,
+    final DateTime? createdAt,
+    final DateTime? updatedAt,
+    final String? buyerPhoto,
+    final bool? refundRequested,
   }) {
     return OrderModel(
       id: id ?? this.id,
@@ -225,19 +225,6 @@ class OrderModel {
 }
 
 class OrderItem {
-  final String id;
-  final String orderId;
-  final String productId;
-  final String productName;
-  final String? productImage;
-  final String farmerId;
-  final String farmerName;
-  final double price;
-  final String unit;
-  final double quantity;
-  final double totalPrice;
-  final String status; // pending, confirmed, declined
-  final String? farmerNotes;
 
   OrderItem({
     required this.id,
@@ -272,6 +259,19 @@ class OrderItem {
       farmerNotes: json['farmer_notes'] as String?,
     );
   }
+  final String id;
+  final String orderId;
+  final String productId;
+  final String productName;
+  final String? productImage;
+  final String farmerId;
+  final String farmerName;
+  final double price;
+  final String unit;
+  final double quantity;
+  final double totalPrice;
+  final String status; // pending, confirmed, declined
+  final String? farmerNotes;
 
   Map<String, dynamic> toJson() {
     return {
@@ -333,7 +333,7 @@ class PaymentMethod {
 
   static List<String> get all => [mobileMoney, cashOnDelivery];
 
-  static String getDisplay(String method) {
+  static String getDisplay(final String method) {
     switch (method) {
       case mobileMoney:
         return 'Mobile Money';

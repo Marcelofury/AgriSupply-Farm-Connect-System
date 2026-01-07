@@ -15,7 +15,7 @@ class ProductProvider extends ChangeNotifier {
   final ProductService _productService = ProductService();
 
   ProductsStatus _status = ProductsStatus.initial;
-  List<ProductModel> _products = [];
+  final List<ProductModel> _products = [];
   List<ProductModel> _featuredProducts = [];
   List<ProductModel> _farmerProducts = [];
   List<ProductModel> _searchResults = [];
@@ -63,7 +63,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Fetch all products with optional filters
-  Future<void> fetchProducts({bool refresh = false}) async {
+  Future<void> fetchProducts({final bool refresh = false}) async {
     if (refresh) {
       _currentPage = 1;
       _hasMoreProducts = true;
@@ -79,7 +79,6 @@ class ProductProvider extends ChangeNotifier {
     try {
       final newProducts = await _productService.getProducts(
         page: _currentPage,
-        pageSize: _pageSize,
         category: _selectedCategory,
         region: _selectedRegion,
         minPrice: _minPrice,
@@ -115,7 +114,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Fetch products by farmer ID
-  Future<void> fetchFarmerProducts(String farmerId) async {
+  Future<void> fetchFarmerProducts(final String farmerId) async {
     _status = ProductsStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -132,7 +131,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Fetch single product by ID
-  Future<void> fetchProductById(String productId) async {
+  Future<void> fetchProductById(final String productId) async {
     _status = ProductsStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -149,7 +148,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Search products
-  Future<void> searchProducts(String query) async {
+  Future<void> searchProducts(final String query) async {
     if (query.isEmpty) {
       _searchResults.clear();
       notifyListeners();
@@ -172,7 +171,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Create new product
-  Future<ProductModel?> createProduct(ProductModel product) async {
+  Future<ProductModel?> createProduct(final ProductModel product) async {
     _errorMessage = null;
 
     try {
@@ -188,20 +187,20 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Update product
-  Future<bool> updateProduct(ProductModel product) async {
+  Future<bool> updateProduct(final ProductModel product) async {
     _errorMessage = null;
 
     try {
       final updatedProduct = await _productService.updateProduct(product);
       
       // Update in farmer products list
-      final farmerIndex = _farmerProducts.indexWhere((p) => p.id == product.id);
+      final farmerIndex = _farmerProducts.indexWhere((final p) => p.id == product.id);
       if (farmerIndex >= 0) {
         _farmerProducts[farmerIndex] = updatedProduct;
       }
       
       // Update in all products list
-      final allIndex = _products.indexWhere((p) => p.id == product.id);
+      final allIndex = _products.indexWhere((final p) => p.id == product.id);
       if (allIndex >= 0) {
         _products[allIndex] = updatedProduct;
       }
@@ -221,14 +220,14 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Delete product
-  Future<bool> deleteProduct(String productId) async {
+  Future<bool> deleteProduct(final String productId) async {
     _errorMessage = null;
 
     try {
       await _productService.deleteProduct(productId);
       
-      _farmerProducts.removeWhere((p) => p.id == productId);
-      _products.removeWhere((p) => p.id == productId);
+      _farmerProducts.removeWhere((final p) => p.id == productId);
+      _products.removeWhere((final p) => p.id == productId);
       
       if (_selectedProduct?.id == productId) {
         _selectedProduct = null;
@@ -244,14 +243,14 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Update product status
-  Future<bool> updateProductStatus(String productId, String status) async {
+  Future<bool> updateProductStatus(final String productId, final String status) async {
     _errorMessage = null;
 
     try {
       await _productService.updateProductStatus(productId, status);
       
       // Update locally
-      final farmerIndex = _farmerProducts.indexWhere((p) => p.id == productId);
+      final farmerIndex = _farmerProducts.indexWhere((final p) => p.id == productId);
       if (farmerIndex >= 0) {
         _farmerProducts[farmerIndex] = _farmerProducts[farmerIndex].copyWith(
           status: status,
@@ -268,7 +267,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Upload product images
-  Future<List<String>> uploadImages(String productId, List<String> imagePaths) async {
+  Future<List<String>> uploadImages(final String productId, final List<String> imagePaths) async {
     try {
       return await _productService.uploadImages(productId, imagePaths);
     } catch (e) {
@@ -279,34 +278,34 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Filter setters
-  void setCategory(String? category) {
+  void setCategory(final String? category) {
     if (_selectedCategory != category) {
       _selectedCategory = category == 'All' ? null : category;
       fetchProducts(refresh: true);
     }
   }
 
-  void setRegion(String? region) {
+  void setRegion(final String? region) {
     if (_selectedRegion != region) {
       _selectedRegion = region;
       fetchProducts(refresh: true);
     }
   }
 
-  void setPriceRange(double? min, double? max) {
+  void setPriceRange(final double? min, final double? max) {
     _minPrice = min;
     _maxPrice = max;
     fetchProducts(refresh: true);
   }
 
-  void setOrganicOnly(bool? value) {
+  void setOrganicOnly(final bool? value) {
     if (_organicOnly != value) {
       _organicOnly = value;
       fetchProducts(refresh: true);
     }
   }
 
-  void setSortBy(String sortBy) {
+  void setSortBy(final String sortBy) {
     if (_sortBy != sortBy) {
       _sortBy = sortBy;
       fetchProducts(refresh: true);
@@ -328,7 +327,7 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedProduct(ProductModel? product) {
+  void setSelectedProduct(final ProductModel? product) {
     _selectedProduct = product;
     notifyListeners();
   }
@@ -341,21 +340,21 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Get products by category for home screen
-  List<ProductModel> getProductsByCategory(String category) {
-    return _products.where((p) => p.category == category).toList();
+  List<ProductModel> getProductsByCategory(final String category) {
+    return _products.where((final p) => p.category == category).toList();
   }
 
   // Get filtered farmer products by status
-  List<ProductModel> getFarmerProductsByStatus(String status) {
-    return _farmerProducts.where((p) => p.status == status).toList();
+  List<ProductModel> getFarmerProductsByStatus(final String status) {
+    return _farmerProducts.where((final p) => p.status == status).toList();
   }
 
   // Get product by ID from local lists or fetch from service
-  Future<ProductModel?> getProductById(String productId) async {
+  Future<ProductModel?> getProductById(final String productId) async {
     // First check local lists
-    ProductModel? product = _products.where((p) => p.id == productId).firstOrNull;
-    product ??= _farmerProducts.where((p) => p.id == productId).firstOrNull;
-    product ??= _featuredProducts.where((p) => p.id == productId).firstOrNull;
+    var product = _products.where((final p) => p.id == productId).firstOrNull;
+    product ??= _farmerProducts.where((final p) => p.id == productId).firstOrNull;
+    product ??= _featuredProducts.where((final p) => p.id == productId).firstOrNull;
     
     if (product != null) return product;
     
@@ -369,15 +368,14 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Load farmer products (alias for fetchFarmerProducts)
-  Future<void> loadFarmerProducts(String farmerId) async {
+  Future<void> loadFarmerProducts(final String farmerId) async {
     await fetchFarmerProducts(farmerId);
   }
 
   // Fetch products by category
-  Future<List<ProductModel>> fetchProductsByCategory(String category) async {
+  Future<List<ProductModel>> fetchProductsByCategory(final String category) async {
     try {
       final products = await _productService.getProducts(
-        page: 1,
         pageSize: 50,
         category: category,
       );

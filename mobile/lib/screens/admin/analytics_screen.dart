@@ -25,7 +25,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -51,13 +51,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               child: DropdownButton<String>(
                 value: _selectedPeriod,
                 underline: const SizedBox.shrink(),
-                items: _periods.map((period) {
+                items: _periods.map((final period) {
                   return DropdownMenuItem(
                     value: period,
                     child: Text(period, style: const TextStyle(fontSize: 13)),
                   );
                 }).toList(),
-                onChanged: (value) {
+                onChanged: (final value) {
                   if (value != null) setState(() => _selectedPeriod = value);
                 },
               ),
@@ -176,7 +176,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       touchTooltipData: BarTouchTooltipData(
                         getTooltipColor: (_) => AppColors.grey900,
                         tooltipPadding: const EdgeInsets.all(8),
-                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        getTooltipItem: (final group, final groupIndex, final rod, final rodIndex) {
                           return BarTooltipItem(
                             '${_getMonthName(group.x)}\n',
                             const TextStyle(
@@ -197,11 +197,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       ),
                     ),
                     titlesData: FlTitlesData(
-                      show: true,
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          getTitlesWidget: (value, meta) {
+                          getTitlesWidget: (final value, final meta) {
                             return Padding(
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(
@@ -218,7 +217,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          getTitlesWidget: (value, meta) {
+                          getTitlesWidget: (final value, final meta) {
                             return Text(
                               '${(value * 5).toInt()}M',
                               style: const TextStyle(
@@ -231,15 +230,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         ),
                       ),
                       topTitles:
-                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          const AxisTitles(sideTitles: SideTitles()),
                       rightTitles:
-                          AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          const AxisTitles(sideTitles: SideTitles()),
                     ),
                     gridData: FlGridData(
-                      show: true,
                       drawVerticalLine: false,
                       horizontalInterval: 2,
-                      getDrawingHorizontalLine: (value) => FlLine(
+                      getDrawingHorizontalLine: (final value) => const FlLine(
                         color: AppColors.grey200,
                         strokeWidth: 1,
                       ),
@@ -334,7 +332,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         PieChartData(
                           pieTouchData: PieTouchData(
                             touchCallback:
-                                (FlTouchEvent event, pieTouchResponse) {
+                                (event, final pieTouchResponse) {
                               setState(() {
                                 if (!event.isInterestedForInteractions ||
                                     pieTouchResponse == null ||
@@ -412,7 +410,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(final String title) {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -421,7 +419,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildRevenueMetric(String label, String value) {
+  Widget _buildRevenueMetric(final String label, final String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -445,11 +443,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildStatCard({
-    required String title,
-    required String value,
-    required String change,
-    required IconData icon,
-    required Color color,
+    required final String title,
+    required final String value,
+    required final String change,
+    required final IconData icon,
+    required final Color color,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -515,7 +513,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  BarChartGroupData _makeBarGroup(int x, double y) {
+  BarChartGroupData _makeBarGroup(final int x, final double y) {
     return BarChartGroupData(
       x: x,
       barRods: [
@@ -529,7 +527,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  String _getMonthName(int index) {
+  String _getMonthName(final int index) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     return months[index];
   }
@@ -543,7 +541,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       (8.0, AppColors.grey500),
     ];
 
-    return data.asMap().entries.map((entry) {
+    return data.asMap().entries.map((final entry) {
       final isTouched = entry.key == _touchedIndex;
       final radius = isTouched ? 60.0 : 50.0;
 
@@ -556,7 +554,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     }).toList();
   }
 
-  Widget _buildLegendItem(String label, Color color, String value) {
+  Widget _buildLegendItem(final String label, final Color color, final String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -587,7 +585,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  List<Widget> _buildTopProducts(NumberFormat currencyFormat) {
+  List<Widget> _buildTopProducts(final NumberFormat currencyFormat) {
     final products = [
       ('Fresh Tomatoes', '🍅', 234, 1560000),
       ('Matooke', '🍌', 189, 1250000),
@@ -596,7 +594,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       ('Beans', '🫘', 128, 640000),
     ];
 
-    return products.asMap().entries.map((entry) {
+    return products.asMap().entries.map((final entry) {
       final index = entry.key;
       final product = entry.value;
 
@@ -674,7 +672,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     }).toList();
   }
 
-  Widget _buildRegionBar(String region, double percentage, int orders) {
+  Widget _buildRegionBar(final String region, final double percentage, final int orders) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

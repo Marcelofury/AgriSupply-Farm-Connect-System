@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -77,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -129,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     hint: 'Enter your email',
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
                     ),
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
                       }

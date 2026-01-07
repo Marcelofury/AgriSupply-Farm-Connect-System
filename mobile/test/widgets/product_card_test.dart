@@ -7,19 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 // Mock Product model
 class Product {
-  final String id;
-  final String name;
-  final String description;
-  final double price;
-  final String unit;
-  final String category;
-  final List<String> images;
-  final double rating;
-  final int reviewCount;
-  final bool isOrganic;
-  final bool isFavorite;
-  final String farmerName;
-  final String region;
 
   const Product({
     required this.id,
@@ -36,14 +23,23 @@ class Product {
     this.farmerName = 'Unknown Farmer',
     this.region = 'Unknown',
   });
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final String unit;
+  final String category;
+  final List<String> images;
+  final double rating;
+  final int reviewCount;
+  final bool isOrganic;
+  final bool isFavorite;
+  final String farmerName;
+  final String region;
 }
 
 // ProductCard widget for testing
 class ProductCard extends StatelessWidget {
-  final Product product;
-  final VoidCallback? onTap;
-  final VoidCallback? onFavorite;
-  final VoidCallback? onAddToCart;
 
   const ProductCard({
     super.key,
@@ -52,9 +48,13 @@ class ProductCard extends StatelessWidget {
     this.onFavorite,
     this.onAddToCart,
   });
+  final Product product;
+  final VoidCallback? onTap;
+  final VoidCallback? onFavorite;
+  final VoidCallback? onAddToCart;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -73,7 +73,7 @@ class ProductCard extends StatelessWidget {
                       ? Image.network(
                           product.images.first,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
+                          errorBuilder: (_, final __, final ___) => const Icon(
                             Icons.image_not_supported,
                             size: 50,
                             color: Colors.grey,
@@ -225,14 +225,13 @@ void main() {
       rating: 4.5,
       reviewCount: 23,
       isOrganic: true,
-      isFavorite: false,
       farmerName: 'Jane Farm',
       region: 'Western',
     );
 
-    testWidgets('displays product name', (WidgetTester tester) async {
+    testWidgets('displays product name', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -243,9 +242,9 @@ void main() {
     });
 
     testWidgets('displays formatted price with currency',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -255,9 +254,9 @@ void main() {
       expect(find.text('UGX 35000'), findsOneWidget);
     });
 
-    testWidgets('displays unit', (WidgetTester tester) async {
+    testWidgets('displays unit', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -267,9 +266,9 @@ void main() {
       expect(find.text('per bunch'), findsOneWidget);
     });
 
-    testWidgets('displays rating', (WidgetTester tester) async {
+    testWidgets('displays rating', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -281,9 +280,9 @@ void main() {
       expect(find.byIcon(Icons.star), findsOneWidget);
     });
 
-    testWidgets('displays farmer name', (WidgetTester tester) async {
+    testWidgets('displays farmer name', (final tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -294,9 +293,9 @@ void main() {
     });
 
     testWidgets('shows organic badge for organic products',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -307,7 +306,7 @@ void main() {
     });
 
     testWidgets('hides organic badge for non-organic products',
-        (WidgetTester tester) async {
+        (tester) async {
       const nonOrganicProduct = Product(
         id: 'test-2',
         name: 'Regular Matooke',
@@ -316,11 +315,10 @@ void main() {
         unit: 'bunch',
         category: 'fruits_vegetables',
         images: [],
-        isOrganic: false,
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: nonOrganicProduct),
           ),
@@ -331,7 +329,7 @@ void main() {
     });
 
     testWidgets('shows filled heart for favorite products',
-        (WidgetTester tester) async {
+        (tester) async {
       const favoriteProduct = Product(
         id: 'test-3',
         name: 'Favorite Product',
@@ -344,7 +342,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: favoriteProduct),
           ),
@@ -356,9 +354,9 @@ void main() {
     });
 
     testWidgets('shows outline heart for non-favorite products',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -368,8 +366,8 @@ void main() {
       expect(find.byIcon(Icons.favorite_border), findsOneWidget);
     });
 
-    testWidgets('calls onTap when card is tapped', (WidgetTester tester) async {
-      bool tapped = false;
+    testWidgets('calls onTap when card is tapped', (tester) async {
+      var tapped = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -387,8 +385,8 @@ void main() {
     });
 
     testWidgets('calls onFavorite when favorite button is tapped',
-        (WidgetTester tester) async {
-      bool favoriteTapped = false;
+        (tester) async {
+      var favoriteTapped = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -406,8 +404,8 @@ void main() {
     });
 
     testWidgets('calls onAddToCart when add to cart button is tapped',
-        (WidgetTester tester) async {
-      bool addedToCart = false;
+        (tester) async {
+      var addedToCart = false;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -424,9 +422,9 @@ void main() {
       expect(addedToCart, isTrue);
     });
 
-    testWidgets('has add to cart button', (WidgetTester tester) async {
+    testWidgets('has add to cart button', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: testProduct),
           ),
@@ -437,7 +435,7 @@ void main() {
       expect(find.byType(ElevatedButton), findsOneWidget);
     });
 
-    testWidgets('shows placeholder when no image', (WidgetTester tester) async {
+    testWidgets('shows placeholder when no image', (tester) async {
       const noImageProduct = Product(
         id: 'test-4',
         name: 'No Image Product',
@@ -449,7 +447,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: noImageProduct),
           ),
@@ -459,7 +457,7 @@ void main() {
       expect(find.byIcon(Icons.image_not_supported), findsOneWidget);
     });
 
-    testWidgets('truncates long product names', (WidgetTester tester) async {
+    testWidgets('truncates long product names', (tester) async {
       const longNameProduct = Product(
         id: 'test-5',
         name:
@@ -472,7 +470,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: SizedBox(
               width: 200,
@@ -487,7 +485,7 @@ void main() {
       expect(nameFinder, findsOneWidget);
     });
 
-    testWidgets('displays zero rating correctly', (WidgetTester tester) async {
+    testWidgets('displays zero rating correctly', (tester) async {
       const zeroRatingProduct = Product(
         id: 'test-6',
         name: 'New Product',
@@ -496,12 +494,10 @@ void main() {
         unit: 'kg',
         category: 'grains',
         images: [],
-        rating: 0.0,
-        reviewCount: 0,
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: zeroRatingProduct),
           ),
@@ -512,7 +508,7 @@ void main() {
       expect(find.text(' (0)'), findsOneWidget);
     });
 
-    testWidgets('handles high prices correctly', (WidgetTester tester) async {
+    testWidgets('handles high prices correctly', (tester) async {
       const expensiveProduct = Product(
         id: 'test-7',
         name: 'Expensive Item',
@@ -524,7 +520,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ProductCard(product: expensiveProduct),
           ),

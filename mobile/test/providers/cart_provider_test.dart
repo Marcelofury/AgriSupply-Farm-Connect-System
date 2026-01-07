@@ -6,11 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 // Mock models for testing
 class Product {
-  final String id;
-  final String name;
-  final double price;
-  final String unit;
-  final int stock;
 
   Product({
     required this.id,
@@ -19,14 +14,14 @@ class Product {
     required this.unit,
     required this.stock,
   });
-}
-
-class CartItem {
-  final String productId;
+  final String id;
   final String name;
   final double price;
   final String unit;
-  int quantity;
+  final int stock;
+}
+
+class CartItem {
 
   CartItem({
     required this.productId,
@@ -35,8 +30,6 @@ class CartItem {
     required this.unit,
     required this.quantity,
   });
-
-  double get total => price * quantity;
 
   factory CartItem.fromProduct(Product product, int quantity) {
     return CartItem(
@@ -47,22 +40,29 @@ class CartItem {
       quantity: quantity,
     );
   }
+  final String productId;
+  final String name;
+  final double price;
+  final String unit;
+  int quantity;
+
+  double get total => price * quantity;
 }
 
 // Cart Provider implementation for testing
 class CartProvider {
   final List<CartItem> _items = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
   String? _error;
 
   List<CartItem> get items => List.unmodifiable(_items);
   bool get isLoading => _isLoading;
   String? get error => _error;
   int get itemCount => _items.length;
-  int get totalQuantity => _items.fold(0, (sum, item) => sum + item.quantity);
+  int get totalQuantity => _items.fold(0, (final sum, final item) => sum + item.quantity);
 
   double get subtotal =>
-      _items.fold(0, (sum, item) => sum + (item.price * item.quantity));
+      _items.fold(0, (final sum, final item) => sum + (item.price * item.quantity));
 
   double get deliveryFee => subtotal > 100000 ? 0 : 5000;
 
@@ -70,7 +70,7 @@ class CartProvider {
 
   bool get isEmpty => _items.isEmpty;
 
-  void addToCart(Product product, int quantity) {
+  void addToCart(final Product product, final int quantity) {
     if (quantity <= 0) {
       _error = 'Quantity must be greater than 0';
       return;
@@ -82,7 +82,7 @@ class CartProvider {
     }
 
     final existingIndex =
-        _items.indexWhere((item) => item.productId == product.id);
+        _items.indexWhere((final item) => item.productId == product.id);
 
     if (existingIndex >= 0) {
       final newQuantity = _items[existingIndex].quantity + quantity;
@@ -97,31 +97,31 @@ class CartProvider {
     _error = null;
   }
 
-  void removeFromCart(String productId) {
-    _items.removeWhere((item) => item.productId == productId);
+  void removeFromCart(final String productId) {
+    _items.removeWhere((final item) => item.productId == productId);
   }
 
-  void updateQuantity(String productId, int quantity) {
+  void updateQuantity(final String productId, final int quantity) {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
 
-    final index = _items.indexWhere((item) => item.productId == productId);
+    final index = _items.indexWhere((final item) => item.productId == productId);
     if (index >= 0) {
       _items[index].quantity = quantity;
     }
   }
 
-  void incrementQuantity(String productId, int maxStock) {
-    final index = _items.indexWhere((item) => item.productId == productId);
+  void incrementQuantity(final String productId, final int maxStock) {
+    final index = _items.indexWhere((final item) => item.productId == productId);
     if (index >= 0 && _items[index].quantity < maxStock) {
       _items[index].quantity++;
     }
   }
 
-  void decrementQuantity(String productId) {
-    final index = _items.indexWhere((item) => item.productId == productId);
+  void decrementQuantity(final String productId) {
+    final index = _items.indexWhere((final item) => item.productId == productId);
     if (index >= 0) {
       if (_items[index].quantity > 1) {
         _items[index].quantity--;
@@ -135,13 +135,13 @@ class CartProvider {
     _items.clear();
   }
 
-  bool isInCart(String productId) {
-    return _items.any((item) => item.productId == productId);
+  bool isInCart(final String productId) {
+    return _items.any((final item) => item.productId == productId);
   }
 
-  int getQuantity(String productId) {
+  int getQuantity(final String productId) {
     final item = _items.firstWhere(
-      (item) => item.productId == productId,
+      (final item) => item.productId == productId,
       orElse: () => CartItem(
           productId: '', name: '', price: 0, unit: '', quantity: 0),
     );
@@ -409,7 +409,7 @@ void main() {
       });
 
       test('handles rapid add/remove operations', () {
-        for (int i = 0; i < 100; i++) {
+        for (var i = 0; i < 100; i++) {
           cart.addToCart(testProduct, 1);
           if (i % 2 == 0) {
             cart.decrementQuantity('product-1');

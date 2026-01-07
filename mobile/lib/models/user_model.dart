@@ -1,32 +1,4 @@
 class UserModel {
-  final String id;
-  final String email;
-  final String? phone;
-  final String fullName;
-  final String userType; // 'farmer', 'buyer', 'admin'
-  final String? profileImage;
-  final String? photoUrl;
-  final String? address;
-  final String? region;
-  final String? district;
-  final String? farmName;
-  final String? farmDescription;
-  final String? bio;
-  final double? latitude;
-  final double? longitude;
-  final bool isVerified;
-  final bool isPremium;
-  final DateTime? premiumExpiresAt;
-  final double rating;
-  final int totalRatings;
-  final int? totalProducts;
-  final int? totalOrders;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final bool isSuspended;
-
-  /// Alias for userType - provides compatibility with code using 'role'
-  String get role => userType;
 
   UserModel({
     required this.id,
@@ -87,6 +59,34 @@ class UserModel {
       isSuspended: json['is_suspended'] as bool? ?? false,
     );
   }
+  final String id;
+  final String email;
+  final String? phone;
+  final String fullName;
+  final String userType; // 'farmer', 'buyer', 'admin'
+  final String? profileImage;
+  final String? photoUrl;
+  final String? address;
+  final String? region;
+  final String? district;
+  final String? farmName;
+  final String? farmDescription;
+  final String? bio;
+  final double? latitude;
+  final double? longitude;
+  final bool isVerified;
+  final bool isPremium;
+  final DateTime? premiumExpiresAt;
+  final double rating;
+  final int totalRatings;
+  final int? totalProducts;
+  final int? totalOrders;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool isSuspended;
+
+  /// Alias for userType - provides compatibility with code using 'role'
+  String get role => userType;
 
   Map<String, dynamic> toJson() {
     return {
@@ -119,31 +119,31 @@ class UserModel {
   }
 
   UserModel copyWith({
-    String? id,
-    String? email,
-    String? phone,
-    String? fullName,
-    String? userType,
-    String? profileImage,
-    String? photoUrl,
-    String? address,
-    String? region,
-    String? district,
-    String? farmName,
-    String? farmDescription,
-    String? bio,
-    double? latitude,
-    double? longitude,
-    bool? isVerified,
-    bool? isPremium,
-    DateTime? premiumExpiresAt,
-    double? rating,
-    int? totalRatings,
-    int? totalProducts,
-    int? totalOrders,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    bool? isSuspended,
+    final String? id,
+    final String? email,
+    final String? phone,
+    final String? fullName,
+    final String? userType,
+    final String? profileImage,
+    final String? photoUrl,
+    final String? address,
+    final String? region,
+    final String? district,
+    final String? farmName,
+    final String? farmDescription,
+    final String? bio,
+    final double? latitude,
+    final double? longitude,
+    final bool? isVerified,
+    final bool? isPremium,
+    final DateTime? premiumExpiresAt,
+    final double? rating,
+    final int? totalRatings,
+    final int? totalProducts,
+    final int? totalOrders,
+    final DateTime? createdAt,
+    final DateTime? updatedAt,
+    final bool? isSuspended,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -188,9 +188,9 @@ enum UserType {
 
 /// UserRole class with static String constants for role values
 class UserRole {
+
+  UserRole._();
   static const String farmer = 'farmer';
   static const String buyer = 'buyer';
-  static const String admin = 'admin';
-
-  UserRole._(); // Private constructor to prevent instantiation
+  static const String admin = 'admin'; // Private constructor to prevent instantiation
 }

@@ -5,34 +5,32 @@ class OrderService {
   final ApiService _apiService = ApiService();
 
   // Get orders by buyer
-  Future<List<OrderModel>> getOrdersByBuyer(String buyerId) async {
+  Future<List<OrderModel>> getOrdersByBuyer(final String buyerId) async {
     try {
       final data = await _apiService.query(
         'orders',
         select: '*, order_items(*, products(*))',
         filters: {'buyer_id': buyerId},
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => OrderModel.fromJson(json)).toList();
+      return data.map(OrderModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch buyer orders: $e');
     }
   }
 
   // Get orders by farmer
-  Future<List<OrderModel>> getOrdersByFarmer(String farmerId) async {
+  Future<List<OrderModel>> getOrdersByFarmer(final String farmerId) async {
     try {
       final data = await _apiService.query(
         'orders',
         select: '*, order_items!inner(*, products(*)), users!orders_buyer_id_fkey(full_name, phone, photo_url)',
         filters: {'order_items.farmer_id': farmerId},
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => OrderModel.fromJson(json)).toList();
+      return data.map(OrderModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch farmer orders: $e');
     }
@@ -45,17 +43,16 @@ class OrderService {
         'orders',
         select: '*, order_items(*, products(*)), users!orders_buyer_id_fkey(full_name, phone)',
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => OrderModel.fromJson(json)).toList();
+      return data.map(OrderModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch all orders: $e');
     }
   }
 
   // Get order by ID
-  Future<OrderModel> getOrderById(String orderId) async {
+  Future<OrderModel> getOrderById(final String orderId) async {
     try {
       final data = await _apiService.getById('orders', orderId);
       if (data == null) {
@@ -69,14 +66,14 @@ class OrderService {
 
   // Create new order
   Future<OrderModel> createOrder({
-    required String buyerId,
-    required String deliveryAddress,
-    required String paymentMethod,
-    required List<Map<String, dynamic>> items,
-    required double subtotal,
-    required double deliveryFee,
-    required double total,
-    String? notes,
+    required final String buyerId,
+    required final String deliveryAddress,
+    required final String paymentMethod,
+    required final List<Map<String, dynamic>> items,
+    required final double subtotal,
+    required final double deliveryFee,
+    required final double total,
+    final String? notes,
   }) async {
     try {
       // Generate order number
@@ -130,7 +127,7 @@ class OrderService {
   }
 
   // Update order status
-  Future<void> updateOrderStatus(String orderId, String status) async {
+  Future<void> updateOrderStatus(final String orderId, final String status) async {
     try {
       await _apiService.update('orders', orderId, {
         'status': status,
@@ -152,7 +149,7 @@ class OrderService {
   }
 
   // Ship order
-  Future<void> shipOrder(String orderId, {String? trackingNumber}) async {
+  Future<void> shipOrder(final String orderId, {final String? trackingNumber}) async {
     try {
       final updates = <String, dynamic>{
         'status': 'shipped',
@@ -180,7 +177,7 @@ class OrderService {
   }
 
   // Cancel order
-  Future<void> cancelOrder(String orderId, {String? reason}) async {
+  Future<void> cancelOrder(final String orderId, {final String? reason}) async {
     try {
       await _apiService.update('orders', orderId, {
         'status': 'cancelled',
@@ -205,7 +202,7 @@ class OrderService {
   }
 
   // Request refund
-  Future<void> requestRefund(String orderId, {required String reason}) async {
+  Future<void> requestRefund(final String orderId, {required final String reason}) async {
     try {
       await _apiService.update('orders', orderId, {
         'refund_requested': true,
@@ -222,7 +219,7 @@ class OrderService {
   }
 
   // Process refund (admin)
-  Future<void> processRefund(String orderId, {bool approved = true}) async {
+  Future<void> processRefund(final String orderId, {final bool approved = true}) async {
     try {
       final updates = <String, dynamic>{
         'updated_at': DateTime.now().toIso8601String(),
@@ -252,7 +249,7 @@ class OrderService {
   }
 
   // Add rating and review
-  Future<void> addRating(String orderId, double rating, {String? review}) async {
+  Future<void> addRating(final String orderId, final double rating, {final String? review}) async {
     try {
       await _apiService.update('orders', orderId, {
         'rating': rating,
@@ -267,9 +264,9 @@ class OrderService {
 
   // Update payment status
   Future<void> updatePaymentStatus(
-    String orderId,
-    String status, {
-    String? transactionId,
+    final String orderId,
+    final String status, {
+    final String? transactionId,
   }) async {
     try {
       final updates = <String, dynamic>{
@@ -292,7 +289,7 @@ class OrderService {
   }
 
   // Get order status history
-  Future<List<Map<String, dynamic>>> getStatusHistory(String orderId) async {
+  Future<List<Map<String, dynamic>>> getStatusHistory(final String orderId) async {
     try {
       final data = await _apiService.query(
         'order_status_history',
@@ -301,7 +298,7 @@ class OrderService {
         ascending: true,
       );
 
-      return data.map((json) => json as Map<String, dynamic>).toList();
+      return data.map((final json) => json).toList();
     } catch (e) {
       throw Exception('Failed to fetch status history: $e');
     }
@@ -309,10 +306,10 @@ class OrderService {
 
   // Get order statistics
   Future<Map<String, dynamic>> getOrderStats({
-    String? farmerId,
-    String? buyerId,
-    DateTime? startDate,
-    DateTime? endDate,
+    final String? farmerId,
+    final String? buyerId,
+    final DateTime? startDate,
+    final DateTime? endDate,
   }) async {
     try {
       final params = <String, String>{};
@@ -336,9 +333,9 @@ class OrderService {
     return 'AGR-$timestamp';
   }
 
-  Future<void> _notifyFarmers(List<Map<String, dynamic>> items) async {
+  Future<void> _notifyFarmers(final List<Map<String, dynamic>> items) async {
     // Group items by farmer
-    final Map<String, List<Map<String, dynamic>>> farmerItems = {};
+    final farmerItems = <String, List<Map<String, dynamic>>>{};
     
     for (final item in items) {
       final farmerId = item['farmer_id'] as String;
@@ -362,7 +359,7 @@ class OrderService {
     }
   }
 
-  Future<void> _notifyBuyerStatusChange(String orderId, String status) async {
+  Future<void> _notifyBuyerStatusChange(final String orderId, final String status) async {
     try {
       final order = await getOrderById(orderId);
       
@@ -405,7 +402,7 @@ class OrderService {
     }
   }
 
-  Future<void> _notifyAdminRefundRequest(String orderId, String reason) async {
+  Future<void> _notifyAdminRefundRequest(final String orderId, final String reason) async {
     try {
       // Get admin users
       final admins = await _apiService.query(
@@ -429,7 +426,7 @@ class OrderService {
     }
   }
 
-  Future<void> _restoreProductQuantities(String orderId) async {
+  Future<void> _restoreProductQuantities(final String orderId) async {
     try {
       final items = await _apiService.query(
         'order_items',

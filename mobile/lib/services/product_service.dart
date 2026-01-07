@@ -8,14 +8,14 @@ class ProductService {
 
   // Get all products with filters
   Future<List<ProductModel>> getProducts({
-    int page = 1,
-    int pageSize = 20,
-    String? category,
-    String? region,
-    double? minPrice,
-    double? maxPrice,
-    bool? organicOnly,
-    String sortBy = 'newest',
+    final int page = 1,
+    final int pageSize = 20,
+    final String? category,
+    final String? region,
+    final double? minPrice,
+    final double? maxPrice,
+    final bool? organicOnly,
+    final String sortBy = 'newest',
   }) async {
     try {
       // Build query parameters
@@ -29,13 +29,13 @@ class ProductService {
       if (region != null) params['region'] = region;
       if (minPrice != null) params['min_price'] = minPrice.toString();
       if (maxPrice != null) params['max_price'] = maxPrice.toString();
-      if (organicOnly == true) params['organic'] = 'true';
+      if (organicOnly ?? false) params['organic'] = 'true';
       params['sort'] = sortBy;
 
       final response = await _apiService.get('/products', queryParams: params);
-      final List<dynamic> data = (response['data'] ?? response) as List;
+      final data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
+      return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to fetch products: $e');
     }
@@ -45,32 +45,31 @@ class ProductService {
   Future<List<ProductModel>> getFeaturedProducts() async {
     try {
       final response = await _apiService.get('/products/featured');
-      final List<dynamic> data = (response['data'] ?? response) as List;
+      final data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
+      return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to fetch featured products: $e');
     }
   }
 
   // Get products by farmer
-  Future<List<ProductModel>> getProductsByFarmer(String farmerId) async {
+  Future<List<ProductModel>> getProductsByFarmer(final String farmerId) async {
     try {
       final data = await _apiService.query(
         'products',
         filters: {'farmer_id': farmerId},
         orderBy: 'created_at',
-        ascending: false,
       );
 
-      return data.map((json) => ProductModel.fromJson(json)).toList();
+      return data.map(ProductModel.fromJson).toList();
     } catch (e) {
       throw Exception('Failed to fetch farmer products: $e');
     }
   }
 
   // Get product by ID
-  Future<ProductModel> getProductById(String productId) async {
+  Future<ProductModel> getProductById(final String productId) async {
     try {
       final data = await _apiService.getById('products', productId);
       if (data == null) {
@@ -83,22 +82,22 @@ class ProductService {
   }
 
   // Search products
-  Future<List<ProductModel>> searchProducts(String query) async {
+  Future<List<ProductModel>> searchProducts(final String query) async {
     try {
       final response = await _apiService.get(
         '/products/search',
         queryParams: {'q': query},
       );
-      final List<dynamic> data = (response['data'] ?? response) as List;
+      final data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
+      return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to search products: $e');
     }
   }
 
   // Create product
-  Future<ProductModel> createProduct(ProductModel product) async {
+  Future<ProductModel> createProduct(final ProductModel product) async {
     try {
       final data = await _apiService.insert('products', product.toJson());
       return ProductModel.fromJson(data);
@@ -108,7 +107,7 @@ class ProductService {
   }
 
   // Update product
-  Future<ProductModel> updateProduct(ProductModel product) async {
+  Future<ProductModel> updateProduct(final ProductModel product) async {
     try {
       final data = await _apiService.update(
         'products',
@@ -122,7 +121,7 @@ class ProductService {
   }
 
   // Delete product
-  Future<void> deleteProduct(String productId) async {
+  Future<void> deleteProduct(final String productId) async {
     try {
       await _apiService.deleteRecord('products', productId);
     } catch (e) {
@@ -131,7 +130,7 @@ class ProductService {
   }
 
   // Update product status
-  Future<void> updateProductStatus(String productId, String status) async {
+  Future<void> updateProductStatus(final String productId, final String status) async {
     try {
       await _apiService.update('products', productId, {
         'status': status,
@@ -143,11 +142,11 @@ class ProductService {
   }
 
   // Upload product images
-  Future<List<String>> uploadImages(String productId, List<String> imagePaths) async {
+  Future<List<String>> uploadImages(final String productId, final List<String> imagePaths) async {
     try {
-      final List<String> imageUrls = [];
+      final imageUrls = <String>[];
 
-      for (int i = 0; i < imagePaths.length; i++) {
+      for (var i = 0; i < imagePaths.length; i++) {
         final file = File(imagePaths[i]);
         final bytes = await file.readAsBytes();
         final extension = imagePaths[i].split('.').last;
@@ -176,7 +175,7 @@ class ProductService {
   }
 
   // Delete product image
-  Future<void> deleteImage(String productId, String imageUrl) async {
+  Future<void> deleteImage(final String productId, final String imageUrl) async {
     try {
       // Extract path from URL
       final uri = Uri.parse(imageUrl);
@@ -189,7 +188,7 @@ class ProductService {
 
       // Get current product
       final product = await getProductById(productId);
-      final updatedImages = product.images.where((img) => img != imageUrl).toList();
+      final updatedImages = product.images.where((final img) => img != imageUrl).toList();
 
       // Update product
       await _apiService.update('products', productId, {
@@ -212,7 +211,7 @@ class ProductService {
   }
 
   // Update product quantity (after order)
-  Future<void> updateQuantity(String productId, int soldQuantity) async {
+  Future<void> updateQuantity(final String productId, final int soldQuantity) async {
     try {
       final product = await getProductById(productId);
       final newQuantity = product.availableQuantity - soldQuantity;
@@ -234,7 +233,7 @@ class ProductService {
   }
 
   // Increment view count
-  Future<void> incrementViews(String productId) async {
+  Future<void> incrementViews(final String productId) async {
     try {
       await _apiService.post('/products/$productId/view');
     } catch (e) {
@@ -244,17 +243,17 @@ class ProductService {
 
   // Get similar products
   Future<List<ProductModel>> getSimilarProducts(
-    String productId,
-    String category,
+    final String productId,
+    final String category,
   ) async {
     try {
       final response = await _apiService.get(
         '/products/$productId/similar',
         queryParams: {'category': category, 'limit': '6'},
       );
-      final List<dynamic> data = (response['data'] ?? response) as List;
+      final data = (response['data'] ?? response) as List;
 
-      return data.map((json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
+      return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
       throw Exception('Failed to fetch similar products: $e');
     }
@@ -262,10 +261,10 @@ class ProductService {
 
   // Add product review
   Future<void> addReview(
-    String productId, {
-    required String userId,
-    required double rating,
-    String? comment,
+    final String productId, {
+    required final String userId,
+    required final double rating,
+    final String? comment,
   }) async {
     try {
       await _apiService.insert('product_reviews', {
@@ -283,7 +282,7 @@ class ProductService {
     }
   }
 
-  Future<void> _updateProductRating(String productId) async {
+  Future<void> _updateProductRating(final String productId) async {
     try {
       final reviews = await _apiService.query(
         'product_reviews',
@@ -293,7 +292,7 @@ class ProductService {
       if (reviews.isNotEmpty) {
         final totalRating = reviews.fold<double>(
           0,
-          (sum, review) => sum + (review['rating'] as num).toDouble(),
+          (final sum, final review) => sum + (review['rating'] as num).toDouble(),
         );
         final avgRating = totalRating / reviews.length;
 
@@ -309,14 +308,13 @@ class ProductService {
   }
 
   // Get product reviews
-  Future<List<Map<String, dynamic>>> getProductReviews(String productId) async {
+  Future<List<Map<String, dynamic>>> getProductReviews(final String productId) async {
     try {
       final reviews = await _apiService.query(
         'product_reviews',
         select: '*, users(full_name, photo_url)',
         filters: {'product_id': productId},
         orderBy: 'created_at',
-        ascending: false,
       );
       return reviews;
     } catch (e) {

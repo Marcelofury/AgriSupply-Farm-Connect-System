@@ -43,7 +43,7 @@ class OrderProvider extends ChangeNotifier {
   double get totalRevenue => _totalRevenue;
 
   // Fetch buyer orders
-  Future<void> fetchBuyerOrders(String buyerId) async {
+  Future<void> fetchBuyerOrders(final String buyerId) async {
     _status = OrdersStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -61,7 +61,7 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Fetch farmer orders
-  Future<void> fetchFarmerOrders(String farmerId) async {
+  Future<void> fetchFarmerOrders(final String farmerId) async {
     _status = OrdersStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -97,7 +97,7 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Fetch single order by ID
-  Future<void> fetchOrderById(String orderId) async {
+  Future<void> fetchOrderById(final String orderId) async {
     _status = OrdersStatus.loading;
     _errorMessage = null;
     notifyListeners();
@@ -114,11 +114,11 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Get order by ID from local lists or fetch from service
-  Future<OrderModel?> getOrderById(String orderId) async {
+  Future<OrderModel?> getOrderById(final String orderId) async {
     // First check local lists
-    OrderModel? order = _buyerOrders.where((o) => o.id == orderId).firstOrNull;
-    order ??= _farmerOrders.where((o) => o.id == orderId).firstOrNull;
-    order ??= _allOrders.where((o) => o.id == orderId).firstOrNull;
+    var order = _buyerOrders.where((final o) => o.id == orderId).firstOrNull;
+    order ??= _farmerOrders.where((final o) => o.id == orderId).firstOrNull;
+    order ??= _allOrders.where((final o) => o.id == orderId).firstOrNull;
     
     if (order != null) return order;
     
@@ -132,20 +132,20 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Load farmer orders (alias for fetchFarmerOrders)
-  Future<void> loadFarmerOrders(String farmerId) async {
+  Future<void> loadFarmerOrders(final String farmerId) async {
     await fetchFarmerOrders(farmerId);
   }
 
   // Create new order
   Future<OrderModel?> createOrder({
-    required String buyerId,
-    required String deliveryAddress,
-    required String paymentMethod,
-    required List<Map<String, dynamic>> items,
-    required double subtotal,
-    required double deliveryFee,
-    required double total,
-    String? notes,
+    required final String buyerId,
+    required final String deliveryAddress,
+    required final String paymentMethod,
+    required final List<Map<String, dynamic>> items,
+    required final double subtotal,
+    required final double deliveryFee,
+    required final double total,
+    final String? notes,
   }) async {
     _isSubmitting = true;
     _errorMessage = null;
@@ -176,20 +176,20 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Update order status (for farmer)
-  Future<bool> updateOrderStatus(String orderId, String newStatus) async {
+  Future<bool> updateOrderStatus(final String orderId, final String newStatus) async {
     _errorMessage = null;
 
     try {
       await _orderService.updateOrderStatus(orderId, newStatus);
 
       // Update locally
-      _updateOrderInList(_farmerOrders, orderId, (order) {
+      _updateOrderInList(_farmerOrders, orderId, (final order) {
         return order.copyWith(
           status: newStatus,
         );
       });
 
-      _updateOrderInList(_allOrders, orderId, (order) {
+      _updateOrderInList(_allOrders, orderId, (final order) {
         return order.copyWith(status: newStatus);
       });
 
@@ -208,23 +208,23 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Confirm order (farmer)
-  Future<bool> confirmOrder(String orderId) async {
+  Future<bool> confirmOrder(final String orderId) async {
     return updateOrderStatus(orderId, OrderStatus.confirmed);
   }
 
   // Start processing order (farmer)
-  Future<bool> processOrder(String orderId) async {
+  Future<bool> processOrder(final String orderId) async {
     return updateOrderStatus(orderId, OrderStatus.processing);
   }
 
   // Ship order (farmer)
-  Future<bool> shipOrder(String orderId, {String? trackingNumber}) async {
+  Future<bool> shipOrder(final String orderId, {final String? trackingNumber}) async {
     _errorMessage = null;
 
     try {
       await _orderService.shipOrder(orderId, trackingNumber: trackingNumber);
 
-      _updateOrderInList(_farmerOrders, orderId, (order) {
+      _updateOrderInList(_farmerOrders, orderId, (final order) {
         return order.copyWith(
           status: OrderStatus.shipped,
         );
@@ -241,24 +241,24 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Mark as delivered
-  Future<bool> markAsDelivered(String orderId) async {
+  Future<bool> markAsDelivered(final String orderId) async {
     return updateOrderStatus(orderId, OrderStatus.delivered);
   }
 
   // Cancel order
-  Future<bool> cancelOrder(String orderId, {String? reason}) async {
+  Future<bool> cancelOrder(final String orderId, {final String? reason}) async {
     _errorMessage = null;
 
     try {
       await _orderService.cancelOrder(orderId, reason: reason);
 
-      _updateOrderInList(_buyerOrders, orderId, (order) {
+      _updateOrderInList(_buyerOrders, orderId, (final order) {
         return order.copyWith(
           status: OrderStatus.cancelled,
         );
       });
 
-      _updateOrderInList(_farmerOrders, orderId, (order) {
+      _updateOrderInList(_farmerOrders, orderId, (final order) {
         return order.copyWith(
           status: OrderStatus.cancelled,
         );
@@ -282,13 +282,13 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Request refund
-  Future<bool> requestRefund(String orderId, {required String reason}) async {
+  Future<bool> requestRefund(final String orderId, {required final String reason}) async {
     _errorMessage = null;
 
     try {
       await _orderService.requestRefund(orderId, reason: reason);
 
-      _updateOrderInList(_buyerOrders, orderId, (order) {
+      _updateOrderInList(_buyerOrders, orderId, (final order) {
         return order.copyWith(refundRequested: true);
       });
 
@@ -302,7 +302,7 @@ class OrderProvider extends ChangeNotifier {
   }
 
   // Add rating to order
-  Future<bool> addRating(String orderId, double rating, {String? review}) async {
+  Future<bool> addRating(final String orderId, final double rating, {final String? review}) async {
     _errorMessage = null;
 
     try {
@@ -320,10 +320,10 @@ class OrderProvider extends ChangeNotifier {
 
   // Filter orders by status
   List<OrderModel> getOrdersByStatus(
-    List<OrderModel> orders,
-    String status,
+    final List<OrderModel> orders,
+    final String status,
   ) {
-    return orders.where((order) => order.status == status).toList();
+    return orders.where((final order) => order.status == status).toList();
   }
 
   // Get pending orders
@@ -334,12 +334,12 @@ class OrderProvider extends ChangeNotifier {
       getOrdersByStatus(_farmerOrders, OrderStatus.pending);
 
   // Get active orders (not completed or cancelled)
-  List<OrderModel> get activeBuyerOrders => _buyerOrders.where((order) =>
+  List<OrderModel> get activeBuyerOrders => _buyerOrders.where((final order) =>
       order.status != OrderStatus.delivered &&
       order.status != OrderStatus.cancelled &&
       order.status != 'refunded').toList();
 
-  List<OrderModel> get activeFarmerOrders => _farmerOrders.where((order) =>
+  List<OrderModel> get activeFarmerOrders => _farmerOrders.where((final order) =>
       order.status != OrderStatus.delivered &&
       order.status != OrderStatus.cancelled &&
       order.status != 'refunded').toList();
@@ -347,70 +347,70 @@ class OrderProvider extends ChangeNotifier {
   // Calculate statistics
   void _calculateBuyerStats() {
     _pendingCount = _buyerOrders
-        .where((o) => o.status == OrderStatus.pending)
+        .where((final o) => o.status == OrderStatus.pending)
         .length;
     _processingCount = _buyerOrders
-        .where((o) =>
+        .where((final o) =>
             o.status == OrderStatus.confirmed ||
             o.status == OrderStatus.processing ||
             o.status == OrderStatus.shipped ||
             o.status == OrderStatus.inTransit)
         .length;
     _deliveredCount = _buyerOrders
-        .where((o) => o.status == OrderStatus.delivered)
+        .where((final o) => o.status == OrderStatus.delivered)
         .length;
     _totalRevenue = _buyerOrders
-        .where((o) => o.status == OrderStatus.delivered)
-        .fold(0.0, (sum, o) => sum + o.total);
+        .where((final o) => o.status == OrderStatus.delivered)
+        .fold(0, (final sum, final o) => sum + o.total);
   }
 
   void _calculateFarmerStats() {
     _pendingCount = _farmerOrders
-        .where((o) => o.status == OrderStatus.pending)
+        .where((final o) => o.status == OrderStatus.pending)
         .length;
     _processingCount = _farmerOrders
-        .where((o) =>
+        .where((final o) =>
             o.status == OrderStatus.confirmed ||
             o.status == OrderStatus.processing)
         .length;
     _deliveredCount = _farmerOrders
-        .where((o) => o.status == OrderStatus.delivered)
+        .where((final o) => o.status == OrderStatus.delivered)
         .length;
     _totalRevenue = _farmerOrders
-        .where((o) => o.status == OrderStatus.delivered)
-        .fold(0.0, (sum, o) => sum + o.total);
+        .where((final o) => o.status == OrderStatus.delivered)
+        .fold(0, (final sum, final o) => sum + o.total);
   }
 
   void _calculateAdminStats() {
     _pendingCount = _allOrders
-        .where((o) => o.status == OrderStatus.pending)
+        .where((final o) => o.status == OrderStatus.pending)
         .length;
     _processingCount = _allOrders
-        .where((o) =>
+        .where((final o) =>
             o.status == OrderStatus.confirmed ||
             o.status == OrderStatus.processing ||
             o.status == OrderStatus.shipped)
         .length;
     _deliveredCount = _allOrders
-        .where((o) => o.status == OrderStatus.delivered)
+        .where((final o) => o.status == OrderStatus.delivered)
         .length;
     _totalRevenue = _allOrders
-        .where((o) => o.status == OrderStatus.delivered)
-        .fold(0.0, (sum, o) => sum + o.total);
+        .where((final o) => o.status == OrderStatus.delivered)
+        .fold(0, (final sum, final o) => sum + o.total);
   }
 
   void _updateOrderInList(
-    List<OrderModel> orders,
-    String orderId,
-    OrderModel Function(OrderModel) updater,
+    final List<OrderModel> orders,
+    final String orderId,
+    final OrderModel Function(OrderModel) updater,
   ) {
-    final index = orders.indexWhere((o) => o.id == orderId);
+    final index = orders.indexWhere((final o) => o.id == orderId);
     if (index >= 0) {
       orders[index] = updater(orders[index]);
     }
   }
 
-  void setSelectedOrder(OrderModel? order) {
+  void setSelectedOrder(final OrderModel? order) {
     _selectedOrder = order;
     notifyListeners();
   }

@@ -3,10 +3,6 @@ import 'dart:convert';
 import 'api_service.dart';
 
 class AIMessage {
-  final String role; // 'user' or 'assistant'
-  final String content;
-  final DateTime timestamp;
-  final String? imageUrl;
 
   AIMessage({
     required this.role,
@@ -15,28 +11,26 @@ class AIMessage {
     this.imageUrl,
   });
 
-  Map<String, dynamic> toJson() => {
-    'role': role,
-    'content': content,
-    'timestamp': timestamp.toIso8601String(),
-    'image_url': imageUrl,
-  };
-
   factory AIMessage.fromJson(Map<String, dynamic> json) => AIMessage(
     role: json['role'] as String,
     content: json['content'] as String,
     timestamp: DateTime.parse(json['timestamp'] as String),
     imageUrl: json['image_url'] as String?,
   );
+  final String role; // 'user' or 'assistant'
+  final String content;
+  final DateTime timestamp;
+  final String? imageUrl;
+
+  Map<String, dynamic> toJson() => {
+    'role': role,
+    'content': content,
+    'timestamp': timestamp.toIso8601String(),
+    'image_url': imageUrl,
+  };
 }
 
 class ChatSession {
-  final String id;
-  final String userId;
-  final String title;
-  final List<AIMessage> messages;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   ChatSession({
     required this.id,
@@ -46,15 +40,6 @@ class ChatSession {
     required this.createdAt,
     required this.updatedAt,
   });
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'user_id': userId,
-    'title': title,
-    'messages': messages.map((m) => m.toJson()).toList(),
-    'created_at': createdAt.toIso8601String(),
-    'updated_at': updatedAt.toIso8601String(),
-  };
 
   factory ChatSession.fromJson(Map<String, dynamic> json) => ChatSession(
     id: json['id'] as String,
@@ -66,6 +51,21 @@ class ChatSession {
     createdAt: DateTime.parse(json['created_at'] as String),
     updatedAt: DateTime.parse(json['updated_at'] as String),
   );
+  final String id;
+  final String userId;
+  final String title;
+  final List<AIMessage> messages;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'user_id': userId,
+    'title': title,
+    'messages': messages.map((final m) => m.toJson()).toList(),
+    'created_at': createdAt.toIso8601String(),
+    'updated_at': updatedAt.toIso8601String(),
+  };
 }
 
 class AIService {
@@ -97,11 +97,11 @@ conversation back to farming-related topics.
 
   // Send message and get AI response
   Future<String> sendMessage({
-    required String message,
-    required String userId,
-    String? sessionId,
-    String? imageBase64,
-    List<AIMessage>? conversationHistory,
+    required final String message,
+    required final String userId,
+    final String? sessionId,
+    final String? imageBase64,
+    final List<AIMessage>? conversationHistory,
   }) async {
     try {
       final messages = <Map<String, dynamic>>[
@@ -143,7 +143,7 @@ conversation back to farming-related topics.
         'temperature': 0.7,
       });
 
-      return (response['content'] ?? response['message'] ?? 'I apologize, but I couldn\'t generate a response. Please try again.') as String;
+      return (response['content'] ?? response['message'] ?? "I apologize, but I couldn't generate a response. Please try again.") as String;
     } catch (e) {
       throw Exception('Failed to get AI response: $e');
     }
@@ -151,8 +151,8 @@ conversation back to farming-related topics.
 
   // Analyze crop image
   Future<Map<String, dynamic>> analyzeCropImage({
-    required String imageBase64,
-    required String userId,
+    required final String imageBase64,
+    required final String userId,
   }) async {
     try {
       final response = await _apiService.post('/ai/analyze-crop', body: {
@@ -174,9 +174,9 @@ conversation back to farming-related topics.
 
   // Get farming tips
   Future<List<String>> getFarmingTips({
-    String? crop,
-    String? season,
-    String? region,
+    final String? crop,
+    final String? season,
+    final String? region,
   }) async {
     try {
       final params = <String, String>{};
@@ -193,8 +193,8 @@ conversation back to farming-related topics.
 
   // Get market price predictions
   Future<Map<String, dynamic>> getMarketPredictions({
-    required String crop,
-    required String region,
+    required final String crop,
+    required final String region,
   }) async {
     try {
       final response = await _apiService.get('/ai/market-predictions', queryParams: {
@@ -216,8 +216,8 @@ conversation back to farming-related topics.
 
   // Get weather-based recommendations
   Future<List<String>> getWeatherRecommendations({
-    required double latitude,
-    required double longitude,
+    required final double latitude,
+    required final double longitude,
   }) async {
     try {
       final response = await _apiService.get('/ai/weather-recommendations', queryParams: {
@@ -233,17 +233,17 @@ conversation back to farming-related topics.
 
   // Save chat session
   Future<void> saveChatSession({
-    required String userId,
-    required String sessionId,
-    required String title,
-    required List<AIMessage> messages,
+    required final String userId,
+    required final String sessionId,
+    required final String title,
+    required final List<AIMessage> messages,
   }) async {
     try {
       final existingSession = await _apiService.getById('ai_chat_sessions', sessionId);
       
       if (existingSession != null) {
         await _apiService.update('ai_chat_sessions', sessionId, {
-          'messages': jsonEncode(messages.map((m) => m.toJson()).toList()),
+          'messages': jsonEncode(messages.map((final m) => m.toJson()).toList()),
           'updated_at': DateTime.now().toIso8601String(),
         });
       } else {
@@ -251,7 +251,7 @@ conversation back to farming-related topics.
           'id': sessionId,
           'user_id': userId,
           'title': title,
-          'messages': jsonEncode(messages.map((m) => m.toJson()).toList()),
+          'messages': jsonEncode(messages.map((final m) => m.toJson()).toList()),
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
@@ -262,17 +262,16 @@ conversation back to farming-related topics.
   }
 
   // Get chat sessions
-  Future<List<ChatSession>> getChatSessions(String userId) async {
+  Future<List<ChatSession>> getChatSessions(final String userId) async {
     try {
       final data = await _apiService.query(
         'ai_chat_sessions',
         filters: {'user_id': userId},
         orderBy: 'updated_at',
-        ascending: false,
         limit: 50,
       );
 
-      return data.map((json) {
+      return data.map((final json) {
         if (json['messages'] is String) {
           json['messages'] = jsonDecode(json['messages'] as String);
         }
@@ -284,7 +283,7 @@ conversation back to farming-related topics.
   }
 
   // Delete chat session
-  Future<void> deleteChatSession(String sessionId) async {
+  Future<void> deleteChatSession(final String sessionId) async {
     try {
       await _apiService.deleteRecord('ai_chat_sessions', sessionId);
     } catch (e) {
@@ -293,8 +292,8 @@ conversation back to farming-related topics.
   }
 
   // Simple chat method - alias for sendMessage
-  Future<String> chat(String message) async {
-    return await sendMessage(
+  Future<String> chat(final String message) async {
+    return sendMessage(
       message: message,
       userId: 'anonymous',
     );
@@ -313,7 +312,7 @@ conversation back to farming-related topics.
   ];
 
   // Generate title from first message
-  String generateSessionTitle(String firstMessage) {
+  String generateSessionTitle(final String firstMessage) {
     if (firstMessage.length <= 50) {
       return firstMessage;
     }

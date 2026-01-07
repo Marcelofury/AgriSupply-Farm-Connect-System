@@ -7,9 +7,9 @@ import '../../providers/order_provider.dart';
 import '../../models/order_model.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
-  final String orderId;
 
   const OrderTrackingScreen({super.key, required this.orderId});
+  final String orderId;
 
   @override
   State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
@@ -39,7 +39,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -193,7 +193,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       {'status': 'delivered', 'label': 'Delivered', 'icon': Icons.home},
     ];
 
-    final currentIndex = steps.indexWhere((s) => s['status'] == _order!.status);
+    final currentIndex = steps.indexWhere((final s) => s['status'] == _order!.status);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +203,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 16),
-        ...steps.asMap().entries.map((entry) {
+        ...steps.asMap().entries.map((final entry) {
           final index = entry.key;
           final step = entry.value;
           final isCompleted = index <= currentIndex;
@@ -226,7 +226,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                           : null,
                     ),
                     child: Icon(
-                      step['icon'] as IconData,
+                      step['icon']! as IconData,
                       color: isCompleted ? Colors.white : AppColors.grey500,
                       size: 20,
                     ),
@@ -249,7 +249,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        step['label'] as String,
+                        step['label']! as String,
                         style: TextStyle(
                           fontWeight:
                               isCurrent ? FontWeight.bold : FontWeight.normal,
@@ -325,7 +325,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(final IconData icon, final String label, final String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -361,7 +361,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 12),
-        ...(_order!.items.map((item) => Container(
+        ...(_order!.items.map((final item) => Container(
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -458,7 +458,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Widget _buildPaymentRow(String label, String value, {bool isBold = false}) {
+  Widget _buildPaymentRow(final String label, final String value, {final bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

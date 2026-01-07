@@ -1,31 +1,4 @@
 class ProductModel {
-  final String id;
-  final String farmerId;
-  final String farmerName;
-  final String? farmerImage;
-  final double farmerRating;
-  final String name;
-  final String description;
-  final String category;
-  final double price;
-  final String unit; // kg, bunch, piece, etc.
-  final double quantity;
-  final double availableQuantity;
-  final List<String> images;
-  final String? region;
-  final String? district;
-  final bool isOrganic;
-  final bool isFeatured;
-  final bool isActive;
-  final DateTime harvestDate;
-  final DateTime? expiryDate;
-  final double rating;
-  final int totalRatings;
-  final int totalSold;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final String status;
-  final int views;
 
   ProductModel({
     required this.id,
@@ -92,6 +65,54 @@ class ProductModel {
     );
   }
 
+  /// Creates an empty ProductModel for use as a default value
+  factory ProductModel.empty() {
+    final now = DateTime.now();
+    return ProductModel(
+      id: '',
+      farmerId: '',
+      farmerName: '',
+      name: '',
+      description: '',
+      category: '',
+      price: 0,
+      unit: 'kg',
+      quantity: 0,
+      availableQuantity: 0,
+      images: [],
+      harvestDate: now,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
+  final String id;
+  final String farmerId;
+  final String farmerName;
+  final String? farmerImage;
+  final double farmerRating;
+  final String name;
+  final String description;
+  final String category;
+  final double price;
+  final String unit; // kg, bunch, piece, etc.
+  final double quantity;
+  final double availableQuantity;
+  final List<String> images;
+  final String? region;
+  final String? district;
+  final bool isOrganic;
+  final bool isFeatured;
+  final bool isActive;
+  final DateTime harvestDate;
+  final DateTime? expiryDate;
+  final double rating;
+  final int totalRatings;
+  final int totalSold;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String status;
+  final int views;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -128,33 +149,33 @@ class ProductModel {
   String? get farmerPhoto => farmerImage;
 
   ProductModel copyWith({
-    String? id,
-    String? farmerId,
-    String? farmerName,
-    String? farmerImage,
-    double? farmerRating,
-    String? name,
-    String? description,
-    String? category,
-    double? price,
-    String? unit,
-    double? quantity,
-    double? availableQuantity,
-    List<String>? images,
-    String? region,
-    String? district,
-    bool? isOrganic,
-    bool? isFeatured,
-    bool? isActive,
-    DateTime? harvestDate,
-    DateTime? expiryDate,
-    double? rating,
-    int? totalRatings,
-    int? totalSold,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    String? status,
-    int? views,
+    final String? id,
+    final String? farmerId,
+    final String? farmerName,
+    final String? farmerImage,
+    final double? farmerRating,
+    final String? name,
+    final String? description,
+    final String? category,
+    final double? price,
+    final String? unit,
+    final double? quantity,
+    final double? availableQuantity,
+    final List<String>? images,
+    final String? region,
+    final String? district,
+    final bool? isOrganic,
+    final bool? isFeatured,
+    final bool? isActive,
+    final DateTime? harvestDate,
+    final DateTime? expiryDate,
+    final double? rating,
+    final int? totalRatings,
+    final int? totalSold,
+    final DateTime? createdAt,
+    final DateTime? updatedAt,
+    final String? status,
+    final int? views,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -190,27 +211,6 @@ class ProductModel {
   String get displayPrice => 'UGX ${price.toStringAsFixed(0)}/$unit';
   bool get isAvailable => availableQuantity > 0 && isActive;
   String get primaryImage => images.isNotEmpty ? images.first : '';
-
-  /// Creates an empty ProductModel for use as a default value
-  factory ProductModel.empty() {
-    final now = DateTime.now();
-    return ProductModel(
-      id: '',
-      farmerId: '',
-      farmerName: '',
-      name: '',
-      description: '',
-      category: '',
-      price: 0,
-      unit: 'kg',
-      quantity: 0,
-      availableQuantity: 0,
-      images: [],
-      harvestDate: now,
-      createdAt: now,
-      updatedAt: now,
-    );
-  }
 }
 
 class ProductCategory {
@@ -246,7 +246,7 @@ class ProductCategory {
     other,
   ];
 
-  static String getIcon(String category) {
+  static String getIcon(final String category) {
     switch (category) {
       case vegetables:
         return '🥬';

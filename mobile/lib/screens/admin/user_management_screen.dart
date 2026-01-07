@@ -33,7 +33,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   // Mock data for demonstration
   final List<UserModel> _users = List.generate(
     20,
-    (index) => UserModel(
+    (final index) => UserModel(
       id: 'user_$index',
       email: 'user$index@example.com',
       fullName: index % 2 == 0 ? 'Farmer $index' : 'Buyer $index',
@@ -63,7 +63,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   List<UserModel> get _filteredUsers {
-    return _users.where((user) {
+    return _users.where((final user) {
       // Search filter
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
@@ -96,7 +96,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
           return true;
       }
     }).toList()
-      ..sort((a, b) {
+      ..sort((final a, final b) {
         switch (_sortBy) {
           case 'newest':
             return b.createdAt.compareTo(a.createdAt);
@@ -111,7 +111,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -164,7 +164,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       ),
                       child: TextField(
                         controller: _searchController,
-                        onChanged: (value) =>
+                        onChanged: (final value) =>
                             setState(() => _searchQuery = value),
                         decoration: const InputDecoration(
                           hintText: 'Search users...',
@@ -187,8 +187,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                     ),
                     child: PopupMenuButton<String>(
                       icon: const Icon(Icons.sort),
-                      onSelected: (value) => setState(() => _sortBy = value),
-                      itemBuilder: (context) => [
+                      onSelected: (final value) => setState(() => _sortBy = value),
+                      itemBuilder: (final context) => [
                         PopupMenuItem(
                           value: 'newest',
                           child: Row(
@@ -248,20 +248,20 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   _buildStatItem(
                       'Farmers',
                       _users
-                          .where((u) => u.userType == _UserType.farmer)
+                          .where((final u) => u.userType == _UserType.farmer)
                           .length
                           .toString()),
                   Container(height: 30, width: 1, color: AppColors.grey300),
                   _buildStatItem(
                       'Buyers',
                       _users
-                          .where((u) => u.userType == _UserType.buyer)
+                          .where((final u) => u.userType == _UserType.buyer)
                           .length
                           .toString()),
                   Container(height: 30, width: 1, color: AppColors.grey300),
                   _buildStatItem(
                       'Premium',
-                      _users.where((u) => u.isPremium).length.toString()),
+                      _users.where((final u) => u.isPremium).length.toString()),
                 ],
               ),
             ),
@@ -280,7 +280,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: _filteredUsers.length,
-                        itemBuilder: (context, index) {
+                        itemBuilder: (final context, final index) {
                           return _buildUserCard(_filteredUsers[index]);
                         },
                       ),
@@ -292,7 +292,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildStatItem(final String label, final String value) {
     return Column(
       children: [
         Text(
@@ -319,7 +319,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline, size: 64, color: AppColors.grey400),
+          const Icon(Icons.people_outline, size: 64, color: AppColors.grey400),
           const SizedBox(height: 16),
           Text(
             'No users found',
@@ -339,7 +339,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  Widget _buildUserCard(UserModel user) {
+  Widget _buildUserCard(final UserModel user) {
     final dateFormat = DateFormat('MMM dd, yyyy');
 
     return Card(
@@ -479,7 +479,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Icon(Icons.location_on,
+                        const Icon(Icons.location_on,
                             size: 12, color: AppColors.grey500),
                         const SizedBox(width: 4),
                         Text(
@@ -505,8 +505,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
 
               // Actions
               PopupMenuButton<String>(
-                onSelected: (value) => _handleUserAction(user, value),
-                itemBuilder: (context) => [
+                onSelected: (final value) => _handleUserAction(user, value),
+                itemBuilder: (final context) => [
                   const PopupMenuItem(
                     value: 'view',
                     child: Row(
@@ -567,7 +567,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  void _handleUserAction(UserModel user, String action) {
+  void _handleUserAction(final UserModel user, final String action) {
     switch (action) {
       case 'view':
         _showUserDetails(user);
@@ -587,19 +587,19 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     }
   }
 
-  void _showUserDetails(UserModel user) {
+  void _showUserDetails(final UserModel user) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => DraggableScrollableSheet(
+      builder: (final context) => DraggableScrollableSheet(
         initialChildSize: 0.7,
         minChildSize: 0.5,
         maxChildSize: 0.9,
         expand: false,
-        builder: (context, scrollController) {
+        builder: (final context, final scrollController) {
           return SingleChildScrollView(
             controller: scrollController,
             padding: const EdgeInsets.all(24),
@@ -654,8 +654,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                     'Joined', DateFormat('MMMM dd, yyyy').format(user.createdAt)),
                 _buildDetailItem('Status', user.isVerified ? 'Verified' : 'Pending'),
                 _buildDetailItem('Premium', user.isPremium ? 'Yes' : 'No'),
-                if (user.rating != null)
-                  _buildDetailItem('Rating', '${user.rating!.toStringAsFixed(1)} ⭐'),
+                _buildDetailItem('Rating', '${user.rating!.toStringAsFixed(1)} ⭐'),
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -695,7 +694,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  Widget _buildDetailItem(String label, String value) {
+  Widget _buildDetailItem(final String label, final String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -714,8 +713,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setSheetState) {
+      builder: (final context) => StatefulBuilder(
+        builder: (final context, final setSheetState) {
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -751,10 +750,10 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 Wrap(
                   spacing: 8,
                   children: ['Central', 'Eastern', 'Northern', 'Western']
-                      .map((region) => ChoiceChip(
+                      .map((final region) => ChoiceChip(
                             label: Text(region),
                             selected: _filterByRegion == region,
-                            onSelected: (selected) {
+                            onSelected: (final selected) {
                               setSheetState(() {
                                 _filterByRegion = selected ? region : null;
                               });
@@ -772,8 +771,8 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   children: [
                     ChoiceChip(
                       label: const Text('Premium'),
-                      selected: _filterByPremium == true,
-                      onSelected: (selected) {
+                      selected: _filterByPremium ?? false,
+                      onSelected: (final selected) {
                         setSheetState(() {
                           _filterByPremium = selected ? true : null;
                         });
@@ -783,7 +782,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                     ChoiceChip(
                       label: const Text('Basic'),
                       selected: _filterByPremium == false,
-                      onSelected: (selected) {
+                      onSelected: (final selected) {
                         setSheetState(() {
                           _filterByPremium = selected ? false : null;
                         });
@@ -817,16 +816,16 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  void _showEditUserDialog(UserModel user) {
+  void _showEditUserDialog(final UserModel user) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Edit ${user.fullName} dialog coming soon')),
     );
   }
 
-  void _verifyUser(UserModel user) {
+  void _verifyUser(final UserModel user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Verify User'),
         content: Text('Are you sure you want to verify ${user.fullName}?'),
         actions: [
@@ -851,10 +850,10 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  void _suspendUser(UserModel user) {
+  void _suspendUser(final UserModel user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Suspend User'),
         content: Text('Are you sure you want to suspend ${user.fullName}?'),
         actions: [
@@ -880,10 +879,10 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  void _deleteUser(UserModel user) {
+  void _deleteUser(final UserModel user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Delete User'),
         content: Text(
             'Are you sure you want to delete ${user.fullName}? This action cannot be undone.'),

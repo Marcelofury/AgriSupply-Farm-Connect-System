@@ -12,9 +12,9 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/loading_overlay.dart';
 
 class AddProductScreen extends StatefulWidget {
-  final String? productId;
 
   const AddProductScreen({super.key, this.productId});
+  final String? productId;
 
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
@@ -32,7 +32,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   bool _isOrganic = false;
   DateTime _harvestDate = DateTime.now();
   DateTime? _expiryDate;
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
   List<String> _existingImages = [];
 
   bool _isLoading = false;
@@ -92,12 +92,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     if (images.isNotEmpty) {
       setState(() {
-        _selectedImages.addAll(images.map((e) => File(e.path)));
+        _selectedImages.addAll(images.map((final e) => File(e.path)));
       });
     }
   }
 
-  Future<void> _selectDate(bool isHarvestDate) async {
+  Future<void> _selectDate(final bool isHarvestDate) async {
     final date = await showDatePicker(
       context: context,
       initialDate: isHarvestDate ? _harvestDate : (_expiryDate ?? DateTime.now()),
@@ -182,7 +182,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -192,20 +192,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  void _removeExistingImage(int index) {
+  void _removeExistingImage(final int index) {
     setState(() {
       _existingImages.removeAt(index);
     });
   }
 
-  void _removeSelectedImage(int index) {
+  void _removeSelectedImage(final int index) {
     setState(() {
       _selectedImages.removeAt(index);
     });
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -247,7 +247,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 label: 'Product Name',
                 hint: 'e.g., Fresh Tomatoes',
                 prefixIcon: Icons.eco,
-                validator: (value) {
+                validator: (final value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter product name';
                   }
@@ -262,7 +262,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 hint: 'Describe your product...',
                 prefixIcon: Icons.description,
                 maxLines: 4,
-                validator: (value) {
+                validator: (final value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter product description';
                   }
@@ -277,7 +277,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 value: _selectedCategory,
                 items: ProductCategory.all,
                 icon: ProductCategory.getIcon(_selectedCategory),
-                onChanged: (value) {
+                onChanged: (final value) {
                   setState(() => _selectedCategory = value!);
                 },
               ),
@@ -299,7 +299,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       hint: '5000',
                       prefixIcon: Icons.money,
                       keyboardType: TextInputType.number,
-                      validator: (value) {
+                      validator: (final value) {
                         if (value == null || value.isEmpty) {
                           return 'Required';
                         }
@@ -316,7 +316,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       label: 'Unit',
                       value: _selectedUnit,
                       items: ProductUnit.all,
-                      onChanged: (value) {
+                      onChanged: (final value) {
                         setState(() => _selectedUnit = value!);
                       },
                     ),
@@ -331,7 +331,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 hint: '100',
                 prefixIcon: Icons.inventory,
                 keyboardType: TextInputType.number,
-                validator: (value) {
+                validator: (final value) {
                   if (value == null || value.isEmpty) {
                     return 'Required';
                   }
@@ -411,8 +411,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     Switch(
                       value: _isOrganic,
-                      onChanged: (value) => setState(() => _isOrganic = value),
-                      activeColor: AppColors.success,
+                      onChanged: (final value) => setState(() => _isOrganic = value),
+                      activeThumbColor: AppColors.success,
                     ),
                   ],
                 ),
@@ -445,14 +445,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
               scrollDirection: Axis.horizontal,
               children: [
                 // Existing images
-                ..._existingImages.asMap().entries.map((entry) {
+                ..._existingImages.asMap().entries.map((final entry) {
                   return _buildImageTile(
                     imageUrl: entry.value,
                     onRemove: () => _removeExistingImage(entry.key),
                   );
                 }),
                 // New images
-                ..._selectedImages.asMap().entries.map((entry) {
+                ..._selectedImages.asMap().entries.map((final entry) {
                   return _buildImageTile(
                     imageFile: entry.value,
                     onRemove: () => _removeSelectedImage(entry.key),
@@ -471,7 +471,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: AppColors.grey300,
-                          style: BorderStyle.solid,
                         ),
                       ),
                       child: const Column(
@@ -527,9 +526,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildImageTile({
-    String? imageUrl,
-    File? imageFile,
-    required VoidCallback onRemove,
+    final String? imageUrl,
+    final File? imageFile,
+    required final VoidCallback onRemove,
   }) {
     return Container(
       width: 100,
@@ -574,11 +573,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildDropdown({
-    required String label,
-    required String value,
-    required List<String> items,
-    required void Function(String?) onChanged,
-    String? icon,
+    required final String label,
+    required final String value,
+    required final List<String> items,
+    required final void Function(String?) onChanged,
+    final String? icon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -600,7 +599,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             value: value,
             isExpanded: true,
             underline: const SizedBox.shrink(),
-            items: items.map((item) {
+            items: items.map((final item) {
               return DropdownMenuItem(
                 value: item,
                 child: Row(
@@ -623,9 +622,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildDatePicker({
-    required String label,
-    required DateTime? date,
-    required VoidCallback onTap,
+    required final String label,
+    required final DateTime? date,
+    required final VoidCallback onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -647,7 +646,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, size: 18, color: AppColors.grey600),
+                const Icon(Icons.calendar_today, size: 18, color: AppColors.grey600),
                 const SizedBox(width: 8),
                 Text(
                   date != null
@@ -668,7 +667,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   void _showDeleteDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Delete Product'),
         content: const Text(
             'Are you sure you want to delete this product? This action cannot be undone.'),

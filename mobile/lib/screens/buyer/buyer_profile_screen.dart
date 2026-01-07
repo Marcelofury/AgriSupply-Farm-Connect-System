@@ -114,7 +114,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -125,7 +125,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.currentUser;
 
@@ -218,15 +218,15 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
                     color: AppColors.primaryGreen.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.shopping_bag,
                         size: 16,
                         color: AppColors.primaryGreen,
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Text(
                         'Buyer Account',
                         style: TextStyle(
@@ -246,7 +246,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
                   hint: 'Enter your full name',
                   prefixIcon: Icons.person_outlined,
                   enabled: _isEditing,
-                  validator: (value) {
+                  validator: (final value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
                     }
@@ -291,7 +291,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
                           label: 'Region',
                           value: _selectedRegion,
                           items: _regions,
-                          onChanged: (value) {
+                          onChanged: (final value) {
                             setState(() {
                               _selectedRegion = value!;
                               _selectedDistrict = _districts[value]!.first;
@@ -305,7 +305,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
                           label: 'District',
                           value: _selectedDistrict,
                           items: _districts[_selectedRegion]!,
-                          onChanged: (value) {
+                          onChanged: (final value) {
                             setState(() => _selectedDistrict = value!);
                           },
                         ),
@@ -364,10 +364,10 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
   }
 
   Widget _buildDropdown({
-    required String label,
-    required String value,
-    required List<String> items,
-    required void Function(String?) onChanged,
+    required final String label,
+    required final String value,
+    required final List<String> items,
+    required final void Function(String?) onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -389,7 +389,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
             value: value,
             isExpanded: true,
             underline: const SizedBox.shrink(),
-            items: items.map((item) {
+            items: items.map((final item) {
               return DropdownMenuItem(value: item, child: Text(item));
             }).toList(),
             onChanged: onChanged,
@@ -399,7 +399,7 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(final String label, final String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

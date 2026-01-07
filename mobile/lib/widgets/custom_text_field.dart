@@ -4,29 +4,6 @@ import 'package:flutter/services.dart';
 import '../config/theme.dart';
 
 class CustomTextField extends StatefulWidget {
-  final TextEditingController? controller;
-  final String? label;
-  final String? hint;
-  final IconData? prefixIcon;
-  final Widget? prefix;
-  final Widget? suffix;
-  final Widget? suffixIcon;
-  final bool obscureText;
-  final bool enabled;
-  final bool readOnly;
-  final int maxLines;
-  final int? maxLength;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final void Function(String)? onSubmitted;
-  final void Function()? onTap;
-  final List<TextInputFormatter>? inputFormatters;
-  final FocusNode? focusNode;
-  final TextCapitalization textCapitalization;
-  final bool autofocus;
-  final EdgeInsetsGeometry? contentPadding;
 
   const CustomTextField({
     super.key,
@@ -54,6 +31,29 @@ class CustomTextField extends StatefulWidget {
     this.autofocus = false,
     this.contentPadding,
   });
+  final TextEditingController? controller;
+  final String? label;
+  final String? hint;
+  final IconData? prefixIcon;
+  final Widget? prefix;
+  final Widget? suffix;
+  final Widget? suffixIcon;
+  final bool obscureText;
+  final bool enabled;
+  final bool readOnly;
+  final int maxLines;
+  final int? maxLength;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final void Function(String)? onSubmitted;
+  final void Function()? onTap;
+  final List<TextInputFormatter>? inputFormatters;
+  final FocusNode? focusNode;
+  final TextCapitalization textCapitalization;
+  final bool autofocus;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -70,7 +70,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -85,7 +85,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           const SizedBox(height: 8),
         ],
         Focus(
-          onFocusChange: (hasFocus) {
+          onFocusChange: (final hasFocus) {
             setState(() => _isFocused = hasFocus);
           },
           child: TextFormField(
@@ -153,7 +153,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
                   color: AppColors.error,
-                  width: 1,
                 ),
               ),
               focusedErrorBorder: OutlineInputBorder(
@@ -180,12 +179,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
 }
 
 class CustomSearchField extends StatelessWidget {
-  final TextEditingController? controller;
-  final String? hint;
-  final void Function(String)? onChanged;
-  final void Function(String)? onSubmitted;
-  final void Function()? onTap;
-  final bool autofocus;
 
   const CustomSearchField({
     super.key,
@@ -196,9 +189,15 @@ class CustomSearchField extends StatelessWidget {
     this.onTap,
     this.autofocus = false,
   });
+  final TextEditingController? controller;
+  final String? hint;
+  final void Function(String)? onChanged;
+  final void Function(String)? onSubmitted;
+  final void Function()? onTap;
+  final bool autofocus;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       height: 48,
       decoration: BoxDecoration(
@@ -215,7 +214,7 @@ class CustomSearchField extends StatelessWidget {
           hintText: hint ?? 'Search...',
           hintStyle: const TextStyle(color: AppColors.grey400),
           prefixIcon: const Icon(Icons.search, color: AppColors.grey500),
-          suffixIcon: controller?.text.isNotEmpty == true
+          suffixIcon: controller?.text.isNotEmpty ?? false
               ? IconButton(
                   icon: const Icon(Icons.clear, color: AppColors.grey500),
                   onPressed: () {
@@ -236,10 +235,6 @@ class CustomSearchField extends StatelessWidget {
 }
 
 class PhoneTextField extends StatelessWidget {
-  final TextEditingController? controller;
-  final String? Function(String?)? validator;
-  final void Function(String)? onChanged;
-  final bool enabled;
 
   const PhoneTextField({
     super.key,
@@ -248,9 +243,13 @@ class PhoneTextField extends StatelessWidget {
     this.onChanged,
     this.enabled = true,
   });
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+  final bool enabled;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return CustomTextField(
       controller: controller,
       label: 'Phone Number',
@@ -266,7 +265,7 @@ class PhoneTextField extends StatelessWidget {
               'assets/images/uganda_flag.png',
               width: 24,
               height: 16,
-              errorBuilder: (_, __, ___) => const Text('🇺🇬'),
+              errorBuilder: (_, final __, final ___) => const Text('🇺🇬'),
             ),
             const SizedBox(width: 8),
             const Text(
@@ -291,7 +290,7 @@ class PhoneTextField extends StatelessWidget {
         _PhoneNumberFormatter(),
       ],
       validator: validator ??
-          (value) {
+          (final value) {
             if (value == null || value.isEmpty) {
               return 'Please enter your phone number';
             }
@@ -309,13 +308,13 @@ class PhoneTextField extends StatelessWidget {
 class _PhoneNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
+    final TextEditingValue oldValue,
+    final TextEditingValue newValue,
   ) {
     final text = newValue.text.replaceAll(' ', '');
     final buffer = StringBuffer();
 
-    for (int i = 0; i < text.length; i++) {
+    for (var i = 0; i < text.length; i++) {
       if (i == 3 || i == 6) {
         buffer.write(' ');
       }

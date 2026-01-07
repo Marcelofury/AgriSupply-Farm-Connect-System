@@ -2,9 +2,6 @@ import 'product_model.dart';
 
 /// Cart item model used by CartProvider with ProductModel reference
 class CartItemModel {
-  final String id;
-  final ProductModel product;
-  final int quantity;
 
   CartItemModel({
     required this.id,
@@ -12,12 +9,23 @@ class CartItemModel {
     required this.quantity,
   });
 
+  factory CartItemModel.fromJson(Map<String, dynamic> json) {
+    return CartItemModel(
+      id: json['id'] as String,
+      product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
+      quantity: json['quantity'] as int,
+    );
+  }
+  final String id;
+  final ProductModel product;
+  final int quantity;
+
   double get totalPrice => product.price * quantity;
 
   CartItemModel copyWith({
-    String? id,
-    ProductModel? product,
-    int? quantity,
+    final String? id,
+    final ProductModel? product,
+    final int? quantity,
   }) {
     return CartItemModel(
       id: id ?? this.id,
@@ -33,18 +41,9 @@ class CartItemModel {
       'quantity': quantity,
     };
   }
-
-  factory CartItemModel.fromJson(Map<String, dynamic> json) {
-    return CartItemModel(
-      id: json['id'] as String,
-      product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
-      quantity: json['quantity'] as int,
-    );
-  }
 }
 
 class CartModel {
-  final List<CartItem> items;
 
   CartModel({required this.items});
 
@@ -55,52 +54,44 @@ class CartModel {
           .toList(),
     );
   }
+  final List<CartItem> items;
 
   Map<String, dynamic> toJson() {
     return {
-      'items': items.map((e) => e.toJson()).toList(),
+      'items': items.map((final e) => e.toJson()).toList(),
     };
   }
 
-  double get subtotal => items.fold(0, (sum, item) => sum + item.totalPrice);
+  double get subtotal => items.fold(0, (final sum, final item) => sum + item.totalPrice);
   int get itemCount => items.length;
   int get totalQuantity =>
-      items.fold(0, (sum, item) => sum + item.quantity.toInt());
+      items.fold(0, (final sum, final item) => sum + item.quantity.toInt());
 
   bool get isEmpty => items.isEmpty;
   bool get isNotEmpty => items.isNotEmpty;
 
-  CartItem? getItem(String productId) {
+  CartItem? getItem(final String productId) {
     try {
-      return items.firstWhere((item) => item.productId == productId);
+      return items.firstWhere((final item) => item.productId == productId);
     } catch (e) {
       return null;
     }
   }
 
-  bool hasProduct(String productId) {
-    return items.any((item) => item.productId == productId);
+  bool hasProduct(final String productId) {
+    return items.any((final item) => item.productId == productId);
   }
 
   List<String> get farmerIds {
-    return items.map((item) => item.farmerId).toSet().toList();
+    return items.map((final item) => item.farmerId).toSet().toList();
   }
 
-  List<CartItem> getItemsByFarmer(String farmerId) {
-    return items.where((item) => item.farmerId == farmerId).toList();
+  List<CartItem> getItemsByFarmer(final String farmerId) {
+    return items.where((final item) => item.farmerId == farmerId).toList();
   }
 }
 
 class CartItem {
-  final String productId;
-  final String productName;
-  final String? productImage;
-  final String farmerId;
-  final String farmerName;
-  final double price;
-  final String unit;
-  final double quantity;
-  final double availableQuantity;
 
   CartItem({
     required this.productId,
@@ -141,6 +132,15 @@ class CartItem {
       availableQuantity: product.availableQuantity,
     );
   }
+  final String productId;
+  final String productName;
+  final String? productImage;
+  final String farmerId;
+  final String farmerName;
+  final double price;
+  final String unit;
+  final double quantity;
+  final double availableQuantity;
 
   Map<String, dynamic> toJson() {
     return {
@@ -157,15 +157,15 @@ class CartItem {
   }
 
   CartItem copyWith({
-    String? productId,
-    String? productName,
-    String? productImage,
-    String? farmerId,
-    String? farmerName,
-    double? price,
-    String? unit,
-    double? quantity,
-    double? availableQuantity,
+    final String? productId,
+    final String? productName,
+    final String? productImage,
+    final String? farmerId,
+    final String? farmerName,
+    final double? price,
+    final String? unit,
+    final double? quantity,
+    final double? availableQuantity,
   }) {
     return CartItem(
       productId: productId ?? this.productId,

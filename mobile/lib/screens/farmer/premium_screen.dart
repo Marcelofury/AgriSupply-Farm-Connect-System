@@ -78,7 +78,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -96,7 +96,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               pinned: true,
               backgroundColor: AppColors.secondaryOrange,
               flexibleSpace: FlexibleSpaceBar(
-                background: Container(
+                background: DecoratedBox(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -168,7 +168,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     ),
                     const SizedBox(height: 16),
                     Row(
-                      children: _plans.asMap().entries.map((entry) {
+                      children: _plans.asMap().entries.map((final entry) {
                         final index = entry.key;
                         final plan = entry.value;
                         final isSelected = _selectedPlan == index;
@@ -298,7 +298,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ...(_features.map((feature) => _buildFeatureItem(feature))),
+                    ...(_features.map(_buildFeatureItem)),
 
                     const SizedBox(height: 32),
 
@@ -433,7 +433,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildFeatureItem(PremiumFeature feature) {
+  Widget _buildFeatureItem(final PremiumFeature feature) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -503,8 +503,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
           Table(
             columnWidths: const {
               0: FlexColumnWidth(2),
-              1: FlexColumnWidth(1),
-              2: FlexColumnWidth(1),
+              1: FlexColumnWidth(),
+              2: FlexColumnWidth(),
             },
             children: [
               const TableRow(
@@ -535,7 +535,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  TableRow _buildComparisonRow(String feature, String basic, String premium) {
+  TableRow _buildComparisonRow(final String feature, final String basic, final String premium) {
     return TableRow(
       children: [
         Padding(
@@ -572,10 +572,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildTestimonialCard({
-    required String name,
-    required String location,
-    required String quote,
-    required int rating,
+    required final String name,
+    required final String location,
+    required final String quote,
+    required final int rating,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -623,7 +623,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               Row(
                 children: List.generate(
                   rating,
-                  (index) => const Icon(
+                  (final index) => const Icon(
                     Icons.star,
                     size: 16,
                     color: AppColors.secondaryOrange,
@@ -646,8 +646,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildFAQItem({
-    required String question,
-    required String answer,
+    required final String question,
+    required final String answer,
   }) {
     return ExpansionTile(
       tilePadding: EdgeInsets.zero,
@@ -683,7 +683,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        builder: (context) => _buildPaymentSheet(),
+        builder: (final context) => _buildPaymentSheet(),
       );
 
       if (paymentMethod != null && mounted) {
@@ -744,7 +744,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
             onTap: () => Navigator.pop(context, 'airtel'),
           ),
           _buildPaymentOption(
-            icon: null,
             title: 'Credit/Debit Card',
             subtitle: 'Visa, Mastercard',
             iconWidget: const Icon(Icons.credit_card, size: 32),
@@ -757,11 +756,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildPaymentOption({
-    String? icon,
-    required String title,
-    required String subtitle,
-    Widget? iconWidget,
-    required VoidCallback onTap,
+    final String? icon,
+    required final String title,
+    required final String subtitle,
+    final Widget? iconWidget,
+    required final VoidCallback onTap,
   }) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
@@ -789,11 +788,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
 }
 
 class PremiumPlan {
-  final String title;
-  final double price;
-  final String period;
-  final double savings;
-  final bool isPopular;
 
   PremiumPlan({
     required this.title,
@@ -802,16 +796,21 @@ class PremiumPlan {
     required this.savings,
     this.isPopular = false,
   });
+  final String title;
+  final double price;
+  final String period;
+  final double savings;
+  final bool isPopular;
 }
 
 class PremiumFeature {
-  final IconData icon;
-  final String title;
-  final String description;
 
   PremiumFeature({
     required this.icon,
     required this.title,
     required this.description,
   });
+  final IconData icon;
+  final String title;
+  final String description;
 }

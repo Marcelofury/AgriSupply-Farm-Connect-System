@@ -1,12 +1,4 @@
 class NotificationModel {
-  final String id;
-  final String userId;
-  final String title;
-  final String body;
-  final String type; // order, product, payment, promotion, system
-  final Map<String, dynamic>? data;
-  final bool isRead;
-  final DateTime createdAt;
 
   NotificationModel({
     required this.id,
@@ -31,6 +23,14 @@ class NotificationModel {
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
+  final String id;
+  final String userId;
+  final String title;
+  final String body;
+  final String type; // order, product, payment, promotion, system
+  final Map<String, dynamic>? data;
+  final bool isRead;
+  final DateTime createdAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -46,14 +46,14 @@ class NotificationModel {
   }
 
   NotificationModel copyWith({
-    String? id,
-    String? userId,
-    String? title,
-    String? body,
-    String? type,
-    Map<String, dynamic>? data,
-    bool? isRead,
-    DateTime? createdAt,
+    final String? id,
+    final String? userId,
+    final String? title,
+    final String? body,
+    final String? type,
+    final Map<String, dynamic>? data,
+    final bool? isRead,
+    final DateTime? createdAt,
   }) {
     return NotificationModel(
       id: id ?? this.id,

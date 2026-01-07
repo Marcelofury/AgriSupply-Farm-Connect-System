@@ -50,7 +50,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Products'),
@@ -92,7 +92,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: TextField(
-                        onChanged: (value) =>
+                        onChanged: (final value) =>
                             setState(() => _searchQuery = value),
                         decoration: const InputDecoration(
                           hintText: 'Search products...',
@@ -115,13 +115,13 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
                     ),
                     child: PopupMenuButton<String>(
                       icon: const Icon(Icons.filter_list),
-                      onSelected: (value) {
+                      onSelected: (final value) {
                         setState(() => _selectedCategory = value);
                       },
-                      itemBuilder: (context) => [
+                      itemBuilder: (final context) => [
                         const PopupMenuItem(value: 'All', child: Text('All')),
                         ...ProductCategory.all.map(
-                          (cat) =>
+                          (final cat) =>
                               PopupMenuItem(value: cat, child: Text(cat)),
                         ),
                       ],
@@ -148,15 +148,15 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
     );
   }
 
-  Widget _buildProductList(String status) {
+  Widget _buildProductList(final String status) {
     return Consumer<ProductProvider>(
-      builder: (context, provider, child) {
-        List<ProductModel> products = provider.farmerProducts
-            .where((p) => p.status == status)
-            .where((p) =>
+      builder: (final context, final provider, final child) {
+        var products = provider.farmerProducts
+            .where((final p) => p.status == status)
+            .where((final p) =>
                 _selectedCategory == 'All' ||
                 p.category == _selectedCategory)
-            .where((p) =>
+            .where((final p) =>
                 p.name.toLowerCase().contains(_searchQuery.toLowerCase()))
             .toList();
 
@@ -169,7 +169,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: products.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (final context, final index) {
               return _buildProductCard(products[index]);
             },
           ),
@@ -178,7 +178,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
     );
   }
 
-  Widget _buildEmptyState(String status) {
+  Widget _buildEmptyState(final String status) {
     String message;
     IconData icon;
 
@@ -224,7 +224,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
     );
   }
 
-  Widget _buildProductCard(ProductModel product) {
+  Widget _buildProductCard(final ProductModel product) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -256,7 +256,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
                         width: 80,
                         height: 80,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
+                        errorBuilder: (_, final __, final ___) => Container(
                           width: 80,
                           height: 80,
                           color: AppColors.grey200,
@@ -358,7 +358,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.visibility, size: 14, color: AppColors.grey500),
+                        const Icon(Icons.visibility, size: 14, color: AppColors.grey500),
                         const SizedBox(width: 4),
                         Text(
                           '${product.views} views',
@@ -368,10 +368,10 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Icon(Icons.shopping_cart, size: 14, color: AppColors.grey500),
+                        const Icon(Icons.shopping_cart, size: 14, color: AppColors.grey500),
                         const SizedBox(width: 4),
                         Text(
-                          '${product.totalSold.toInt()} sold',
+                          '${product.totalSold} sold',
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.grey500,
@@ -381,8 +381,8 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
                         PopupMenuButton<String>(
                           iconSize: 20,
                           padding: EdgeInsets.zero,
-                          onSelected: (value) => _handleProductAction(product, value),
-                          itemBuilder: (context) => [
+                          onSelected: (final value) => _handleProductAction(product, value),
+                          itemBuilder: (final context) => [
                             const PopupMenuItem(
                               value: 'edit',
                               child: Row(
@@ -438,13 +438,13 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
     );
   }
 
-  Color _getStockColor(double quantity) {
+  Color _getStockColor(final double quantity) {
     if (quantity <= 0) return AppColors.error;
     if (quantity < 10) return AppColors.warning;
     return AppColors.success;
   }
 
-  void _handleProductAction(ProductModel product, String action) async {
+  Future<void> _handleProductAction(final ProductModel product, final String action) async {
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
 
@@ -474,10 +474,10 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
     }
   }
 
-  void _showDeleteDialog(ProductModel product) {
+  void _showDeleteDialog(final ProductModel product) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Delete Product'),
         content: Text('Are you sure you want to delete "${product.name}"?'),
         actions: [

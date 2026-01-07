@@ -9,10 +9,6 @@ enum PaymentProvider {
 }
 
 class PaymentResult {
-  final bool success;
-  final String? transactionId;
-  final String? message;
-  final String? errorCode;
 
   PaymentResult({
     required this.success,
@@ -20,6 +16,10 @@ class PaymentResult {
     this.message,
     this.errorCode,
   });
+  final bool success;
+  final String? transactionId;
+  final String? message;
+  final String? errorCode;
 }
 
 class PaymentService {
@@ -27,10 +27,10 @@ class PaymentService {
 
   // Initialize payment
   Future<PaymentResult> initiatePayment({
-    required String orderId,
-    required double amount,
-    required PaymentProvider provider,
-    required String phoneNumber,
+    required final String orderId,
+    required final double amount,
+    required final PaymentProvider provider,
+    required final String phoneNumber,
   }) async {
     try {
       switch (provider) {
@@ -53,9 +53,9 @@ class PaymentService {
 
   // MTN Mobile Money payment
   Future<PaymentResult> _initiateMTNPayment(
-    String orderId,
-    double amount,
-    String phoneNumber,
+    final String orderId,
+    final double amount,
+    final String phoneNumber,
   ) async {
     try {
       final response = await _apiService.post('/payments/mtn', body: {
@@ -99,9 +99,9 @@ class PaymentService {
 
   // Airtel Money payment
   Future<PaymentResult> _initiateAirtelPayment(
-    String orderId,
-    double amount,
-    String phoneNumber,
+    final String orderId,
+    final double amount,
+    final String phoneNumber,
   ) async {
     try {
       final response = await _apiService.post('/payments/airtel', body: {
@@ -143,8 +143,8 @@ class PaymentService {
 
   // Card payment (Flutterwave/Paystack)
   Future<PaymentResult> _initiateCardPayment(
-    String orderId,
-    double amount,
+    final String orderId,
+    final double amount,
   ) async {
     try {
       final response = await _apiService.post('/payments/card', body: {
@@ -184,8 +184,8 @@ class PaymentService {
 
   // Cash on Delivery
   Future<PaymentResult> _initiateCOD(
-    String orderId,
-    double amount,
+    final String orderId,
+    final double amount,
   ) async {
     try {
       await _recordPayment(
@@ -215,7 +215,7 @@ class PaymentService {
   }
 
   // Check payment status
-  Future<String> checkPaymentStatus(String transactionId) async {
+  Future<String> checkPaymentStatus(final String transactionId) async {
     try {
       final response = await _apiService.get('/payments/$transactionId/status');
       
@@ -238,7 +238,7 @@ class PaymentService {
   }
 
   // Verify payment callback
-  Future<bool> verifyPayment(String transactionId) async {
+  Future<bool> verifyPayment(final String transactionId) async {
     try {
       final response = await _apiService.post('/payments/$transactionId/verify');
       
@@ -267,10 +267,10 @@ class PaymentService {
 
   // Process refund
   Future<PaymentResult> processRefund({
-    required String orderId,
-    required String transactionId,
-    required double amount,
-    String? reason,
+    required final String orderId,
+    required final String transactionId,
+    required final double amount,
+    final String? reason,
   }) async {
     try {
       final response = await _apiService.post('/payments/refund', body: {
@@ -309,13 +309,12 @@ class PaymentService {
   }
 
   // Get payment history for order
-  Future<List<Map<String, dynamic>>> getPaymentHistory(String orderId) async {
+  Future<List<Map<String, dynamic>>> getPaymentHistory(final String orderId) async {
     try {
       final payments = await _apiService.query(
         'payments',
         filters: {'order_id': orderId},
         orderBy: 'created_at',
-        ascending: false,
       );
       return payments;
     } catch (e) {
@@ -325,11 +324,11 @@ class PaymentService {
 
   // Record payment in database
   Future<void> _recordPayment({
-    required String orderId,
-    required double amount,
-    required String provider,
-    String? transactionId,
-    required String status,
+    required final String orderId,
+    required final double amount,
+    required final String provider,
+    final String? transactionId,
+    required final String status,
   }) async {
     await _apiService.insert('payments', {
       'order_id': orderId,
@@ -343,7 +342,7 @@ class PaymentService {
   }
 
   // Update payment status
-  Future<void> _updatePaymentStatus(String transactionId, String status) async {
+  Future<void> _updatePaymentStatus(final String transactionId, final String status) async {
     try {
       final payments = await _apiService.query(
         'payments',
@@ -364,7 +363,7 @@ class PaymentService {
 
   // Get payment by transaction ID
   Future<Map<String, dynamic>?> _getPaymentByTransactionId(
-    String transactionId,
+    final String transactionId,
   ) async {
     try {
       final payments = await _apiService.query(
@@ -380,7 +379,7 @@ class PaymentService {
   }
 
   // Validate phone number for mobile money
-  bool validatePhoneNumber(String phone, PaymentProvider provider) {
+  bool validatePhoneNumber(final String phone, final PaymentProvider provider) {
     // Remove spaces and dashes
     final cleanPhone = phone.replaceAll(RegExp(r'[\s-]'), '');
 
@@ -413,10 +412,10 @@ class PaymentService {
   }
 
   // Format amount for display
-  String formatAmount(double amount) {
+  String formatAmount(final double amount) {
     return 'UGX ${amount.toStringAsFixed(0).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
+          (m) => '${m[1]},',
         )}';
   }
 }

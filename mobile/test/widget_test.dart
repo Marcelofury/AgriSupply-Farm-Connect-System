@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agrisupply/main.dart';
 
 void main() {
-  testWidgets('App loads successfully', (WidgetTester tester) async {
+  testWidgets('App loads successfully', (tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const AgriSupplyApp());
 

@@ -6,13 +6,6 @@ import '../config/theme.dart';
 import '../models/product_model.dart';
 
 class ProductCard extends StatelessWidget {
-  final ProductModel product;
-  final VoidCallback? onTap;
-  final VoidCallback? onFavorite;
-  final VoidCallback? onAddToCart;
-  final bool isFavorite;
-  final bool showFarmerInfo;
-  final bool isCompact;
 
   const ProductCard({
     super.key,
@@ -24,9 +17,16 @@ class ProductCard extends StatelessWidget {
     this.showFarmerInfo = true,
     this.isCompact = false,
   });
+  final ProductModel product;
+  final VoidCallback? onTap;
+  final VoidCallback? onFavorite;
+  final VoidCallback? onAddToCart;
+  final bool isFavorite;
+  final bool showFarmerInfo;
+  final bool isCompact;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -35,7 +35,7 @@ class ProductCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -62,14 +62,14 @@ class ProductCard extends StatelessWidget {
                           height: isCompact ? 100 : 120,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
+                          placeholder: (final context, final url) => Container(
                             height: isCompact ? 100 : 120,
                             color: AppColors.grey200,
                             child: const Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),
-                          errorWidget: (context, url, error) => Container(
+                          errorWidget: (final context, final url, final error) => Container(
                             height: isCompact ? 100 : 120,
                             color: AppColors.grey200,
                             child: const Icon(Icons.image, color: AppColors.grey400),
@@ -174,7 +174,7 @@ class ProductCard extends StatelessWidget {
                   if (!isCompact)
                     Text(
                       product.category,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         color: AppColors.grey500,
                         fontWeight: FontWeight.w500,
@@ -239,7 +239,7 @@ class ProductCard extends StatelessWidget {
                   ),
 
                   // Farmer Info
-                  if (showFarmerInfo && !isCompact && product.farmerName != null) ...[
+                  if (showFarmerInfo && !isCompact) ...[
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -251,7 +251,7 @@ class ProductCard extends StatelessWidget {
                               : null,
                           child: product.farmerPhoto == null
                               ? Text(
-                                  product.farmerName![0].toUpperCase(),
+                                  product.farmerName[0].toUpperCase(),
                                   style: const TextStyle(
                                     fontSize: 8,
                                     fontWeight: FontWeight.bold,
@@ -263,7 +263,7 @@ class ProductCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
-                            product.farmerName!,
+                            product.farmerName,
                             style: const TextStyle(
                               fontSize: 11,
                               color: AppColors.grey600,
@@ -272,17 +272,17 @@ class ProductCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (product.rating != null) ...[
-                          const Icon(Icons.star, size: 12, color: AppColors.warning),
-                          const SizedBox(width: 2),
-                          Text(
-                            product.rating!.toStringAsFixed(1),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        ...[
+                        const Icon(Icons.star, size: 12, color: AppColors.warning),
+                        const SizedBox(width: 2),
+                        Text(
+                          product.rating!.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
+                        ),
+                      ],
                       ],
                     ),
                   ],
@@ -297,11 +297,6 @@ class ProductCard extends StatelessWidget {
 }
 
 class ProductCardHorizontal extends StatelessWidget {
-  final ProductModel product;
-  final VoidCallback? onTap;
-  final VoidCallback? onFavorite;
-  final VoidCallback? onAddToCart;
-  final bool isFavorite;
 
   const ProductCardHorizontal({
     super.key,
@@ -311,9 +306,14 @@ class ProductCardHorizontal extends StatelessWidget {
     this.onAddToCart,
     this.isFavorite = false,
   });
+  final ProductModel product;
+  final VoidCallback? onTap;
+  final VoidCallback? onFavorite;
+  final VoidCallback? onAddToCart;
+  final bool isFavorite;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
@@ -348,12 +348,12 @@ class ProductCardHorizontal extends StatelessWidget {
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
+                          placeholder: (final context, final url) => Container(
                             width: 80,
                             height: 80,
                             color: AppColors.grey200,
                           ),
-                          errorWidget: (context, url, error) => Container(
+                          errorWidget: (final context, final url, final error) => Container(
                             width: 80,
                             height: 80,
                             color: AppColors.grey200,
@@ -430,24 +430,23 @@ class ProductCardHorizontal extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  if (product.farmerName != null)
-                    Row(
-                      children: [
-                        const Icon(Icons.person, size: 12, color: AppColors.grey500),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            product.farmerName!,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.grey600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      const Icon(Icons.person, size: 12, color: AppColors.grey500),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          product.farmerName!,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.grey600,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -487,17 +486,17 @@ class ProductCardHorizontal extends StatelessWidget {
 }
 
 class FeaturedProductCard extends StatelessWidget {
-  final ProductModel product;
-  final VoidCallback? onTap;
 
   const FeaturedProductCard({
     super.key,
     required this.product,
     this.onTap,
   });
+  final ProductModel product;
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',

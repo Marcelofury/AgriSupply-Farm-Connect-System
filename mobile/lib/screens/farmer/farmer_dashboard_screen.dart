@@ -36,7 +36,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -56,7 +56,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
           : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (final index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),
@@ -203,12 +203,12 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
       ),
       child: Row(
         children: [
-          Expanded(
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: const [
+                  children: [
                     Icon(Icons.star, color: Colors.white, size: 20),
                     SizedBox(width: 8),
                     Text(
@@ -221,8 +221,8 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: 8),
+                Text(
                   'Get more visibility, analytics, and promotional tools',
                   style: TextStyle(color: Colors.white70),
                 ),
@@ -244,11 +244,11 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
 
   Widget _buildStatsGrid() {
     return Consumer2<ProductProvider, OrderProvider>(
-      builder: (context, productProvider, orderProvider, child) {
+      builder: (final context, final productProvider, final orderProvider, final child) {
         final products = productProvider.farmerProducts;
         final orders = orderProvider.orders;
-        final pendingOrders = orders.where((o) => o.status == 'pending').length;
-        final totalSales = orders.where((o) => o.isPaid).fold(0.0, (sum, o) => sum + o.totalAmount);
+        final pendingOrders = orders.where((final o) => o.status == 'pending').length;
+        final totalSales = orders.where((final o) => o.isPaid).fold(0, (final sum, final o) => sum + o.totalAmount);
 
         return GridView.count(
           shrinkWrap: true,
@@ -288,7 +288,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(final String title, final String value, final IconData icon, final Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -352,7 +352,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     );
   }
 
-  Widget _buildActionCard(String title, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildActionCard(final String title, final IconData icon, final Color color, final VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -402,15 +402,15 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
       ),
       child: LineChart(
         LineChartData(
-          gridData: FlGridData(show: false),
+          gridData: const FlGridData(show: false),
           titlesData: FlTitlesData(
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: const AxisTitles(sideTitles: SideTitles()),
+            rightTitles: const AxisTitles(sideTitles: SideTitles()),
+            topTitles: const AxisTitles(sideTitles: SideTitles()),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                getTitlesWidget: (value, meta) {
+                getTitlesWidget: (final value, final meta) {
                   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                   if (value.toInt() < days.length) {
                     return Text(
@@ -438,7 +438,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
               isCurved: true,
               color: AppColors.primaryGreen,
               barWidth: 3,
-              dotData: FlDotData(show: false),
+              dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
                 color: AppColors.primaryGreen.withOpacity(0.1),
@@ -452,7 +452,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
 
   Widget _buildRecentOrders() {
     return Consumer<OrderProvider>(
-      builder: (context, orderProvider, child) {
+      builder: (final context, final orderProvider, final child) {
         final orders = orderProvider.orders.take(3).toList();
 
         if (orders.isEmpty) {
@@ -461,7 +461,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             child: Center(
               child: Column(
                 children: [
-                  Icon(Icons.receipt_long_outlined, size: 48, color: AppColors.grey400),
+                  const Icon(Icons.receipt_long_outlined, size: 48, color: AppColors.grey400),
                   const SizedBox(height: 16),
                   Text(
                     'No orders yet',
@@ -476,7 +476,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
         }
 
         return Column(
-          children: orders.map((order) {
+          children: orders.map((final order) {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
@@ -539,7 +539,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(final String status) {
     Color color;
     switch (status) {
       case 'pending':
@@ -588,7 +588,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: Consumer<ProductProvider>(
-                builder: (context, productProvider, child) {
+                builder: (final context, final productProvider, final child) {
                   final products = productProvider.farmerProducts;
 
                   if (products.isEmpty) {
@@ -596,7 +596,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inventory_2_outlined, size: 80, color: AppColors.grey400),
+                          const Icon(Icons.inventory_2_outlined, size: 80, color: AppColors.grey400),
                           const SizedBox(height: 16),
                           Text(
                             'No products yet',
@@ -616,7 +616,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
 
                   return ListView.builder(
                     itemCount: products.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (final context, final index) {
                       final product = products[index];
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -701,7 +701,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: Consumer<OrderProvider>(
-                builder: (context, orderProvider, child) {
+                builder: (final context, final orderProvider, final child) {
                   final orders = orderProvider.orders;
 
                   if (orders.isEmpty) {
@@ -709,7 +709,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.receipt_long_outlined, size: 80, color: AppColors.grey400),
+                          const Icon(Icons.receipt_long_outlined, size: 80, color: AppColors.grey400),
                           const SizedBox(height: 16),
                           Text('No orders yet', style: Theme.of(context).textTheme.headlineSmall),
                         ],
@@ -719,7 +719,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
 
                   return ListView.builder(
                     itemCount: orders.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (final context, final index) {
                       final order = orders[index];
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -868,7 +868,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     );
   }
 
-  Widget _buildProfileMenuItem(IconData icon, String title, VoidCallback onTap, {bool isDestructive = false}) {
+  Widget _buildProfileMenuItem(final IconData icon, final String title, final VoidCallback onTap, {final bool isDestructive = false}) {
     return ListTile(
       leading: Icon(icon, color: isDestructive ? AppColors.error : AppColors.grey700),
       title: Text(title, style: TextStyle(color: isDestructive ? AppColors.error : null)),

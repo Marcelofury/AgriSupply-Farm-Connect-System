@@ -45,7 +45,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Orders'),
@@ -77,11 +77,11 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
     );
   }
 
-  Widget _buildOrdersList(List<String> statuses) {
+  Widget _buildOrdersList(final List<String> statuses) {
     return Consumer<OrderProvider>(
-      builder: (context, orderProvider, child) {
+      builder: (final context, final orderProvider, final child) {
         final orders = orderProvider.orders
-            .where((order) => statuses.contains(order.status))
+            .where((final order) => statuses.contains(order.status))
             .toList();
 
         if (orders.isEmpty) {
@@ -89,7 +89,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.receipt_long_outlined,
                   size: 80,
                   color: AppColors.grey400,
@@ -116,7 +116,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: orders.length,
-            itemBuilder: (context, index) {
+            itemBuilder: (final context, final index) {
               return _buildOrderCard(orders[index]);
             },
           ),
@@ -125,7 +125,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
     );
   }
 
-  Widget _buildOrderCard(OrderModel order) {
+  Widget _buildOrderCard(final OrderModel order) {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(
         context,
@@ -169,7 +169,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
                   ),
             ),
             const Divider(height: 24),
-            ...order.items.take(2).map((item) => Padding(
+            ...order.items.take(2).map((final item) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     children: [
@@ -259,7 +259,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(final String status) {
     Color color;
     switch (status) {
       case 'pending':

@@ -6,19 +6,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/app_config.dart';
 
 class ApiException implements Exception {
-  final String message;
-  final int? statusCode;
 
   ApiException(this.message, {this.statusCode});
+  final String message;
+  final int? statusCode;
 
   @override
   String toString() => message;
 }
 
 class ApiService {
-  static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
   ApiService._internal();
+  static final ApiService _instance = ApiService._internal();
 
   final String _baseUrl = AppConfig.apiBaseUrl;
   
@@ -37,7 +37,7 @@ class ApiService {
   }
 
   // Generic GET request
-  Future<dynamic> get(String endpoint, {Map<String, String>? queryParams}) async {
+  Future<dynamic> get(final String endpoint, {final Map<String, String>? queryParams}) async {
     try {
       final uri = Uri.parse('$_baseUrl$endpoint').replace(
         queryParameters: queryParams,
@@ -50,12 +50,12 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e.toString()}');
+      throw ApiException('Network error: ${e}');
     }
   }
 
   // Generic POST request
-  Future<dynamic> post(String endpoint, {dynamic body}) async {
+  Future<dynamic> post(final String endpoint, {final dynamic body}) async {
     try {
       final uri = Uri.parse('$_baseUrl$endpoint');
       final headers = await _getHeaders();
@@ -68,12 +68,12 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e.toString()}');
+      throw ApiException('Network error: ${e}');
     }
   }
 
   // Generic PUT request
-  Future<dynamic> put(String endpoint, {dynamic body}) async {
+  Future<dynamic> put(final String endpoint, {final dynamic body}) async {
     try {
       final uri = Uri.parse('$_baseUrl$endpoint');
       final headers = await _getHeaders();
@@ -86,12 +86,12 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e.toString()}');
+      throw ApiException('Network error: ${e}');
     }
   }
 
   // Generic PATCH request
-  Future<dynamic> patch(String endpoint, {dynamic body}) async {
+  Future<dynamic> patch(final String endpoint, {final dynamic body}) async {
     try {
       final uri = Uri.parse('$_baseUrl$endpoint');
       final headers = await _getHeaders();
@@ -104,12 +104,12 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e.toString()}');
+      throw ApiException('Network error: ${e}');
     }
   }
 
   // Generic DELETE request
-  Future<dynamic> delete(String endpoint) async {
+  Future<dynamic> delete(final String endpoint) async {
     try {
       final uri = Uri.parse('$_baseUrl$endpoint');
       final headers = await _getHeaders();
@@ -120,12 +120,12 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e.toString()}');
+      throw ApiException('Network error: ${e}');
     }
   }
 
   // Handle response
-  dynamic _handleResponse(http.Response response) {
+  dynamic _handleResponse(final http.Response response) {
     final statusCode = response.statusCode;
     final body = response.body.isNotEmpty ? jsonDecode(response.body) : null;
 
@@ -139,10 +139,10 @@ class ApiService {
 
   // Upload file to Supabase Storage
   Future<String> uploadFile({
-    required String bucket,
-    required String path,
-    required List<int> fileBytes,
-    String? contentType,
+    required final String bucket,
+    required final String path,
+    required final List<int> fileBytes,
+    final String? contentType,
   }) async {
     try {
       final response = await _supabase.storage.from(bucket).uploadBinary(
@@ -157,38 +157,38 @@ class ApiService {
       final publicUrl = _supabase.storage.from(bucket).getPublicUrl(path);
       return publicUrl;
     } catch (e) {
-      throw ApiException('Failed to upload file: ${e.toString()}');
+      throw ApiException('Failed to upload file: ${e}');
     }
   }
 
   // Delete file from Supabase Storage
   Future<void> deleteFile({
-    required String bucket,
-    required String path,
+    required final String bucket,
+    required final String path,
   }) async {
     try {
       await _supabase.storage.from(bucket).remove([path]);
     } catch (e) {
-      throw ApiException('Failed to delete file: ${e.toString()}');
+      throw ApiException('Failed to delete file: ${e}');
     }
   }
 
   // Supabase query helpers
   Future<List<Map<String, dynamic>>> query(
-    String table, {
-    String? select,
-    Map<String, dynamic>? filters,
-    String? orderBy,
-    bool ascending = false,
-    int? limit,
-    int? offset,
+    final String table, {
+    final String? select,
+    final Map<String, dynamic>? filters,
+    final String? orderBy,
+    final bool ascending = false,
+    final int? limit,
+    final int? offset,
   }) async {
     try {
       dynamic query = _supabase.from(table).select(select ?? '*');
 
       // Apply filters
       if (filters != null) {
-        filters.forEach((key, value) {
+        filters.forEach((final key, final value) {
           if (value != null) {
             query = query.eq(key, value);
           }
@@ -212,28 +212,28 @@ class ApiService {
       final response = await query;
       return List<Map<String, dynamic>>.from(response as List);
     } catch (e) {
-      throw ApiException('Query failed: ${e.toString()}');
+      throw ApiException('Query failed: ${e}');
     }
   }
 
   // Insert data
   Future<Map<String, dynamic>> insert(
-    String table,
-    Map<String, dynamic> data,
+    final String table,
+    final Map<String, dynamic> data,
   ) async {
     try {
       final response = await _supabase.from(table).insert(data).select().single();
       return response;
     } catch (e) {
-      throw ApiException('Insert failed: ${e.toString()}');
+      throw ApiException('Insert failed: ${e}');
     }
   }
 
   // Update data
   Future<Map<String, dynamic>> update(
-    String table,
-    String id,
-    Map<String, dynamic> data,
+    final String table,
+    final String id,
+    final Map<String, dynamic> data,
   ) async {
     try {
       final response = await _supabase
@@ -244,21 +244,21 @@ class ApiService {
           .single();
       return response;
     } catch (e) {
-      throw ApiException('Update failed: ${e.toString()}');
+      throw ApiException('Update failed: ${e}');
     }
   }
 
   // Delete data
-  Future<void> deleteRecord(String table, String id) async {
+  Future<void> deleteRecord(final String table, final String id) async {
     try {
       await _supabase.from(table).delete().eq('id', id);
     } catch (e) {
-      throw ApiException('Delete failed: ${e.toString()}');
+      throw ApiException('Delete failed: ${e}');
     }
   }
 
   // Get single record
-  Future<Map<String, dynamic>?> getById(String table, String id) async {
+  Future<Map<String, dynamic>?> getById(final String table, final String id) async {
     try {
       final response = await _supabase
           .from(table)
@@ -267,16 +267,16 @@ class ApiService {
           .maybeSingle();
       return response;
     } catch (e) {
-      throw ApiException('Get failed: ${e.toString()}');
+      throw ApiException('Get failed: ${e}');
     }
   }
 
   // Subscribe to realtime changes
   RealtimeChannel subscribe(
-    String table, {
-    required Function(Map<String, dynamic> payload) onInsert,
-    Function(Map<String, dynamic> payload)? onUpdate,
-    Function(Map<String, dynamic> payload)? onDelete,
+    final String table, {
+    required final Function(Map<String, dynamic> payload) onInsert,
+    final Function(Map<String, dynamic> payload)? onUpdate,
+    final Function(Map<String, dynamic> payload)? onDelete,
   }) {
     return _supabase
         .channel('public:$table')
@@ -284,25 +284,25 @@ class ApiService {
           event: PostgresChangeEvent.insert,
           schema: 'public',
           table: table,
-          callback: (payload) => onInsert(payload.newRecord),
+          callback: (final payload) => onInsert(payload.newRecord),
         )
         .onPostgresChanges(
           event: PostgresChangeEvent.update,
           schema: 'public',
           table: table,
-          callback: (payload) => onUpdate?.call(payload.newRecord),
+          callback: (final payload) => onUpdate?.call(payload.newRecord),
         )
         .onPostgresChanges(
           event: PostgresChangeEvent.delete,
           schema: 'public',
           table: table,
-          callback: (payload) => onDelete?.call(payload.oldRecord),
+          callback: (final payload) => onDelete?.call(payload.oldRecord),
         )
         .subscribe();
   }
 
   // Unsubscribe from channel
-  void unsubscribe(RealtimeChannel channel) {
+  void unsubscribe(final RealtimeChannel channel) {
     _supabase.removeChannel(channel);
   }
 }

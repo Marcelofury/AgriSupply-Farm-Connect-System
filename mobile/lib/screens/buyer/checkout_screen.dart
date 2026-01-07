@@ -127,11 +127,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  void _showPaymentDialog(String orderId) {
+  void _showPaymentDialog(final String orderId) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Mobile Money Payment'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -172,11 +172,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  void _showSuccessDialog(String orderId) {
+  void _showSuccessDialog(final String orderId) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -219,7 +219,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 AppRoutes.buyerHome,
-                (route) => false,
+                (final route) => false,
               );
             },
             child: const Text('Continue Shopping'),
@@ -240,7 +240,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -251,7 +251,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final deliveryFee = _calculateDeliveryFee();
     final total = cartProvider.subtotal + deliveryFee;
@@ -278,7 +278,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 label: 'Street Address',
                 hint: 'Enter your delivery address',
                 prefixIcon: Icons.location_on_outlined,
-                validator: (value) {
+                validator: (final value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your address';
                   }
@@ -293,7 +293,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       label: 'Region',
                       value: _selectedRegion,
                       items: _regions,
-                      onChanged: (value) {
+                      onChanged: (final value) {
                         setState(() {
                           _selectedRegion = value!;
                           _selectedDistrict = _districts[value]!.first;
@@ -307,7 +307,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       label: 'District',
                       value: _selectedDistrict,
                       items: _districts[_selectedRegion]!,
-                      onChanged: (value) {
+                      onChanged: (final value) {
                         setState(() => _selectedDistrict = value!);
                       },
                     ),
@@ -321,7 +321,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 hint: '+256 700 123 456',
                 keyboardType: TextInputType.phone,
                 prefixIcon: Icons.phone_outlined,
-                validator: (value) {
+                validator: (final value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your phone number';
                   }
@@ -393,7 +393,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(final String title) {
     return Text(
       title,
       style: Theme.of(context).textTheme.headlineSmall,
@@ -401,10 +401,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildDropdown({
-    required String label,
-    required String value,
-    required List<String> items,
-    required void Function(String?) onChanged,
+    required final String label,
+    required final String value,
+    required final List<String> items,
+    required final void Function(String?) onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,7 +426,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             value: value,
             isExpanded: true,
             underline: const SizedBox.shrink(),
-            items: items.map((item) {
+            items: items.map((final item) {
               return DropdownMenuItem(value: item, child: Text(item));
             }).toList(),
             onChanged: onChanged,
@@ -437,10 +437,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _buildPaymentOption(
-    String value,
-    String title,
-    String subtitle,
-    IconData icon,
+    final String value,
+    final String title,
+    final String subtitle,
+    final IconData icon,
   ) {
     final isSelected = _selectedPaymentMethod == value;
     return GestureDetector(
@@ -486,7 +486,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Radio<String>(
               value: value,
               groupValue: _selectedPaymentMethod,
-              onChanged: (value) => setState(() => _selectedPaymentMethod = value!),
+              onChanged: (final value) => setState(() => _selectedPaymentMethod = value!),
               activeColor: AppColors.primaryGreen,
             ),
           ],
@@ -495,7 +495,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isBold = false}) {
+  Widget _buildSummaryRow(final String label, final String value, {final bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -516,7 +516,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildBottomBar(double total) {
+  Widget _buildBottomBar(final double total) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

@@ -145,7 +145,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -171,7 +171,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
           ],
         ),
         body: Consumer<AuthProvider>(
-          builder: (context, authProvider, child) {
+          builder: (final context, final authProvider, final child) {
             _user = authProvider.user;
 
             return Form(
@@ -194,7 +194,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                           child: _profileImage == null &&
                                   _user?.photoUrl == null
                               ? Text(
-                                  _user?.fullName.isNotEmpty == true
+                                  _user?.fullName.isNotEmpty ?? false
                                       ? _user!.fullName[0].toUpperCase()
                                       : 'F',
                                   style: const TextStyle(
@@ -243,7 +243,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _user?.isPremium == true
+                        color: _user?.isPremium ?? false
                             ? AppColors.secondaryOrange.withOpacity(0.1)
                             : AppColors.grey100,
                         borderRadius: BorderRadius.circular(20),
@@ -251,7 +251,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (_user?.isPremium == true)
+                          if (_user?.isPremium ?? false)
                             const Icon(
                               Icons.star,
                               size: 14,
@@ -259,12 +259,12 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                             ),
                           const SizedBox(width: 4),
                           Text(
-                            _user?.isPremium == true
+                            _user?.isPremium ?? false
                                 ? 'Premium Farmer'
                                 : 'Basic Farmer',
                             style: TextStyle(
                               fontSize: 12,
-                              color: _user?.isPremium == true
+                              color: _user?.isPremium ?? false
                                   ? AppColors.secondaryOrange
                                   : AppColors.grey600,
                               fontWeight: FontWeight.w600,
@@ -288,7 +288,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                     label: 'Full Name',
                     prefixIcon: Icons.person,
                     enabled: _isEditing,
-                    validator: (value) {
+                    validator: (final value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your name';
                       }
@@ -342,7 +342,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                           value: _selectedRegion.isEmpty ? null : _selectedRegion,
                           items: _regions,
                           enabled: _isEditing,
-                          onChanged: (value) {
+                          onChanged: (final value) {
                             setState(() {
                               _selectedRegion = value ?? '';
                               _selectedDistrict = '';
@@ -359,7 +359,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                               : _selectedDistrict,
                           items: _districts[_selectedRegion] ?? [],
                           enabled: _isEditing && _selectedRegion.isNotEmpty,
-                          onChanged: (value) {
+                          onChanged: (final value) {
                             setState(() => _selectedDistrict = value ?? '');
                           },
                         ),
@@ -444,7 +444,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       title: 'Logout',
                       subtitle: 'Sign out of your account',
                       isDestructive: true,
-                      onTap: () => _showLogoutDialog(),
+                      onTap: _showLogoutDialog,
                     ),
                   ],
                   const SizedBox(height: 32),
@@ -459,7 +459,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
 
   Widget _buildStatsRow() {
     return Consumer<AuthProvider>(
-      builder: (context, provider, child) {
+      builder: (final context, final provider, final child) {
         final user = provider.user;
 
         return Container(
@@ -478,7 +478,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
               Container(height: 40, width: 1, color: AppColors.grey300),
               _buildStatItem(
                 'Rating',
-                user?.rating?.toStringAsFixed(1) ?? '0.0',
+                user?.rating.toStringAsFixed(1) ?? '0.0',
                 suffix: '⭐',
               ),
             ],
@@ -488,7 +488,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, {String? suffix}) {
+  Widget _buildStatItem(final String label, final String value, {final String? suffix}) {
     return Column(
       children: [
         Row(
@@ -519,7 +519,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(final String title) {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -529,11 +529,11 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   }
 
   Widget _buildDropdown({
-    required String label,
-    required String? value,
-    required List<String> items,
-    required bool enabled,
-    required void Function(String?) onChanged,
+    required final String label,
+    required final String? value,
+    required final List<String> items,
+    required final bool enabled,
+    required final void Function(String?) onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,7 +557,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
             isExpanded: true,
             underline: const SizedBox.shrink(),
             items: items
-                .map((item) => DropdownMenuItem(
+                .map((final item) => DropdownMenuItem(
                       value: item,
                       child: Text(item),
                     ))
@@ -570,15 +570,15 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   }
 
   Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    Widget? trailing,
-    bool isDestructive = false,
+    required final IconData icon,
+    required final String title,
+    required final String subtitle,
+    required final VoidCallback onTap,
+    final Widget? trailing,
+    final bool isDestructive = false,
   }) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(vertical: 4),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -617,7 +617,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: [
@@ -635,7 +635,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/login',
-                  (route) => false,
+                  (final route) => false,
                 );
               }
             },

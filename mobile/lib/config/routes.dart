@@ -66,7 +66,7 @@ class AppRoutes {
   // Common Routes
   static const String notifications = '/notifications';
 
-  static Route<dynamic> generateRoute(RouteSettings settings) {
+  static Route<dynamic> generateRoute(final RouteSettings settings) {
     switch (settings.name) {
       // Auth Routes
       case splash:
@@ -155,7 +155,7 @@ class AppRoutes {
     }
   }
 
-  static MaterialPageRoute _buildRoute(Widget page, RouteSettings settings) {
+  static MaterialPageRoute _buildRoute(final Widget page, final RouteSettings settings) {
     return MaterialPageRoute(
       builder: (_) => page,
       settings: settings,

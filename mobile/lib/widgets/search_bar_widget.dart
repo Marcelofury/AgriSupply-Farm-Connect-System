@@ -3,13 +3,6 @@ import 'package:flutter/material.dart';
 import '../config/theme.dart';
 
 class SearchBarWidget extends StatelessWidget {
-  final VoidCallback? onTap;
-  final TextEditingController? controller;
-  final ValueChanged<String>? onChanged;
-  final ValueChanged<String>? onSubmitted;
-  final String hintText;
-  final bool enabled;
-  final bool autofocus;
 
   const SearchBarWidget({
     super.key,
@@ -21,18 +14,24 @@ class SearchBarWidget extends StatelessWidget {
     this.enabled = true,
     this.autofocus = false,
   });
+  final VoidCallback? onTap;
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final String hintText;
+  final bool enabled;
+  final bool autofocus;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.grey100,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppColors.grey200,
-            width: 1,
           ),
         ),
         child: TextField(
@@ -43,11 +42,11 @@ class SearchBarWidget extends StatelessWidget {
           onSubmitted: onSubmitted,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(
+            hintStyle: const TextStyle(
               color: AppColors.grey500,
               fontSize: 14,
             ),
-            prefixIcon: Icon(
+            prefixIcon: const Icon(
               Icons.search,
               color: AppColors.grey500,
             ),
