@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 
 import '../../config/routes.dart';
 import '../../config/theme.dart';
-import '../../providers/product_provider.dart';
-import '../../providers/cart_provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../models/product_model.dart';
-import '../../widgets/product_card.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/cart_provider.dart';
+import '../../providers/product_provider.dart';
 import '../../widgets/category_chip.dart';
+import '../../widgets/product_card.dart';
 import '../../widgets/search_bar_widget.dart';
 
 class BuyerHomeScreen extends StatefulWidget {

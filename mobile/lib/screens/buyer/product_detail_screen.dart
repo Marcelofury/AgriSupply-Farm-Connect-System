@@ -13,7 +13,7 @@ import '../../widgets/rating_stars.dart';
 
 class ProductDetailScreen extends StatefulWidget {
 
-  const ProductDetailScreen({super.key, required this.productId});
+  const ProductDetailScreen({required this.productId, super.key});
   final String productId;
 
   @override
@@ -165,13 +165,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 return CachedNetworkImage(
                   imageUrl: images[index],
                   fit: BoxFit.cover,
-                  placeholder: (final context, final url) => ColoredBox(
+                  placeholder: (final context, final url) => const ColoredBox(
                     color: AppColors.grey200,
-                    child: const Center(child: CircularProgressIndicator()),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
-                  errorWidget: (final context, final url, final error) => ColoredBox(
+                  errorWidget: (final context, final url, final error) => const ColoredBox(
                     color: AppColors.grey200,
-                    child: const Icon(Icons.image, size: 64),
+                    child: Icon(Icons.image, size: 64),
                   ),
                 );
               },

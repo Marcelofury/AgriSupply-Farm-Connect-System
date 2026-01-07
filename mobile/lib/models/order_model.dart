@@ -4,18 +4,11 @@ class OrderModel {
 
   OrderModel({
     required this.id,
-    this.orderNumber,
-    required this.buyerId,
-    required this.buyerName,
+    required this.buyerId, required this.buyerName, required this.items, required this.subtotal, required this.deliveryFee, required this.totalAmount, required this.paymentMethod, required this.createdAt, required this.updatedAt, this.orderNumber,
     this.buyerPhone,
     this.buyerAddress,
-    required this.items,
-    required this.subtotal,
-    required this.deliveryFee,
-    required this.totalAmount,
     this.status = 'pending',
     this.paymentStatus = 'pending',
-    required this.paymentMethod,
     this.paymentReference,
     this.deliveryAddress,
     this.deliveryRegion,
@@ -25,13 +18,11 @@ class OrderModel {
     this.deliveryNotes,
     this.estimatedDelivery,
     this.deliveredAt,
-    required this.createdAt,
-    required this.updatedAt,
     this.buyerPhoto,
     this.refundRequested = false,
   });
 
-  factory OrderModel.fromJson(Map<String, dynamic> json) {
+  factory OrderModel.fromJson(final Map<String, dynamic> json) {
     return OrderModel(
       id: json['id'] as String,
       orderNumber: json['order_number'] as String?,
@@ -41,7 +32,7 @@ class OrderModel {
       buyerAddress: json['buyer_address'] as String?,
       items:
           (json['items'] as List<dynamic>?)
-              ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
+              ?.map((final e) => OrderItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
       subtotal: (json['subtotal'] as num).toDouble(),
@@ -231,18 +222,12 @@ class OrderItem {
     required this.orderId,
     required this.productId,
     required this.productName,
-    this.productImage,
-    required this.farmerId,
-    required this.farmerName,
-    required this.price,
-    required this.unit,
-    required this.quantity,
-    required this.totalPrice,
+    required this.farmerId, required this.farmerName, required this.price, required this.unit, required this.quantity, required this.totalPrice, this.productImage,
     this.status = 'pending',
     this.farmerNotes,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) {
+  factory OrderItem.fromJson(final Map<String, dynamic> json) {
     return OrderItem(
       id: json['id'] as String,
       orderId: json['order_id'] as String,

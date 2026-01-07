@@ -8,8 +8,7 @@ import '../models/product_model.dart';
 class ProductCard extends StatelessWidget {
 
   const ProductCard({
-    super.key,
-    required this.product,
+    required this.product, super.key,
     this.onTap,
     this.onFavorite,
     this.onAddToCart,
@@ -144,7 +143,7 @@ class ProductCard extends StatelessWidget {
                 // Out of Stock Overlay
                 if (product.availableQuantity <= 0)
                   Positioned.fill(
-                    child: Container(
+                    child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.5),
                         borderRadius:
@@ -276,7 +275,7 @@ class ProductCard extends StatelessWidget {
                         const Icon(Icons.star, size: 12, color: AppColors.warning),
                         const SizedBox(width: 2),
                         Text(
-                          product.rating!.toStringAsFixed(1),
+                          product.rating.toStringAsFixed(1),
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
@@ -299,8 +298,7 @@ class ProductCard extends StatelessWidget {
 class ProductCardHorizontal extends StatelessWidget {
 
   const ProductCardHorizontal({
-    super.key,
-    required this.product,
+    required this.product, super.key,
     this.onTap,
     this.onFavorite,
     this.onAddToCart,
@@ -436,7 +434,7 @@ class ProductCardHorizontal extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          product.farmerName!,
+                          product.farmerName,
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppColors.grey600,
@@ -488,8 +486,7 @@ class ProductCardHorizontal extends StatelessWidget {
 class FeaturedProductCard extends StatelessWidget {
 
   const FeaturedProductCard({
-    super.key,
-    required this.product,
+    required this.product, super.key,
     this.onTap,
   });
   final ProductModel product;

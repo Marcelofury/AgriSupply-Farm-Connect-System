@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 
-import '../screens/splash_screen.dart';
-import '../screens/auth/login_screen.dart';
-import '../screens/auth/register_screen.dart';
-import '../screens/auth/forgot_password_screen.dart';
-import '../screens/auth/otp_verification_screen.dart';
-import '../screens/buyer/buyer_home_screen.dart';
-import '../screens/buyer/product_detail_screen.dart';
-import '../screens/buyer/cart_screen.dart';
-import '../screens/buyer/checkout_screen.dart';
-import '../screens/buyer/order_tracking_screen.dart';
-import '../screens/buyer/buyer_orders_screen.dart';
-import '../screens/buyer/buyer_profile_screen.dart';
-import '../screens/buyer/search_screen.dart';
-import '../screens/farmer/farmer_dashboard_screen.dart';
-import '../screens/farmer/add_product_screen.dart';
-import '../screens/farmer/farmer_orders_screen.dart';
-import '../screens/farmer/farmer_products_screen.dart';
-import '../screens/farmer/farmer_profile_screen.dart';
-import '../screens/farmer/ai_assistant_screen.dart';
-import '../screens/farmer/premium_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
-import '../screens/admin/user_management_screen.dart';
 // import '../screens/admin/product_management_screen.dart'; // TODO: Create this file
 // import '../screens/admin/order_management_screen.dart'; // TODO: Create this file
 import '../screens/admin/analytics_screen.dart';
+import '../screens/admin/user_management_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/otp_verification_screen.dart';
+import '../screens/auth/register_screen.dart';
+import '../screens/buyer/buyer_home_screen.dart';
+import '../screens/buyer/buyer_orders_screen.dart';
+import '../screens/buyer/buyer_profile_screen.dart';
+import '../screens/buyer/cart_screen.dart';
+import '../screens/buyer/checkout_screen.dart';
+import '../screens/buyer/order_tracking_screen.dart';
+import '../screens/buyer/product_detail_screen.dart';
+import '../screens/buyer/search_screen.dart';
 // import '../screens/notifications_screen.dart'; // TODO: File doesn't exist at this path
 import '../screens/common/notifications_screen.dart';
+import '../screens/farmer/add_product_screen.dart';
+import '../screens/farmer/ai_assistant_screen.dart';
+import '../screens/farmer/farmer_dashboard_screen.dart';
+import '../screens/farmer/farmer_orders_screen.dart';
+import '../screens/farmer/farmer_products_screen.dart';
+import '../screens/farmer/farmer_profile_screen.dart';
+import '../screens/farmer/premium_screen.dart';
+import '../screens/splash_screen.dart';
 
 class AppRoutes {
   // Auth Routes

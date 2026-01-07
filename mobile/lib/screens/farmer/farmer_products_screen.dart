@@ -151,7 +151,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
   Widget _buildProductList(final String status) {
     return Consumer<ProductProvider>(
       builder: (final context, final provider, final child) {
-        var products = provider.farmerProducts
+        final products = provider.farmerProducts
             .where((final p) => p.status == status)
             .where((final p) =>
                 _selectedCategory == 'All' ||

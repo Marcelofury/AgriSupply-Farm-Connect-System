@@ -31,7 +31,7 @@ class CartItem {
     required this.quantity,
   });
 
-  factory CartItem.fromProduct(Product product, int quantity) {
+  factory CartItem.fromProduct(final Product product, final int quantity) {
     return CartItem(
       productId: product.id,
       name: product.name,

@@ -17,7 +17,7 @@ class User {
     this.region,
     this.district,
     this.isVerified = false,
-    DateTime? createdAt,
+    final DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
   final String id;
   final String email;

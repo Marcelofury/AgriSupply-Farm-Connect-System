@@ -327,8 +327,7 @@ class PaymentService {
     required final String orderId,
     required final double amount,
     required final String provider,
-    final String? transactionId,
-    required final String status,
+    required final String status, final String? transactionId,
   }) async {
     await _apiService.insert('payments', {
       'order_id': orderId,
@@ -415,7 +414,7 @@ class PaymentService {
   String formatAmount(final double amount) {
     return 'UGX ${amount.toStringAsFixed(0).replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]},',
+          (final m) => '${m[1]},',
         )}';
   }
 }

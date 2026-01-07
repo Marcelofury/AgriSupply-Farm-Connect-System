@@ -9,7 +9,7 @@ class CartItemModel {
     required this.quantity,
   });
 
-  factory CartItemModel.fromJson(Map<String, dynamic> json) {
+  factory CartItemModel.fromJson(final Map<String, dynamic> json) {
     return CartItemModel(
       id: json['id'] as String,
       product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
@@ -47,10 +47,10 @@ class CartModel {
 
   CartModel({required this.items});
 
-  factory CartModel.fromJson(Map<String, dynamic> json) {
+  factory CartModel.fromJson(final Map<String, dynamic> json) {
     return CartModel(
       items: (json['items'] as List<dynamic>)
-          .map((e) => CartItem.fromJson(e as Map<String, dynamic>))
+          .map((final e) => CartItem.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -96,16 +96,10 @@ class CartItem {
   CartItem({
     required this.productId,
     required this.productName,
-    this.productImage,
-    required this.farmerId,
-    required this.farmerName,
-    required this.price,
-    required this.unit,
-    required this.quantity,
-    required this.availableQuantity,
+    required this.farmerId, required this.farmerName, required this.price, required this.unit, required this.quantity, required this.availableQuantity, this.productImage,
   });
 
-  factory CartItem.fromJson(Map<String, dynamic> json) {
+  factory CartItem.fromJson(final Map<String, dynamic> json) {
     return CartItem(
       productId: json['product_id'] as String,
       productName: json['product_name'] as String,
@@ -119,7 +113,7 @@ class CartItem {
     );
   }
 
-  factory CartItem.fromProduct(ProductModel product, double quantity) {
+  factory CartItem.fromProduct(final ProductModel product, final double quantity) {
     return CartItem(
       productId: product.id,
       productName: product.name,

@@ -14,7 +14,7 @@ void main() {
 
   group('AgriSupply Integration Tests', () {
     group('Authentication Flow', () {
-      testWidgets('Complete registration flow', (tester) async {
+      testWidgets('Complete registration flow', (final tester) async {
         // Launch app
         // app.main();
         // await tester.pumpAndSettle();
@@ -56,7 +56,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Login with email and password', (tester) async {
+      testWidgets('Login with email and password', (final tester) async {
         // app.main();
         // await tester.pumpAndSettle();
 
@@ -84,7 +84,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Logout flow', (tester) async {
+      testWidgets('Logout flow', (final tester) async {
         // Login first, then logout
         // Navigate to profile
         // Tap logout
@@ -95,7 +95,7 @@ void main() {
     });
 
     group('Product Browsing', () {
-      testWidgets('Browse products by category', (tester) async {
+      testWidgets('Browse products by category', (final tester) async {
         // Navigate to products
         // Select category
         // Verify filtered results
@@ -111,7 +111,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('View product details', (tester) async {
+      testWidgets('View product details', (final tester) async {
         // Tap on product card
         // Verify product detail screen
         // Check all product info displayed
@@ -119,7 +119,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Filter products by price', (tester) async {
+      testWidgets('Filter products by price', (final tester) async {
         // Open filter
         // Set price range
         // Apply filter
@@ -128,7 +128,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Filter products by region', (tester) async {
+      testWidgets('Filter products by region', (final tester) async {
         // Open filter
         // Select region
         // Verify products from selected region
@@ -138,7 +138,7 @@ void main() {
     });
 
     group('Shopping Cart', () {
-      testWidgets('Add product to cart', (tester) async {
+      testWidgets('Add product to cart', (final tester) async {
         // Navigate to product
         // Tap add to cart
         // Verify cart badge updates
@@ -146,7 +146,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Update cart quantity', (tester) async {
+      testWidgets('Update cart quantity', (final tester) async {
         // Open cart
         // Increase quantity
         // Verify total updates
@@ -154,7 +154,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Remove item from cart', (tester) async {
+      testWidgets('Remove item from cart', (final tester) async {
         // Open cart
         // Remove item
         // Verify item removed
@@ -162,7 +162,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Cart persists across sessions', (tester) async {
+      testWidgets('Cart persists across sessions', (final tester) async {
         // Add item to cart
         // Close app
         // Reopen app
@@ -174,7 +174,7 @@ void main() {
 
     group('Checkout Flow', () {
       testWidgets('Complete MTN Mobile Money checkout',
-          (tester) async {
+          (final tester) async {
         // Add item to cart
         // Proceed to checkout
         // Enter delivery address
@@ -186,20 +186,20 @@ void main() {
       });
 
       testWidgets('Complete Airtel Money checkout',
-          (tester) async {
+          (final tester) async {
         // Similar to MTN but with Airtel
 
         expect(true, isTrue);
       });
 
       testWidgets('Complete Cash on Delivery checkout',
-          (tester) async {
+          (final tester) async {
         // Checkout with COD option
 
         expect(true, isTrue);
       });
 
-      testWidgets('Validate delivery address', (tester) async {
+      testWidgets('Validate delivery address', (final tester) async {
         // Try to checkout without address
         // Verify error message
         // Enter valid address
@@ -210,14 +210,14 @@ void main() {
     });
 
     group('Order Management', () {
-      testWidgets('View order history', (tester) async {
+      testWidgets('View order history', (final tester) async {
         // Navigate to orders
         // Verify order list displayed
 
         expect(true, isTrue);
       });
 
-      testWidgets('View order details', (tester) async {
+      testWidgets('View order details', (final tester) async {
         // Tap on order
         // Verify order details displayed
         // Check status, items, total
@@ -225,7 +225,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Cancel pending order', (tester) async {
+      testWidgets('Cancel pending order', (final tester) async {
         // Find pending order
         // Tap cancel
         // Confirm cancellation
@@ -234,7 +234,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Track order status', (tester) async {
+      testWidgets('Track order status', (final tester) async {
         // View order details
         // Verify status timeline displayed
 
@@ -243,14 +243,14 @@ void main() {
     });
 
     group('Farmer Features', () {
-      testWidgets('Farmer dashboard overview', (tester) async {
+      testWidgets('Farmer dashboard overview', (final tester) async {
         // Login as farmer
         // Verify dashboard stats displayed
 
         expect(true, isTrue);
       });
 
-      testWidgets('Add new product', (tester) async {
+      testWidgets('Add new product', (final tester) async {
         // Navigate to add product
         // Fill product form
         // Upload images
@@ -259,7 +259,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Edit existing product', (tester) async {
+      testWidgets('Edit existing product', (final tester) async {
         // Navigate to my products
         // Select product to edit
         // Modify details
@@ -268,7 +268,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Delete product', (tester) async {
+      testWidgets('Delete product', (final tester) async {
         // Navigate to my products
         // Delete product
         // Confirm deletion
@@ -276,14 +276,14 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('View farmer orders', (tester) async {
+      testWidgets('View farmer orders', (final tester) async {
         // Navigate to farmer orders
         // Verify orders displayed
 
         expect(true, isTrue);
       });
 
-      testWidgets('Update order status', (tester) async {
+      testWidgets('Update order status', (final tester) async {
         // Find confirmed order
         // Update to processing
         // Verify status updated
@@ -291,7 +291,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('View earnings', (tester) async {
+      testWidgets('View earnings', (final tester) async {
         // Navigate to earnings
         // Verify earnings summary displayed
 
@@ -300,7 +300,7 @@ void main() {
     });
 
     group('AI Features', () {
-      testWidgets('Chat with AI assistant', (tester) async {
+      testWidgets('Chat with AI assistant', (final tester) async {
         // Open AI chat
         // Send message
         // Verify response received
@@ -308,7 +308,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Analyze crop image', (tester) async {
+      testWidgets('Analyze crop image', (final tester) async {
         // Open image analysis
         // Select/capture image
         // View analysis results
@@ -326,21 +326,21 @@ void main() {
     });
 
     group('Notifications', () {
-      testWidgets('View notifications', (tester) async {
+      testWidgets('View notifications', (final tester) async {
         // Open notifications
         // Verify notifications displayed
 
         expect(true, isTrue);
       });
 
-      testWidgets('Mark notification as read', (tester) async {
+      testWidgets('Mark notification as read', (final tester) async {
         // Tap notification
         // Verify marked as read
 
         expect(true, isTrue);
       });
 
-      testWidgets('Mark all as read', (tester) async {
+      testWidgets('Mark all as read', (final tester) async {
         // Tap mark all as read
         // Verify all marked as read
 
@@ -349,14 +349,14 @@ void main() {
     });
 
     group('Profile Management', () {
-      testWidgets('View profile', (tester) async {
+      testWidgets('View profile', (final tester) async {
         // Navigate to profile
         // Verify profile info displayed
 
         expect(true, isTrue);
       });
 
-      testWidgets('Edit profile', (tester) async {
+      testWidgets('Edit profile', (final tester) async {
         // Navigate to edit profile
         // Update info
         // Save changes
@@ -373,7 +373,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Change password', (tester) async {
+      testWidgets('Change password', (final tester) async {
         // Navigate to change password
         // Enter old password
         // Enter new password
@@ -384,7 +384,7 @@ void main() {
     });
 
     group('Favorites', () {
-      testWidgets('Add product to favorites', (tester) async {
+      testWidgets('Add product to favorites', (final tester) async {
         // Find product
         // Tap favorite button
         // Verify added to favorites
@@ -392,14 +392,14 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('View favorites', (tester) async {
+      testWidgets('View favorites', (final tester) async {
         // Navigate to favorites
         // Verify favorites displayed
 
         expect(true, isTrue);
       });
 
-      testWidgets('Remove from favorites', (tester) async {
+      testWidgets('Remove from favorites', (final tester) async {
         // Open favorites
         // Remove item
         // Verify removed
@@ -409,7 +409,7 @@ void main() {
     });
 
     group('Reviews', () {
-      testWidgets('Add product review', (tester) async {
+      testWidgets('Add product review', (final tester) async {
         // Navigate to completed order
         // Add review for product
         // Rate and comment
@@ -429,7 +429,7 @@ void main() {
 
     group('Offline Mode', () {
       testWidgets('Browse cached products offline',
-          (tester) async {
+          (final tester) async {
         // Load products while online
         // Go offline
         // Verify cached products displayed
@@ -437,7 +437,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('View cached orders offline', (tester) async {
+      testWidgets('View cached orders offline', (final tester) async {
         // Load orders while online
         // Go offline
         // Verify cached orders displayed
@@ -445,7 +445,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Queue actions for sync', (tester) async {
+      testWidgets('Queue actions for sync', (final tester) async {
         // Go offline
         // Add to cart
         // Come online
@@ -457,7 +457,7 @@ void main() {
 
     group('Error Handling', () {
       testWidgets('Handle network error gracefully',
-          (tester) async {
+          (final tester) async {
         // Simulate network error
         // Verify error message displayed
         // Verify retry option available
@@ -465,7 +465,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Handle authentication error', (tester) async {
+      testWidgets('Handle authentication error', (final tester) async {
         // Use invalid credentials
         // Verify error message
         // Stay on login screen
@@ -473,7 +473,7 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Handle server error', (tester) async {
+      testWidgets('Handle server error', (final tester) async {
         // Simulate server error
         // Verify graceful handling
 
@@ -482,21 +482,21 @@ void main() {
     });
 
     group('Accessibility', () {
-      testWidgets('Screen reader support', (tester) async {
+      testWidgets('Screen reader support', (final tester) async {
         // Verify semantic labels
         // Check accessibility tree
 
         expect(true, isTrue);
       });
 
-      testWidgets('Large text support', (tester) async {
+      testWidgets('Large text support', (final tester) async {
         // Enable large text
         // Verify layout adapts
 
         expect(true, isTrue);
       });
 
-      testWidgets('High contrast support', (tester) async {
+      testWidgets('High contrast support', (final tester) async {
         // Enable high contrast
         // Verify visibility
 
@@ -506,7 +506,7 @@ void main() {
 
     group('Performance', () {
       testWidgets('Product list scrolling performance',
-          (tester) async {
+          (final tester) async {
         // Load products
         // Scroll rapidly
         // Verify smooth scrolling
@@ -514,14 +514,14 @@ void main() {
         expect(true, isTrue);
       });
 
-      testWidgets('Image loading performance', (tester) async {
+      testWidgets('Image loading performance', (final tester) async {
         // Load product grid
         // Verify images load progressively
 
         expect(true, isTrue);
       });
 
-      testWidgets('App startup time', (tester) async {
+      testWidgets('App startup time', (final tester) async {
         // Measure startup time
         // Verify under threshold
 

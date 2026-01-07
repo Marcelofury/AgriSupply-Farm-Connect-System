@@ -230,9 +230,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         ),
                       ),
                       topTitles:
-                          const AxisTitles(sideTitles: SideTitles()),
+                          const AxisTitles(),
                       rightTitles:
-                          const AxisTitles(sideTitles: SideTitles()),
+                          const AxisTitles(),
                     ),
                     gridData: FlGridData(
                       drawVerticalLine: false,
@@ -332,7 +332,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         PieChartData(
                           pieTouchData: PieTouchData(
                             touchCallback:
-                                (event, final pieTouchResponse) {
+                                (final event, final pieTouchResponse) {
                               setState(() {
                                 if (!event.isInterestedForInteractions ||
                                     pieTouchResponse == null ||

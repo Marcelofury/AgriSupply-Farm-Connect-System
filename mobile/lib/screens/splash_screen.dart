@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+
 import '../config/routes.dart';
 import '../config/theme.dart';
 import '../main.dart';

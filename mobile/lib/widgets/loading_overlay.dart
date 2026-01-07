@@ -5,9 +5,7 @@ import '../config/theme.dart';
 class LoadingOverlay extends StatelessWidget {
 
   const LoadingOverlay({
-    super.key,
-    required this.child,
-    required this.isLoading,
+    required this.child, required this.isLoading, super.key,
     this.message,
     this.backgroundColor,
     this.progressColor,
@@ -127,9 +125,7 @@ class LoadingScreen extends StatelessWidget {
 class ShimmerLoading extends StatefulWidget {
 
   const ShimmerLoading({
-    super.key,
-    required this.width,
-    required this.height,
+    required this.width, required this.height, super.key,
     this.borderRadius,
   });
   final double width;
@@ -292,7 +288,7 @@ class AnimatedBuilder extends AnimatedWidget {
 
   const AnimatedBuilder({
     super.key,
-    required Animation<double> animation,
+    required final Animation<double> animation,
     required this.builder,
   }) : super(listenable: animation);
   final TransitionBuilder builder;

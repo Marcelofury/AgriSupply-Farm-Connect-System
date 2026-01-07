@@ -8,7 +8,7 @@ import '../../models/order_model.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
 
-  const OrderTrackingScreen({super.key, required this.orderId});
+  const OrderTrackingScreen({required this.orderId, super.key});
   final String orderId;
 
   @override

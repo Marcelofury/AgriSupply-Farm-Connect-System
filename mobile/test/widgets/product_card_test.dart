@@ -42,8 +42,7 @@ class Product {
 class ProductCard extends StatelessWidget {
 
   const ProductCard({
-    super.key,
-    required this.product,
+    required this.product, super.key,
     this.onTap,
     this.onFavorite,
     this.onAddToCart,
@@ -229,7 +228,7 @@ void main() {
       region: 'Western',
     );
 
-    testWidgets('displays product name', (tester) async {
+    testWidgets('displays product name', (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -242,7 +241,7 @@ void main() {
     });
 
     testWidgets('displays formatted price with currency',
-        (tester) async {
+        (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -254,7 +253,7 @@ void main() {
       expect(find.text('UGX 35000'), findsOneWidget);
     });
 
-    testWidgets('displays unit', (tester) async {
+    testWidgets('displays unit', (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -266,7 +265,7 @@ void main() {
       expect(find.text('per bunch'), findsOneWidget);
     });
 
-    testWidgets('displays rating', (tester) async {
+    testWidgets('displays rating', (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -293,7 +292,7 @@ void main() {
     });
 
     testWidgets('shows organic badge for organic products',
-        (tester) async {
+        (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -306,7 +305,7 @@ void main() {
     });
 
     testWidgets('hides organic badge for non-organic products',
-        (tester) async {
+        (final tester) async {
       const nonOrganicProduct = Product(
         id: 'test-2',
         name: 'Regular Matooke',
@@ -329,7 +328,7 @@ void main() {
     });
 
     testWidgets('shows filled heart for favorite products',
-        (tester) async {
+        (final tester) async {
       const favoriteProduct = Product(
         id: 'test-3',
         name: 'Favorite Product',
@@ -354,7 +353,7 @@ void main() {
     });
 
     testWidgets('shows outline heart for non-favorite products',
-        (tester) async {
+        (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -366,7 +365,7 @@ void main() {
       expect(find.byIcon(Icons.favorite_border), findsOneWidget);
     });
 
-    testWidgets('calls onTap when card is tapped', (tester) async {
+    testWidgets('calls onTap when card is tapped', (final tester) async {
       var tapped = false;
 
       await tester.pumpWidget(
@@ -385,7 +384,7 @@ void main() {
     });
 
     testWidgets('calls onFavorite when favorite button is tapped',
-        (tester) async {
+        (final tester) async {
       var favoriteTapped = false;
 
       await tester.pumpWidget(
@@ -404,7 +403,7 @@ void main() {
     });
 
     testWidgets('calls onAddToCart when add to cart button is tapped',
-        (tester) async {
+        (final tester) async {
       var addedToCart = false;
 
       await tester.pumpWidget(
@@ -422,7 +421,7 @@ void main() {
       expect(addedToCart, isTrue);
     });
 
-    testWidgets('has add to cart button', (tester) async {
+    testWidgets('has add to cart button', (final tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -435,7 +434,7 @@ void main() {
       expect(find.byType(ElevatedButton), findsOneWidget);
     });
 
-    testWidgets('shows placeholder when no image', (tester) async {
+    testWidgets('shows placeholder when no image', (final tester) async {
       const noImageProduct = Product(
         id: 'test-4',
         name: 'No Image Product',
@@ -457,7 +456,7 @@ void main() {
       expect(find.byIcon(Icons.image_not_supported), findsOneWidget);
     });
 
-    testWidgets('truncates long product names', (tester) async {
+    testWidgets('truncates long product names', (final tester) async {
       const longNameProduct = Product(
         id: 'test-5',
         name:
@@ -485,7 +484,7 @@ void main() {
       expect(nameFinder, findsOneWidget);
     });
 
-    testWidgets('displays zero rating correctly', (tester) async {
+    testWidgets('displays zero rating correctly', (final tester) async {
       const zeroRatingProduct = Product(
         id: 'test-6',
         name: 'New Product',
@@ -508,7 +507,7 @@ void main() {
       expect(find.text(' (0)'), findsOneWidget);
     });
 
-    testWidgets('handles high prices correctly', (tester) async {
+    testWidgets('handles high prices correctly', (final tester) async {
       const expensiveProduct = Product(
         id: 'test-7',
         name: 'Expensive Item',

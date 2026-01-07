@@ -150,15 +150,15 @@ class CartScreen extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: CachedNetworkImage(
-                    imageUrl: product.primaryImage!,
+                    imageUrl: product.primaryImage,
                     width: 80,
                     height: 80,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
+                    placeholder: (final context, final url) => ColoredBox(
                       color: AppColors.grey200,
                       child: const Center(child: CircularProgressIndicator()),
                     ),
-                    errorWidget: (context, url, error) => Container(
+                    errorWidget: (final context, final url, final error) => ColoredBox(
                       color: AppColors.grey200,
                       child: const Icon(Icons.image),
                     ),

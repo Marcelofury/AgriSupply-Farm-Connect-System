@@ -11,7 +11,7 @@ class AIMessage {
     this.imageUrl,
   });
 
-  factory AIMessage.fromJson(Map<String, dynamic> json) => AIMessage(
+  factory AIMessage.fromJson(final Map<String, dynamic> json) => AIMessage(
     role: json['role'] as String,
     content: json['content'] as String,
     timestamp: DateTime.parse(json['timestamp'] as String),
@@ -41,12 +41,12 @@ class ChatSession {
     required this.updatedAt,
   });
 
-  factory ChatSession.fromJson(Map<String, dynamic> json) => ChatSession(
+  factory ChatSession.fromJson(final Map<String, dynamic> json) => ChatSession(
     id: json['id'] as String,
     userId: json['user_id'] as String,
     title: json['title'] as String,
     messages: (json['messages'] as List? ?? [])
-        .map((m) => AIMessage.fromJson(m as Map<String, dynamic>))
+        .map((final m) => AIMessage.fromJson(m as Map<String, dynamic>))
         .toList(),
     createdAt: DateTime.parse(json['created_at'] as String),
     updatedAt: DateTime.parse(json['updated_at'] as String),

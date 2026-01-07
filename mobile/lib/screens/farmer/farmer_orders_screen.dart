@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
-import '../../providers/order_provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../models/order_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../widgets/loading_overlay.dart';
 
 class FarmerOrdersScreen extends StatefulWidget {
@@ -195,7 +195,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
   Widget _buildOrderList(final String status) {
     return Consumer<OrderProvider>(
       builder: (final context, final provider, final child) {
-        final var orders = provider.farmerOrders
+        final orders = provider.farmerOrders
             .where((final o) => o.status == status)
             .where((final o) =>
                 (o.orderNumber?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||

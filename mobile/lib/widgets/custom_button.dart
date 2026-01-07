@@ -5,8 +5,7 @@ import '../config/theme.dart';
 class CustomButton extends StatelessWidget {
 
   const CustomButton({
-    super.key,
-    required this.text,
+    required this.text, super.key,
     this.onPressed,
     this.isLoading = false,
     this.isOutlined = false,
@@ -120,8 +119,7 @@ class CustomButton extends StatelessWidget {
 class CustomIconButton extends StatelessWidget {
 
   const CustomIconButton({
-    super.key,
-    required this.icon,
+    required this.icon, super.key,
     this.onPressed,
     this.backgroundColor,
     this.iconColor,
@@ -205,8 +203,7 @@ class CustomIconButton extends StatelessWidget {
 class CustomTextButton extends StatelessWidget {
 
   const CustomTextButton({
-    super.key,
-    required this.text,
+    required this.text, super.key,
     this.onPressed,
     this.textColor,
     this.icon,
@@ -263,9 +260,7 @@ class CustomTextButton extends StatelessWidget {
 class SocialButton extends StatelessWidget {
 
   const SocialButton({
-    super.key,
-    required this.text,
-    required this.iconAsset,
+    required this.text, required this.iconAsset, super.key,
     this.onPressed,
     this.isLoading = false,
   });
@@ -321,9 +316,7 @@ class SocialButton extends StatelessWidget {
 class FloatingActionButtonExtended extends StatelessWidget {
 
   const FloatingActionButtonExtended({
-    super.key,
-    required this.text,
-    required this.icon,
+    required this.text, required this.icon, super.key,
     this.onPressed,
     this.backgroundColor,
     this.foregroundColor,

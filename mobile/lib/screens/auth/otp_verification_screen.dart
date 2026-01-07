@@ -10,9 +10,7 @@ import '../../widgets/loading_overlay.dart';
 class OtpVerificationScreen extends StatefulWidget {
 
   const OtpVerificationScreen({
-    super.key,
-    required this.email,
-    required this.phone,
+    required this.email, required this.phone, super.key,
   });
   final String email;
   final String phone;

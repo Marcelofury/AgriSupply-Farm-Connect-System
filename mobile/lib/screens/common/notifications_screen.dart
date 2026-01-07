@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
+import '../../models/notification_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/notification_provider.dart';
-import '../../models/notification_model.dart';
 import '../../widgets/loading_overlay.dart';
 
 class NotificationsScreen extends StatefulWidget {

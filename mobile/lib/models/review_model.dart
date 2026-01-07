@@ -7,17 +7,14 @@ class ReviewModel {
     required this.farmerId,
     required this.buyerId,
     required this.buyerName,
-    this.buyerImage,
-    required this.rating,
+    required this.rating, required this.createdAt, required this.updatedAt, this.buyerImage,
     this.comment,
     this.images,
     this.farmerReply,
     this.replyAt,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  factory ReviewModel.fromJson(Map<String, dynamic> json) {
+  factory ReviewModel.fromJson(final Map<String, dynamic> json) {
     return ReviewModel(
       id: json['id'] as String,
       orderId: json['order_id'] as String,

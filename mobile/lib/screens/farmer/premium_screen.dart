@@ -756,11 +756,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Widget _buildPaymentOption({
-    final String? icon,
-    required final String title,
-    required final String subtitle,
+    required final String title, required final String subtitle, required final VoidCallback onTap, final String? icon,
     final Widget? iconWidget,
-    required final VoidCallback onTap,
   }) {
     return ListTile(
       contentPadding: EdgeInsets.zero,

@@ -50,7 +50,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e}');
+      throw ApiException('Network error: $e');
     }
   }
 
@@ -68,7 +68,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e}');
+      throw ApiException('Network error: $e');
     }
   }
 
@@ -86,7 +86,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e}');
+      throw ApiException('Network error: $e');
     }
   }
 
@@ -104,7 +104,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e}');
+      throw ApiException('Network error: $e');
     }
   }
 
@@ -120,7 +120,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      throw ApiException('Network error: ${e}');
+      throw ApiException('Network error: $e');
     }
   }
 
@@ -157,7 +157,7 @@ class ApiService {
       final publicUrl = _supabase.storage.from(bucket).getPublicUrl(path);
       return publicUrl;
     } catch (e) {
-      throw ApiException('Failed to upload file: ${e}');
+      throw ApiException('Failed to upload file: $e');
     }
   }
 
@@ -169,7 +169,7 @@ class ApiService {
     try {
       await _supabase.storage.from(bucket).remove([path]);
     } catch (e) {
-      throw ApiException('Failed to delete file: ${e}');
+      throw ApiException('Failed to delete file: $e');
     }
   }
 
@@ -212,7 +212,7 @@ class ApiService {
       final response = await query;
       return List<Map<String, dynamic>>.from(response as List);
     } catch (e) {
-      throw ApiException('Query failed: ${e}');
+      throw ApiException('Query failed: $e');
     }
   }
 
@@ -225,7 +225,7 @@ class ApiService {
       final response = await _supabase.from(table).insert(data).select().single();
       return response;
     } catch (e) {
-      throw ApiException('Insert failed: ${e}');
+      throw ApiException('Insert failed: $e');
     }
   }
 
@@ -244,7 +244,7 @@ class ApiService {
           .single();
       return response;
     } catch (e) {
-      throw ApiException('Update failed: ${e}');
+      throw ApiException('Update failed: $e');
     }
   }
 
@@ -253,7 +253,7 @@ class ApiService {
     try {
       await _supabase.from(table).delete().eq('id', id);
     } catch (e) {
-      throw ApiException('Delete failed: ${e}');
+      throw ApiException('Delete failed: $e');
     }
   }
 
@@ -267,7 +267,7 @@ class ApiService {
           .maybeSingle();
       return response;
     } catch (e) {
-      throw ApiException('Get failed: ${e}');
+      throw ApiException('Get failed: $e');
     }
   }
 

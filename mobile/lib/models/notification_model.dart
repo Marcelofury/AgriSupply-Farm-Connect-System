@@ -6,12 +6,11 @@ class NotificationModel {
     required this.title,
     required this.body,
     required this.type,
-    this.data,
+    required this.createdAt, this.data,
     this.isRead = false,
-    required this.createdAt,
   });
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+  factory NotificationModel.fromJson(final Map<String, dynamic> json) {
     return NotificationModel(
       id: json['id'] as String,
       userId: json['user_id'] as String,

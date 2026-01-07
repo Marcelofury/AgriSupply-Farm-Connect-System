@@ -526,9 +526,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Widget _buildImageTile({
-    final String? imageUrl,
+    required final VoidCallback onRemove, final String? imageUrl,
     final File? imageFile,
-    required final VoidCallback onRemove,
   }) {
     return Container(
       width: 100,

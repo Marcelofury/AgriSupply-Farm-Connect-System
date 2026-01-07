@@ -3,9 +3,7 @@ class UserModel {
   UserModel({
     required this.id,
     required this.email,
-    this.phone,
-    required this.fullName,
-    required this.userType,
+    required this.fullName, required this.userType, required this.createdAt, required this.updatedAt, this.phone,
     this.profileImage,
     this.photoUrl,
     this.address,
@@ -23,12 +21,10 @@ class UserModel {
     this.totalRatings = 0,
     this.totalProducts,
     this.totalOrders,
-    required this.createdAt,
-    required this.updatedAt,
     this.isSuspended = false,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+  factory UserModel.fromJson(final Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as String,
       email: json['email'] as String,

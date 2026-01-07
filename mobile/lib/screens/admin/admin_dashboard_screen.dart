@@ -224,9 +224,9 @@ class _DashboardTab extends StatelessWidget {
                 LineChartData(
                   gridData: const FlGridData(show: false),
                   titlesData: FlTitlesData(
-                    leftTitles: const AxisTitles(sideTitles: SideTitles()),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles()),
-                    topTitles: const AxisTitles(sideTitles: SideTitles()),
+                    leftTitles: const AxisTitles(),
+                    rightTitles: const AxisTitles(),
+                    topTitles: const AxisTitles(),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,

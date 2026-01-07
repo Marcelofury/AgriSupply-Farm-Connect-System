@@ -5,8 +5,7 @@ import '../config/theme.dart';
 class RatingStars extends StatelessWidget {
 
   const RatingStars({
-    super.key,
-    required this.rating,
+    required this.rating, super.key,
     this.size = 16,
     this.activeColor,
     this.inactiveColor,
@@ -72,9 +71,7 @@ class RatingStars extends StatelessWidget {
 class RatingInput extends StatelessWidget {
 
   const RatingInput({
-    super.key,
-    required this.rating,
-    required this.onRatingChanged,
+    required this.rating, required this.onRatingChanged, super.key,
     this.size = 36,
     this.activeColor,
     this.inactiveColor,
@@ -128,9 +125,7 @@ class RatingInput extends StatelessWidget {
 class RatingBar extends StatelessWidget {
 
   const RatingBar({
-    super.key,
-    required this.starNumber,
-    required this.percentage,
+    required this.starNumber, required this.percentage, super.key,
     this.count = 0,
     this.barColor,
   });
@@ -198,10 +193,7 @@ class RatingBar extends StatelessWidget {
 class RatingBreakdown extends StatelessWidget {
 
   const RatingBreakdown({
-    super.key,
-    required this.averageRating,
-    required this.totalReviews,
-    required this.ratingCounts,
+    required this.averageRating, required this.totalReviews, required this.ratingCounts, super.key,
   });
   final double averageRating;
   final int totalReviews;
@@ -262,11 +254,8 @@ class RatingBreakdown extends StatelessWidget {
 class RatingCard extends StatelessWidget {
 
   const RatingCard({
-    super.key,
-    required this.userName,
+    required this.userName, required this.rating, required this.date, super.key,
     this.userPhoto,
-    required this.rating,
-    required this.date,
     this.comment,
     this.images,
     this.onReport,
@@ -407,8 +396,7 @@ class RatingCard extends StatelessWidget {
 class QuickRating extends StatelessWidget {
 
   const QuickRating({
-    super.key,
-    required this.rating,
+    required this.rating, super.key,
     this.color,
     this.showStar = true,
   });

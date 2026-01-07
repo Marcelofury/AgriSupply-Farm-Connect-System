@@ -6,8 +6,7 @@ import '../models/order_model.dart';
 class OrderStatusBadge extends StatelessWidget {
 
   const OrderStatusBadge({
-    super.key,
-    required this.status,
+    required this.status, super.key,
     this.isLarge = false,
     this.showIcon = true,
   });
@@ -129,8 +128,7 @@ class _StatusInfo {
 class OrderStatusTimeline extends StatelessWidget {
 
   const OrderStatusTimeline({
-    super.key,
-    required this.currentStatus,
+    required this.currentStatus, super.key,
     this.statusDates,
     this.isVertical = true,
   });
@@ -567,8 +565,7 @@ class _HorizontalTimelineItem extends StatelessWidget {
 class PaymentStatusBadge extends StatelessWidget {
 
   const PaymentStatusBadge({
-    super.key,
-    required this.status,
+    required this.status, super.key,
     this.isLarge = false,
   });
   final PaymentStatus status;

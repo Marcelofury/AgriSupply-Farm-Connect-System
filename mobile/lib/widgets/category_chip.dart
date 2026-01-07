@@ -81,8 +81,7 @@ class CategoryChip extends StatelessWidget {
 class CategoryChipList extends StatelessWidget {
 
   const CategoryChipList({
-    super.key,
-    required this.categories,
+    required this.categories, super.key,
     this.selectedCategory,
     this.onCategorySelected,
     this.showAllOption = true,
@@ -130,8 +129,7 @@ class CategoryChipList extends StatelessWidget {
 class CategoryCard extends StatelessWidget {
 
   const CategoryCard({
-    super.key,
-    required this.category,
+    required this.category, super.key,
     this.onTap,
     this.productCount = 0,
   });
@@ -202,8 +200,7 @@ class CategoryCard extends StatelessWidget {
 class CategoryGrid extends StatelessWidget {
 
   const CategoryGrid({
-    super.key,
-    required this.categories,
+    required this.categories, super.key,
     this.onCategorySelected,
     this.productCounts,
     this.crossAxisCount = 3,
@@ -242,8 +239,7 @@ class CategoryGrid extends StatelessWidget {
 class FilterChip extends StatelessWidget {
 
   const FilterChip({
-    super.key,
-    required this.label,
+    required this.label, super.key,
     this.isSelected = false,
     this.onTap,
     this.icon,
@@ -308,8 +304,7 @@ class FilterChip extends StatelessWidget {
 class TagChip extends StatelessWidget {
 
   const TagChip({
-    super.key,
-    required this.label,
+    required this.label, super.key,
     this.color,
     this.icon,
     this.onRemove,

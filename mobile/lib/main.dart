@@ -4,13 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config/app_config.dart';
-import 'config/theme.dart';
 import 'config/routes.dart';
+import 'config/theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
-import 'providers/product_provider.dart';
-import 'providers/order_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/order_provider.dart';
+import 'providers/product_provider.dart';
 import 'screens/splash_screen.dart';
 
 void main() async {

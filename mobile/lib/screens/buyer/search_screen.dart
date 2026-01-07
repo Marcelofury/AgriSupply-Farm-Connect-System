@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Search failed: ${e}'),
+          content: Text('Search failed: $e'),
           backgroundColor: AppColors.error,
         ),
       );

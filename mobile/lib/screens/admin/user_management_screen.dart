@@ -654,7 +654,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                     'Joined', DateFormat('MMMM dd, yyyy').format(user.createdAt)),
                 _buildDetailItem('Status', user.isVerified ? 'Verified' : 'Pending'),
                 _buildDetailItem('Premium', user.isPremium ? 'Yes' : 'No'),
-                _buildDetailItem('Rating', '${user.rating!.toStringAsFixed(1)} ⭐'),
+                _buildDetailItem('Rating', '${user.rating.toStringAsFixed(1)} ⭐'),
                 const SizedBox(height: 24),
                 Row(
                   children: [

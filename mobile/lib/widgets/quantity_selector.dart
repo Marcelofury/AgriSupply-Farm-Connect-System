@@ -6,9 +6,7 @@ import '../config/theme.dart';
 class QuantitySelector extends StatelessWidget {
 
   const QuantitySelector({
-    super.key,
-    required this.quantity,
-    required this.onChanged,
+    required this.quantity, required this.onChanged, super.key,
     this.minQuantity = 1,
     this.maxQuantity = 99,
     this.unit,
@@ -147,9 +145,7 @@ class _QuantityButton extends StatelessWidget {
 class QuantitySelectorWithInput extends StatefulWidget {
 
   const QuantitySelectorWithInput({
-    super.key,
-    required this.quantity,
-    required this.onChanged,
+    required this.quantity, required this.onChanged, super.key,
     this.minQuantity = 1,
     this.maxQuantity = 9999,
     this.unit,
@@ -327,9 +323,7 @@ class _QuantitySelectorWithInputState extends State<QuantitySelectorWithInput> {
 class CartQuantitySelector extends StatelessWidget {
 
   const CartQuantitySelector({
-    super.key,
-    required this.quantity,
-    required this.onChanged,
+    required this.quantity, required this.onChanged, super.key,
     this.maxQuantity = 99,
     this.onRemove,
   });
@@ -407,8 +401,7 @@ class CartQuantitySelector extends StatelessWidget {
 class QuantityBadge extends StatelessWidget {
 
   const QuantityBadge({
-    super.key,
-    required this.count,
+    required this.count, super.key,
     this.color,
     this.size = 18,
   });
