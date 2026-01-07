@@ -246,9 +246,9 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     return Consumer2<ProductProvider, OrderProvider>(
       builder: (final context, final productProvider, final orderProvider, final child) {
         final products = productProvider.farmerProducts;
-        final orders = orderProvider.orders;
+        final orders = orderProvider.farmerOrders;
         final pendingOrders = orders.where((final o) => o.status == 'pending').length;
-        final totalSales = orders.where((final o) => o.isPaid).fold(0, (final sum, final o) => sum + o.totalAmount);
+        final totalSales = orders.where((final o) => o.isPaid).fold<double>(0.0, (final sum, final o) => sum + o.totalAmount);
 
         return GridView.count(
           shrinkWrap: true,
@@ -453,7 +453,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   Widget _buildRecentOrders() {
     return Consumer<OrderProvider>(
       builder: (final context, final orderProvider, final child) {
-        final orders = orderProvider.orders.take(3).toList();
+        final orders = orderProvider.farmerOrders.take(3).toList();
 
         if (orders.isEmpty) {
           return Container(
@@ -702,7 +702,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             Expanded(
               child: Consumer<OrderProvider>(
                 builder: (final context, final orderProvider, final child) {
-                  final orders = orderProvider.orders;
+                  final orders = orderProvider.farmerOrders;
 
                   if (orders.isEmpty) {
                     return Center(
