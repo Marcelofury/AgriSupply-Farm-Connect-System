@@ -10,7 +10,7 @@ const logger = require('../utils/logger');
 const register = asyncHandler(async (req, res) => {
   const { email, password, fullName, role = 'buyer', phone } = req.body;
 
-  // Create user in Supabase Auth
+  // Create user in Supabase Auth (trigger will create profile automatically)
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
     password,
@@ -18,6 +18,7 @@ const register = asyncHandler(async (req, res) => {
     user_metadata: {
       full_name: fullName,
       role,
+      phone: formatPhoneNumber(phone),
     },
   });
 
@@ -26,26 +27,19 @@ const register = asyncHandler(async (req, res) => {
     throw new ApiError(400, authError.message);
   }
 
-  // Create user profile in database
+  // Wait briefly for trigger to create profile
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Fetch the profile created by the database trigger
   const { data: profile, error: profileError } = await supabase
     .from('users')
-    .insert({
-      id: authData.user.id,
-      email,
-      full_name: fullName,
-      role,
-      phone: formatPhoneNumber(phone),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .select()
+    .select('*')
+    .eq('id', authData.user.id)
     .single();
 
-  if (profileError) {
-    // Rollback: delete auth user if profile creation fails
-    await supabase.auth.admin.deleteUser(authData.user.id);
-    logger.error('Profile creation error:', profileError);
-    throw new ApiError(400, 'Failed to create user profile');
+  if (profileError || !profile) {
+    logger.error('Profile fetch error after creation:', profileError);
+    throw new ApiError(500, 'User created but profile not found. Please try logging in.');
   }
 
   // Create default notification preferences
