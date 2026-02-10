@@ -21,7 +21,150 @@ class AuthService {
     }
   }
 
-  // Sign up with email and password
+  // Sign up with email OTP (for mobile - sends 6-digit code instead of confirmation link)
+  Future<bool> signUpWithEmailOtp({
+    required final String email,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? farmName,
+    final String? region,
+    final String? district,
+  }) async {
+    try {
+      print('[AuthService] Starting email OTP signup for: $email');
+      
+      // Send OTP to email - Supabase will send a 6-digit code
+      await _supabase.auth.signInWithOtp(
+        email: email,
+        emailRedirectTo: null, // No redirect needed for mobile OTP
+        data: {
+          'full_name': fullName,
+          'phone': phone,
+          'role': role,
+          'farm_name': farmName,
+          'region': region,
+          'district': district,
+          'password': password, // Store temporarily in metadata for later
+        },
+      );
+
+      print('[AuthService] OTP sent successfully to $email');
+      return true;
+    } on AuthException catch (e) {
+      print('[AuthService] AuthException: ${e.message}');
+      throw Exception(e.message);
+    } catch (e) {
+      print('[AuthService] General Exception: $e');
+      throw Exception('Failed to send OTP: $e');
+    }
+  }
+
+  // Verify email OTP and complete signup
+  Future<UserModel?> verifyEmailOtp({
+    required final String email,
+    required final String otp,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? farmName,
+    final String? region,
+    final String? district,
+  }) async {
+    try {
+      print('[AuthService] Verifying OTP for email: $email');
+      
+      // Verify the OTP
+      final authResponse = await _supabase.auth.verifyOTP(
+        email: email,
+        token: otp,
+        type: OtpType.email,
+      );
+
+      if (authResponse.user == null) {
+        print('[AuthService] ERROR: No user in verify response');
+        throw Exception('Invalid verification code');
+      }
+
+      print('[AuthService] OTP verified successfully. User ID: ${authResponse.user!.id}');
+      
+      // Now update the user's password (OTP signup doesn't set password)
+      try {
+        await _supabase.auth.updateUser(
+          UserAttributes(password: password),
+        );
+        print('[AuthService] Password set successfully');
+      } catch (passwordError) {
+        print('[AuthService] Warning: Could not set password: $passwordError');
+      }
+
+      // Check if profile already exists (from trigger)
+      UserModel? profile;
+      try {
+        profile = await getUserProfile(authResponse.user!.id);
+        print('[AuthService] Profile exists: ${profile?.id}');
+      } catch (e) {
+        print('[AuthService] Profile does not exist, creating...');
+      }
+
+      // If no profile exists, create it manually
+      if (profile == null) {
+        try {
+          final profileData = await _supabase.from('users').insert({
+            'id': authResponse.user!.id,
+            'email': email,
+            'full_name': fullName,
+            'phone': phone,
+            'role': role,
+            'farm_name': farmName,
+            'region': region,
+            'district': district,
+            'is_verified': true,
+          }).select().single();
+          
+          profile = UserModel.fromJson(profileData);
+          print('[AuthService] Profile created successfully');
+        } catch (createError) {
+          print('[AuthService] ERROR creating profile: $createError');
+          throw Exception('Failed to create user profile: $createError');
+        }
+      }
+
+      return profile;
+    } on AuthException catch (e) {
+      print('[AuthService] AuthException: ${e.message}');
+      throw Exception(e.message);
+    } catch (e) {
+      print('[AuthService] General Exception: $e');
+      throw Exception('Failed to verify OTP: $e');
+    }
+  }
+
+  // Resend email OTP
+  Future<bool> resendEmailOtp({required final String email}) async {
+    try {
+      print('[AuthService] Resending OTP to: $email');
+      
+      await _supabase.auth.signInWithOtp(
+        email: email,
+        emailRedirectTo: null,
+      );
+
+      print('[AuthService] OTP resent successfully');
+      return true;
+    } on AuthException catch (e) {
+      print('[AuthService] AuthException: ${e.message}');
+      throw Exception(e.message);
+    } catch (e) {
+      print('[AuthService] General Exception: $e');
+      throw Exception('Failed to resend OTP: $e');
+    }
+  }
+
+  // Legacy sign up method (keeping for backward compatibility)
+  // Use signUpWithEmailOtp for mobile apps instead
   Future<UserModel?> signUp({
     required final String email,
     required final String password,
