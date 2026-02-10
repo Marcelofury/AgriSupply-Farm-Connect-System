@@ -83,6 +83,9 @@ class AppRoutes {
           OtpVerificationScreen(
             email: (args?['email'] as String?) ?? '',
             phone: (args?['phone'] as String?) ?? '',
+            password: args?['password'] as String?,
+            fullName: args?['fullName'] as String?,
+            role: args?['role'] as String?,
           ),
           settings,
         );
