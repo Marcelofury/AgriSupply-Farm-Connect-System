@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.agrisupply.agrisupply"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId = "com.agrisupply.agrisupply"
         // Support Android 5.0 (Lollipop) and above - covers ~99% of devices
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
