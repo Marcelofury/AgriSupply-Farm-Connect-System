@@ -5,9 +5,8 @@ class AppConfig {
 
   // Backend API Configuration
   // For local development: http://localhost:3000/api
-  // After deploying to Render: https://your-app-name.onrender.com/api
-  // Example: https://agrisupply-backend.onrender.com/api
-  static const String apiBaseUrl = 'http://localhost:3000/api';
+  // Production (Render): https://agrisupply-farm-connect-system.onrender.com/api
+  static const String apiBaseUrl = 'https://agrisupply-farm-connect-system.onrender.com/api';
 
   // App Information
   static const String appName = 'AgriSupply Farm Connect';
