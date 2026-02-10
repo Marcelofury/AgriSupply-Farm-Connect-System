@@ -192,19 +192,31 @@ class AuthService {
           // If no profile, create one
           if (profile == null) {
             print('[AuthService] No profile found, creating one...');
-            final profileData = await _supabase.from('users').insert({
-              'id': existingSession.user!.id,
-              'email': email,
-              'full_name': fullName,
-              'phone': phone,
-              'role': role,
-              'farm_name': farmName,
-              'region': region,
-              'district': district,
-            }).select().single();
-            
-            profile = UserModel.fromJson(profileData);
-            print('[AuthService] Profile created for existing user');
+            try {
+              final profileData = await _supabase.from('users').insert({
+                'id': existingSession.user!.id,
+                'email': email,
+                'full_name': fullName,
+                'phone': phone,
+                'role': role,
+                'farm_name': farmName,
+                'region': region,
+                'district': district,
+              }).select().single();
+              
+              profile = UserModel.fromJson(profileData);
+              print('[AuthService] Profile created for existing user');
+            } catch (profileError) {
+              print('[AuthService] ERROR creating profile for existing user: $profileError');
+              
+              // Check if it's a duplicate phone error
+              if (profileError.toString().contains('users_phone_key') || 
+                  profileError.toString().contains('duplicate key')) {
+                throw Exception('This phone number is already registered. Please use a different phone number.');
+              }
+              
+              throw Exception('Failed to create profile: $profileError');
+            }
           }
           
           return profile;
@@ -261,6 +273,13 @@ class AuthService {
           print('[AuthService] Manual profile creation successful');
         } catch (manualError) {
           print('[AuthService] ERROR in manual profile creation: $manualError');
+          
+          // Check if it's a duplicate phone error
+          if (manualError.toString().contains('users_phone_key') || 
+              manualError.toString().contains('duplicate key')) {
+            throw Exception('This phone number is already registered. Please use a different phone number or sign in.');
+          }
+          
           throw Exception('Failed to create user profile. Error: $manualError');
         }
       } else {
