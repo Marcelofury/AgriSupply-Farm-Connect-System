@@ -176,6 +176,43 @@ class AuthService {
     try {
       print('[AuthService] Starting signup for email: $email');
       
+      // Check if user already exists - if so, try to sign in instead
+      try {
+        final existingSession = await _supabase.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
+        
+        if (existingSession.user != null) {
+          print('[AuthService] User already exists, attempting to fetch/create profile...');
+          
+          // Try to get existing profile
+          var profile = await getUserProfile(existingSession.user!.id);
+          
+          // If no profile, create one
+          if (profile == null) {
+            print('[AuthService] No profile found, creating one...');
+            final profileData = await _supabase.from('users').insert({
+              'id': existingSession.user!.id,
+              'email': email,
+              'full_name': fullName,
+              'phone': phone,
+              'role': role,
+              'farm_name': farmName,
+              'region': region,
+              'district': district,
+            }).select().single();
+            
+            profile = UserModel.fromJson(profileData);
+            print('[AuthService] Profile created for existing user');
+          }
+          
+          return profile;
+        }
+      } catch (signInError) {
+        print('[AuthService] User does not exist or wrong password, proceeding with signup...');
+      }
+      
       // Create auth user - the database trigger will automatically create the profile
       final authResponse = await _supabase.auth.signUp(
         email: email,
@@ -199,19 +236,15 @@ class AuthService {
 
       // Wait a moment for the trigger to create the profile
       print('[AuthService] Waiting for trigger to create profile...');
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await Future.delayed(const Duration(milliseconds: 1500));
 
       // Try to get the profile - if it fails, the trigger didn't work
       print('[AuthService] Attempting to fetch user profile...');
-      UserModel? profile;
-      try {
-        profile = await getUserProfile(authResponse.user!.id);
-        print('[AuthService] Profile fetched successfully: ${profile?.id}');
-      } catch (profileError) {
-        print('[AuthService] ERROR fetching profile: $profileError');
-        // Profile doesn't exist - trigger might not be working
-        // Try to manually create the profile
-        print('[AuthService] Attempting manual profile creation...');
+      var profile = await getUserProfile(authResponse.user!.id);
+      
+      // If profile is null, create it manually
+      if (profile == null) {
+        print('[AuthService] Profile is null, attempting manual profile creation...');
         try {
           final manualProfile = await _supabase.from('users').insert({
             'id': authResponse.user!.id,
@@ -228,8 +261,10 @@ class AuthService {
           print('[AuthService] Manual profile creation successful');
         } catch (manualError) {
           print('[AuthService] ERROR in manual profile creation: $manualError');
-          throw Exception('Failed to create user profile. Please check database permissions and triggers. Error: $manualError');
+          throw Exception('Failed to create user profile. Error: $manualError');
         }
+      } else {
+        print('[AuthService] Profile fetched successfully: ${profile.id}');
       }
 
       // Update additional profile fields if provided
@@ -251,6 +286,12 @@ class AuthService {
       return profile;
     } on AuthException catch (e) {
       print('[AuthService] AuthException: ${e.message}');
+      
+      // If user already exists, show helpful message
+      if (e.message.contains('already registered')) {
+        throw Exception('An account with this email already exists. Please try logging in instead.');
+      }
+      
       throw Exception(e.message);
     } catch (e) {
       print('[AuthService] General Exception: $e');

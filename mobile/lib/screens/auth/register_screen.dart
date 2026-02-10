@@ -67,8 +67,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       
-      // Use email OTP signup (sends 6-digit code instead of confirmation link)
-      final success = await authProvider.signUpWithEmailOtp(
+      // Sign up directly without email verification
+      final success = await authProvider.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         fullName: _fullNameController.text.trim(),
@@ -79,20 +79,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       if (success) {
-        // Navigate to OTP verification and pass all user data
-        Navigator.pushReplacementNamed(
-          context,
-          AppRoutes.otpVerification,
-          arguments: {
-            'email': _emailController.text.trim(),
-            'phone': _phoneController.text.trim(),
-            'password': _passwordController.text,
-            'fullName': _fullNameController.text.trim(),
-            'role': _selectedUserType,
-          },
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully!'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
+
+        // Navigate to appropriate home screen based on role
+        if (_selectedUserType == 'farmer') {
+          Navigator.pushReplacementNamed(context, AppRoutes.farmerDashboard);
+        } else if (_selectedUserType == 'admin') {
+          Navigator.pushReplacementNamed(context, AppRoutes.adminDashboard);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.buyerHome);
+        }
       } else {
-        _showError(authProvider.errorMessage ?? 'Failed to send verification code. Please try again.');
+        _showError(authProvider.errorMessage ?? 'Registration failed. Please try again.');
       }
     } catch (e) {
       _showError('An unexpected error occurred. Please try again.');
