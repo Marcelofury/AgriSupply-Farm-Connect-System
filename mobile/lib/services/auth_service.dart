@@ -38,7 +38,6 @@ class AuthService {
       // Send OTP to email - Supabase will send a 6-digit code
       await _supabase.auth.signInWithOtp(
         email: email,
-        emailRedirectTo: null, // No redirect needed for mobile OTP
         data: {
           'full_name': fullName,
           'phone': phone,
@@ -149,7 +148,6 @@ class AuthService {
       
       await _supabase.auth.signInWithOtp(
         email: email,
-        emailRedirectTo: null,
       );
 
       print('[AuthService] OTP resent successfully');
