@@ -2,19 +2,29 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../../config/routes.dart';
 import '../../config/theme.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/loading_overlay.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
 
   const OtpVerificationScreen({
-    required this.email, required this.phone, super.key,
+    required this.email, 
+    required this.phone, 
+    this.password,
+    this.fullName,
+    this.role,
+    super.key,
   });
   final String email;
   final String phone;
+  final String? password;
+  final String? fullName;
+  final String? role;
 
   @override
   State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -72,15 +82,44 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement OTP verification with Supabase
-      await Future.delayed(const Duration(seconds: 2));
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      // Verify email OTP and complete registration
+      final success = await authProvider.verifyEmailOtp(
+        email: widget.email,
+        otp: _otp,
+        password: widget.password ?? '',
+        fullName: widget.fullName ?? '',
+        phone: widget.phone,
+        role: widget.role ?? 'buyer',
+      );
 
       if (!mounted) return;
 
-      // Navigate to appropriate screen based on user type
-      Navigator.pushReplacementNamed(context, AppRoutes.buyerHome);
+      if (success) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully!'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+        // Navigate based on user role
+        final user = authProvider.user;
+        if (user?.userType == 'farmer') {
+          Navigator.pushReplacementNamed(context, AppRoutes.farmerHome);
+        } else if (user?.userType == 'admin') {
+          Navigator.pushReplacementNamed(context, AppRoutes.adminHome);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.buyerHome);
+        }
+      } else {
+        _showError(authProvider.errorMessage ?? 'Invalid verification code. Please try again.');
+      }
     } catch (e) {
-      _showError('Invalid verification code. Please try again.');
+      _showError('Failed to verify code. Please try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -92,19 +131,26 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Implement resend OTP
-      await Future.delayed(const Duration(seconds: 1));
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      
+      final success = await authProvider.resendEmailOtp(
+        email: widget.email,
+      );
 
       if (!mounted) return;
 
-      _startResendTimer();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification code resent successfully'),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      if (success) {
+        _startResendTimer();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Verification code resent successfully'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        _showError('Failed to resend code. Please try again.');
+      }
     } catch (e) {
       _showError('Failed to resend code. Please try again.');
     } finally {
