@@ -66,7 +66,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.signUp(
+      
+      // Use email OTP signup (sends 6-digit code instead of confirmation link)
+      final success = await authProvider.signUpWithEmailOtp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         fullName: _fullNameController.text.trim(),
@@ -77,16 +79,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       if (success) {
+        // Navigate to OTP verification and pass all user data
         Navigator.pushReplacementNamed(
           context,
           AppRoutes.otpVerification,
           arguments: {
             'email': _emailController.text.trim(),
             'phone': _phoneController.text.trim(),
+            'password': _passwordController.text,
+            'fullName': _fullNameController.text.trim(),
+            'role': _selectedUserType,
           },
         );
       } else {
-        _showError(authProvider.errorMessage ?? 'Registration failed. Please try again.');
+        _showError(authProvider.errorMessage ?? 'Failed to send verification code. Please try again.');
       }
     } catch (e) {
       _showError('An unexpected error occurred. Please try again.');

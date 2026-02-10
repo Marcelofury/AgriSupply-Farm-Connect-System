@@ -198,6 +198,101 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Sign up with email OTP (sends 6-digit code instead of confirmation link)
+  Future<bool> signUpWithEmailOtp({
+    required final String email,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? farmName,
+    final String? region,
+    final String? district,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final success = await _authService.signUpWithEmailOtp(
+        email: email,
+        password: password,
+        fullName: fullName,
+        phone: phone,
+        role: role,
+        farmName: farmName,
+        region: region,
+        district: district,
+      );
+
+      _setLoading(false);
+      return success;
+    } catch (e) {
+      _errorMessage = _parseError(e);
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Verify email OTP and complete registration
+  Future<bool> verifyEmailOtp({
+    required final String email,
+    required final String otp,
+    required final String password,
+    required final String fullName,
+    required final String phone,
+    required final String role,
+    final String? farmName,
+    final String? region,
+    final String? district,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      _user = await _authService.verifyEmailOtp(
+        email: email,
+        otp: otp,
+        password: password,
+        fullName: fullName,
+        phone: phone,
+        role: role,
+        farmName: farmName,
+        region: region,
+        district: district,
+      );
+
+      if (_user != null) {
+        _status = AuthStatus.authenticated;
+        _setLoading(false);
+        return true;
+      } else {
+        _errorMessage = 'Failed to verify OTP';
+        _setLoading(false);
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = _parseError(e);
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  // Resend email OTP
+  Future<bool> resendEmailOtp({required final String email}) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final success = await _authService.resendEmailOtp(email: email);
+      _setLoading(false);
+      return success;
+    } catch (e) {
+      _errorMessage = _parseError(e);
+      _setLoading(false);
+      return false;
+    }
+  }
+
   Future<bool> signInWithGoogle() async {
     _setLoading(true);
     _clearError();
