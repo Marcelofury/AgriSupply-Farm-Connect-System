@@ -71,7 +71,7 @@ const chat = asyncHandler(async (req, res) => {
 
   // Call OpenAI API
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: constants.ai.model,
       messages,
       max_tokens: constants.ai.maxTokens,
@@ -146,7 +146,7 @@ const analyzeImage = asyncHandler(async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-vision-preview',
       messages: [
         {
@@ -296,7 +296,7 @@ ${issues ? `Also address these specific issues: ${issues}` : ''}
 Provide practical advice specific to small-scale farming in Uganda.`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -346,7 +346,7 @@ Consider current season: ${season || 'normal season'}
 Make tips practical and actionable for small-scale farmers.`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -397,7 +397,7 @@ For each crop, analyze:
 Note: These are predictions based on typical seasonal patterns and market knowledge. Actual prices may vary.`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -448,7 +448,7 @@ Include:
 Keep advice practical for small-scale farmers with limited resources.`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -490,7 +490,7 @@ const identifyPest = asyncHandler(async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-vision-preview',
       messages: [
         {
@@ -551,7 +551,7 @@ const diagnosePlantDisease = asyncHandler(async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4-vision-preview',
       messages: [
         {

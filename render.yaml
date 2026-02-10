@@ -3,6 +3,7 @@ services:
     name: agrisupply-backend
     env: node
     plan: free
+    runtime: node
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /health
