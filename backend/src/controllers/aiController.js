@@ -5,10 +5,20 @@ const { processFile } = require('../middleware/uploadMiddleware');
 const constants = require('../config/constants');
 const logger = require('../utils/logger');
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client (lazy initialization)
+let openai = null;
+
+const getOpenAIClient = () => {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new ApiError(503, 'AI service is not configured. Please contact administrator.');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openai;
+};
 
 // System prompt for farming assistant
 const FARMING_SYSTEM_PROMPT = constants.ai.systemPrompt;
