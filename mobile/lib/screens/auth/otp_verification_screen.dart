@@ -109,9 +109,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         // Navigate based on user role
         final user = authProvider.user;
         if (user?.userType == 'farmer') {
-          Navigator.pushReplacementNamed(context, AppRoutes.farmerHome);
+          Navigator.pushReplacementNamed(context, AppRoutes.farmerDashboard);
         } else if (user?.userType == 'admin') {
-          Navigator.pushReplacementNamed(context, AppRoutes.adminHome);
+          Navigator.pushReplacementNamed(context, AppRoutes.adminDashboard);
         } else {
           Navigator.pushReplacementNamed(context, AppRoutes.buyerHome);
         }
