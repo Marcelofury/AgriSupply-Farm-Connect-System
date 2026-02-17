@@ -130,9 +130,9 @@ class ProductService {
         'quantity': product.quantity.toString(),
         'isOrganic': product.isOrganic.toString(),
         if (product.harvestDate != null) 
-          'harvestDate': product.harvestDate.toIso8601String(),
+          'harvestDate': product.harvestDate!.toIso8601String(),
         if (product.expiryDate != null) 
-          'expiryDate': product.expiryDate.toIso8601String(),
+          'expiryDate': product.expiryDate!.toIso8601String(),
       };
 
       final response = await _apiService.postMultipart('/products', fields, files: files);

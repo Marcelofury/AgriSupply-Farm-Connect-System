@@ -392,31 +392,12 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            user.fullName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                                SizedBox(width: 2),
-                                Text(
-                                  'PRO',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
+                    Text(
+                      user.fullName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(

@@ -119,8 +119,8 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 Expanded(
                   child: Text(
                     'Your payment information is securely stored and encrypted',
-                    style: TextStyle(
-                      color: AppColors.info.shade700,
+                    style: const TextStyle(
+                      color: AppColors.info,
                       fontSize: 13,
                     ),
                   ),

@@ -173,7 +173,7 @@ class ProductProvider extends ChangeNotifier {
   // Create new product
   Future<ProductModel?> createProduct(
     final ProductModel product,
-    final List<dynamic> imageFiles,
+    final List<File> imageFiles,
   ) async {
     _errorMessage = null;
 
