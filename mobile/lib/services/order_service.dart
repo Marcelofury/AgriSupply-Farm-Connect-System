@@ -78,7 +78,7 @@ class OrderService {
     try {
       // Prepare order payload
       final orderPayload = {
-        'items': items.map((item) => {
+        'items': items.map((final item) => {
           'productId': item['product_id'],
           'quantity': item['quantity'],
         }).toList(),
