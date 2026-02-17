@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
 import '../models/product_model.dart';
 import 'api_service.dart';
 
@@ -97,10 +98,46 @@ class ProductService {
   }
 
   // Create product
-  Future<ProductModel> createProduct(final ProductModel product) async {
+  Future<ProductModel> createProduct(
+    final ProductModel product,
+    final List<File> imageFiles,
+  ) async {
     try {
-      final data = await _apiService.insert('products', product.toJson());
-      return ProductModel.fromJson(data);
+      final files = <http.MultipartFile>[];
+      
+      // Add image files
+      for (var i = 0; i < imageFiles.length; i++) {
+        final file = imageFiles[i];
+        final bytes = await file.readAsBytes();
+        final filename = file.path.split('/').last;
+        
+        files.add(
+          http.MultipartFile.fromBytes(
+            'images',
+            bytes,
+            filename: filename,
+          ),
+        );
+      }
+
+      // Prepare form fields
+      final fields = <String, String>{
+        'name': product.name,
+        'description': product.description,
+        'category': product.category,
+        'price': product.price.toString(),
+        'unit': product.unit,
+        'quantity': product.quantity.toString(),
+        'isOrganic': product.isOrganic.toString(),
+        if (product.harvestDate != null) 
+          'harvestDate': product.harvestDate.toIso8601String(),
+        if (product.expiryDate != null) 
+          'expiryDate': product.expiryDate.toIso8601String(),
+      };
+
+      final response = await _apiService.postMultipart('/products', fields, files: files);
+      final data = response['data'] ?? response;
+      return ProductModel.fromJson(data as Map<String, dynamic>);
     } catch (e) {
       throw Exception('Failed to create product: $e');
     }

@@ -305,4 +305,40 @@ class ApiService {
   void unsubscribe(final RealtimeChannel channel) {
     _supabase.removeChannel(channel);
   }
+
+  // Upload multipart/form-data (for file uploads)
+  Future<dynamic> postMultipart(
+    final String endpoint,
+    final Map<String, String> fields, {
+    final List<http.MultipartFile>? files,
+  }) async {
+    try {
+      final uri = Uri.parse('$_baseUrl$endpoint');
+      final request = http.MultipartRequest('POST', uri);
+
+      // Add headers
+      final session = _supabase.auth.currentSession;
+      final token = session?.accessToken;
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+
+      // Add fields
+      request.fields.addAll(fields);
+
+      // Add files
+      if (files != null) {
+        request.files.addAll(files);
+      }
+
+      final streamedResponse = await request.send().timeout(
+        const Duration(seconds: 60),
+      );
+      final response = await http.Response.fromStream(streamedResponse);
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw ApiException('Network error: $e');
+    }
+  }
 }

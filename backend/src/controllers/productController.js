@@ -266,7 +266,7 @@ const getProductById = asyncHandler(async (req, res) => {
  * @route   POST /api/v1/products
  */
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, description, category, price, unit, quantity, isOrganic } = req.body;
+  const { name, description, category, price, unit, quantity, isOrganic, harvestDate, expiryDate } = req.body;
   const farmerId = req.user.id;
 
   // Process uploaded images
@@ -288,23 +288,33 @@ const createProduct = asyncHandler(async (req, res) => {
     }
   }
 
+  const productData = {
+    farmer_id: farmerId,
+    name,
+    slug: slugify(name),
+    description,
+    category,
+    price: parseFloat(price),
+    unit,
+    quantity_available: parseInt(quantity),
+    is_organic: isOrganic === 'true',
+    images,
+    region: req.user.region,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  // Add optional date fields if provided
+  if (harvestDate) {
+    productData.harvest_date = new Date(harvestDate).toISOString();
+  }
+  if (expiryDate) {
+    productData.expiry_date = new Date(expiryDate).toISOString();
+  }
+
   const { data, error } = await supabase
     .from('products')
-    .insert({
-      farmer_id: farmerId,
-      name,
-      slug: slugify(name),
-      description,
-      category,
-      price: parseFloat(price),
-      unit,
-      quantity: parseInt(quantity),
-      is_organic: isOrganic === 'true',
-      images,
-      region: req.user.region,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
+    .insert(productData)
     .select()
     .single();
 
@@ -345,7 +355,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   }
 
   // Prepare updates
-  const allowedUpdates = ['name', 'description', 'category', 'price', 'unit', 'quantity', 'is_organic', 'is_active'];
+  const allowedUpdates = ['name', 'description', 'category', 'price', 'unit', 'quantity', 'is_organic', 'is_active', 'harvest_date', 'expiry_date'];
   const filteredUpdates = {};
   
   for (const key of allowedUpdates) {
@@ -353,7 +363,9 @@ const updateProduct = asyncHandler(async (req, res) => {
       if (key === 'price') {
         filteredUpdates[key] = parseFloat(updates[key]);
       } else if (key === 'quantity') {
-        filteredUpdates[key] = parseInt(updates[key]);
+        filteredUpdates.quantity_available = parseInt(updates[key]);
+      } else if (key === 'harvest_date' || key === 'expiry_date') {
+        filteredUpdates[key] = new Date(updates[key]).toISOString();
       } else {
         filteredUpdates[key] = updates[key];
       }

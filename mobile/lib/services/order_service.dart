@@ -76,51 +76,20 @@ class OrderService {
     final String? notes,
   }) async {
     try {
-      // Generate order number
-      final orderNumber = _generateOrderNumber();
-
-      // Create order
-      final orderData = await _apiService.insert('orders', {
-        'order_number': orderNumber,
-        'buyer_id': buyerId,
-        'delivery_address': deliveryAddress,
-        'payment_method': paymentMethod,
-        'subtotal': subtotal,
-        'delivery_fee': deliveryFee,
-        'total': total,
-        'notes': notes,
-        'status': 'pending',
-        'payment_status': 'pending',
-        'created_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      final orderId = orderData['id'];
-
-      // Create order items
-      for (final item in items) {
-        await _apiService.insert('order_items', {
-          'order_id': orderId,
-          'product_id': item['product_id'],
-          'farmer_id': item['farmer_id'],
+      // Prepare order payload
+      final orderPayload = {
+        'items': items.map((item) => {
+          'productId': item['product_id'],
           'quantity': item['quantity'],
-          'price': item['price'],
-          'total': item['total'],
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      }
+        }).toList(),
+        'deliveryAddress': deliveryAddress,
+        'paymentMethod': paymentMethod,
+        'notes': notes,
+      };
 
-      // Add initial status history
-      await _apiService.insert('order_status_history', {
-        'order_id': orderId,
-        'status': 'pending',
-        'created_at': DateTime.now().toIso8601String(),
-      });
-
-      // Send notification to farmers
-      await _notifyFarmers(items);
-
-      return OrderModel.fromJson(orderData);
+      final response = await _apiService.post('/orders', body: orderPayload);
+      final data = response['data'] ?? response;
+      return OrderModel.fromJson(data as Map<String, dynamic>);
     } catch (e) {
       throw Exception('Failed to create order: $e');
     }
@@ -129,20 +98,7 @@ class OrderService {
   // Update order status
   Future<void> updateOrderStatus(final String orderId, final String status) async {
     try {
-      await _apiService.update('orders', orderId, {
-        'status': status,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      // Add to status history
-      await _apiService.insert('order_status_history', {
-        'order_id': orderId,
-        'status': status,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-
-      // Send notification to buyer
-      await _notifyBuyerStatusChange(orderId, status);
+      await _apiService.put('/orders/$orderId/status', body: {'status': status});
     } catch (e) {
       throw Exception('Failed to update order status: $e');
     }
