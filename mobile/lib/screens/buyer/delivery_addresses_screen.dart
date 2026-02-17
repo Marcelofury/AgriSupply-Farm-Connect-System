@@ -36,7 +36,7 @@ class DeliveryAddressesScreen extends StatefulWidget {
 
 class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
   final List<DeliveryAddress> _addresses = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -88,7 +88,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddAddressDialog(),
+        onPressed: _showAddAddressDialog,
         backgroundColor: AppColors.primaryGreen,
         icon: const Icon(Icons.add),
         label: const Text('Add Address'),
@@ -101,7 +101,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.location_off_outlined,
             size: 80,
             color: AppColors.grey400,
@@ -122,7 +122,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => _showAddAddressDialog(),
+            onPressed: _showAddAddressDialog,
             icon: const Icon(Icons.add),
             label: const Text('Add Address'),
             style: ElevatedButton.styleFrom(
@@ -271,8 +271,8 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
     final labelController = TextEditingController();
     final addressController = TextEditingController();
     final phoneController = TextEditingController();
-    String selectedRegion = 'Central';
-    String selectedDistrict = 'Kampala';
+    var selectedRegion = 'Central';
+    var selectedDistrict = 'Kampala';
 
     final regions = ['Central', 'Eastern', 'Northern', 'Western'];
     final districts = {
@@ -307,7 +307,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: selectedRegion,
+                  initialValue: selectedRegion,
                   decoration: const InputDecoration(
                     labelText: 'Region',
                     border: OutlineInputBorder(),
@@ -329,7 +329,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: selectedDistrict,
+                  initialValue: selectedDistrict,
                   decoration: const InputDecoration(
                     labelText: 'District',
                     border: OutlineInputBorder(),
