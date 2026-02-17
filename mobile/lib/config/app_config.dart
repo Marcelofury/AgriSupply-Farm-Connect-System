@@ -4,9 +4,9 @@ class AppConfig {
   static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVncnJheG1qdmJ1anBkemZzdnp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczNDYyNjEsImV4cCI6MjA4MjkyMjI2MX0.julW_csYQxpYGBdWG-jP1i5ARX4Ym-F0egeL_nkNOlo';
 
   // Backend API Configuration
-  // For local development: http://localhost:3000/api
-  // Production (Render): https://agrisupply-farm-connect-system.onrender.com/api
-  static const String apiBaseUrl = 'https://agrisupply-farm-connect-system.onrender.com/api';
+  // For local development: http://localhost:3000/api/v1
+  // Production (Render): https://agrisupply-farm-connect-system.onrender.com/api/v1
+  static const String apiBaseUrl = 'https://agrisupply-farm-connect-system.onrender.com/api/v1';
 
   // App Information
   static const String appName = 'AgriSupply Farm Connect';
