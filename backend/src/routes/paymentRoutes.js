@@ -40,6 +40,34 @@ router.post('/mtn/callback', paymentController.mtnCallback);
 router.post('/airtel/callback', paymentController.airtelCallback);
 
 /**
+ * @route   POST /api/v1/payments/relworx/callback
+ * @desc    Relworx payment callback/webhook
+ * @access  Public (Webhook)
+ */
+router.post('/relworx/callback', paymentController.relworxCallback);
+
+/**
+ * @route   POST /api/v1/payments/validate-phone
+ * @desc    Validate mobile money phone number
+ * @access  Private
+ */
+router.post('/validate-phone', authenticate, paymentController.validatePhone);
+
+/**
+ * @route   GET /api/v1/payments/wallet-balance
+ * @desc    Check Relworx wallet balance (Admin only)
+ * @access  Private (Admin)
+ */
+router.get('/wallet-balance', authenticate, paymentController.checkWalletBalance);
+
+/**
+ * @route   GET /api/v1/payments/relworx-transactions
+ * @desc    Get Relworx transaction history (Admin only)
+ * @access  Private (Admin)
+ */
+router.get('/relworx-transactions', authenticate, paymentController.getRelworxTransactions);
+
+/**
  * @route   POST /api/v1/payments/card/callback
  * @desc    Card payment callback (Flutterwave)
  * @access  Public (Webhook)
