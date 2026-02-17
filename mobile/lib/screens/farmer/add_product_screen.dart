@@ -156,7 +156,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       if (_isEditing) {
         result = await productProvider.updateProduct(product);
       } else {
-        result = await productProvider.createProduct(product);
+        result = await productProvider.createProduct(product, _selectedImages);
       }
 
       if (!mounted) return;

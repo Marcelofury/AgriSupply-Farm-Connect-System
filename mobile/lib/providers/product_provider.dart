@@ -171,11 +171,14 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Create new product
-  Future<ProductModel?> createProduct(final ProductModel product) async {
+  Future<ProductModel?> createProduct(
+    final ProductModel product,
+    final List<dynamic> imageFiles,
+  ) async {
     _errorMessage = null;
 
     try {
-      final createdProduct = await _productService.createProduct(product);
+      final createdProduct = await _productService.createProduct(product, imageFiles);
       _farmerProducts.insert(0, createdProduct);
       notifyListeners();
       return createdProduct;
