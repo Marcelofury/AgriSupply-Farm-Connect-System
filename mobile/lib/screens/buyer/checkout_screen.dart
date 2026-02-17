@@ -7,6 +7,7 @@ import '../../models/order_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
+import '../../services/payment_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
@@ -96,8 +97,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         cartProvider.clearCart();
         
         if (_selectedPaymentMethod == PaymentMethod.mobileMoney) {
-          // Navigate to payment screen
-          _showPaymentDialog(order.id);
+          // Initiate Relworx payment
+          await _initiatePayment(order.id, order.total);
+        } else {
+          // COD - show success
+          _showSuccessDialog(order.id);
+        }
         } else {
           // Cash on delivery - go to success
           _showSuccessDialog(order.id);
@@ -128,6 +133,87 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _showPaymentDialog(final String orderId) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (final context) => AlertDialog(
+        title: const Text('Mobile Money Payment'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.phone_android,
+              size: 64,
+              color: AppColors.primaryGreen,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'A payment request has been sent to your phone.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _phoneController.text,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Please enter your PIN to complete the payment.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.grey600),
+            ),
+            const SizedBox(height: 16),
+            const CircularProgressIndicator(),
+            const SizedBox(height: 8),
+            const Text(
+              'Verifying payment...',
+              style: TextStyle(fontSize: 12, color: AppColors.grey600),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showSuccessDialog(orderId);
+            },
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _initiatePayment(String orderId, double amount) async {
+    try {
+      // Show payment dialog
+      _showPaymentDialog(orderId);
+
+      final paymentService = PaymentService();
+      final result = await paymentService.initiatePayment(
+        orderId: orderId,
+        amount: amount,
+        provider: PaymentProvider.relworxMobile,
+        phoneNumber: _phoneController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (result.success) {
+        // Keep dialog open, user will click "Done" after approving
+        // In production, you'd poll for payment status
+      } else {
+        Navigator.pop(context); // Close dialog
+        _showError(result.message ?? 'Payment initiation failed');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+      _showError('Payment failed: $e');
+    }
+  }
+
+  void _showPaymentDialog_old(final String orderId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -344,7 +430,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               _buildPaymentOption(
                 PaymentMethod.mobileMoney,
                 'Mobile Money',
-                'MTN, Airtel Money',
+                'MTN (077/078/076) or Airtel (070/075/074)',
                 Icons.phone_android,
               ),
               _buildPaymentOption(

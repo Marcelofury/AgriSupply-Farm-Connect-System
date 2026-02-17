@@ -2,8 +2,9 @@ import '../models/order_model.dart';
 import 'api_service.dart';
 
 enum PaymentProvider {
-  mtnMobile,
-  airtelMoney,
+  relworxMobile, // Unified mobile money (MTN & Airtel via Relworx)
+  mtnMobile,     // Legacy - prefer relworxMobile
+  airtelMoney,   // Legacy - prefer relworxMobile
   card,
   cashOnDelivery,
 }
@@ -34,6 +35,8 @@ class PaymentService {
   }) async {
     try {
       switch (provider) {
+        case PaymentProvider.relworxMobile:
+          return await _initiateRelworxPayment(orderId, amount, phoneNumber);
         case PaymentProvider.mtnMobile:
           return await _initiateMTNPayment(orderId, amount, phoneNumber);
         case PaymentProvider.airtelMoney:
@@ -51,7 +54,42 @@ class PaymentService {
     }
   }
 
-  // MTN Mobile Money payment
+  // Relworx Mobile Money payment (Unified MTN & Airtel)
+  Future<PaymentResult> _initiateRelworxPayment(
+    final String orderId,
+    final double amount,
+    final String phoneNumber,
+  ) async {
+    try {
+      // Use the unified /payments/initiate endpoint
+      final response = await _apiService.post('/payments/initiate', body: {
+        'orderId': orderId,
+        'method': 'relworx_mobile',
+        'phone': phoneNumber,
+      });
+
+      if (response['success'] == true) {
+        final data = response['data'];
+        return PaymentResult(
+          success: true,
+          transactionId: data['transactionRef'] as String?,
+          message: response['message'] as String? ?? 'Please confirm payment on your phone',
+        );
+      } else {
+        return PaymentResult(
+          success: false,
+          message: (response['message'] as String?) ?? 'Payment failed',
+        );
+      }
+    } catch (e) {
+      return PaymentResult(
+        success: false,
+        message: 'Mobile money payment failed: $e',
+      );
+    }
+  }
+
+  // MTN Mobile Money payment (Legacy)
   Future<PaymentResult> _initiateMTNPayment(
     final String orderId,
     final double amount,
