@@ -496,21 +496,20 @@ class AuthService {
     final String? bio,
   }) async {
     try {
-      final updates = <String, dynamic>{
-        'updated_at': DateTime.now().toIso8601String(),
-      };
+      final updates = <String, dynamic>{};
 
-      if (fullName != null) updates['full_name'] = fullName;
+      if (fullName != null) updates['fullName'] = fullName;
       if (phone != null) updates['phone'] = phone;
-      if (photoUrl != null) updates['photo_url'] = photoUrl;
-      if (farmName != null) updates['farm_name'] = farmName;
+      if (photoUrl != null) updates['photoUrl'] = photoUrl;
+      if (farmName != null) updates['farmName'] = farmName;
       if (region != null) updates['region'] = region;
       if (district != null) updates['district'] = district;
       if (address != null) updates['address'] = address;
       if (bio != null) updates['bio'] = bio;
 
-      final data = await _apiService.update('users', userId, updates);
-      return UserModel.fromJson(data);
+      final response = await _apiService.put('/users/profile', body: updates);
+      final data = response['data'] ?? response;
+      return UserModel.fromJson(data as Map<String, dynamic>);
     } catch (e) {
       throw Exception('Failed to update profile: $e');
     }
@@ -528,19 +527,6 @@ class AuthService {
       );
     } catch (e) {
       throw Exception('Failed to upload photo: $e');
-    }
-  }
-
-  // Upgrade to premium
-  Future<void> upgradeToPremium({required final String userId}) async {
-    try {
-      await _apiService.update('users', userId, {
-        'is_premium': true,
-        'premium_since': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      throw Exception('Failed to upgrade to premium: $e');
     }
   }
 

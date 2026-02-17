@@ -484,84 +484,6 @@ const getStatistics = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * @desc    Upgrade to premium
- * @route   PUT /api/v1/users/premium
- */
-const upgradeToPremium = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
-  const { plan = 'monthly', paymentMethod } = req.body;
-
-  // In a real app, this would process payment first
-  // For now, we'll just update the user
-
-  const expiresAt = new Date();
-  if (plan === 'yearly') {
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-  } else {
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
-  }
-
-  const { data, error } = await supabase
-    .from('users')
-    .update({
-      is_premium: true,
-      premium_expires_at: expiresAt.toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', userId)
-    .select()
-    .single();
-
-  if (error) {
-    logger.error('Upgrade premium error:', error);
-    throw new ApiError(400, 'Failed to upgrade to premium');
-  }
-
-  res.json({
-    success: true,
-    message: 'Successfully upgraded to premium',
-    data: {
-      isPremium: true,
-      expiresAt: expiresAt.toISOString(),
-      plan,
-    },
-  });
-});
-
-/**
- * @desc    Get premium subscription status
- * @route   GET /api/v1/users/premium/status
- */
-const getPremiumStatus = asyncHandler(async (req, res) => {
-  const { is_premium, premium_expires_at } = req.user;
-
-  let status = 'inactive';
-  let daysRemaining = 0;
-
-  if (is_premium && premium_expires_at) {
-    const expiresAt = new Date(premium_expires_at);
-    const now = new Date();
-
-    if (expiresAt > now) {
-      status = 'active';
-      daysRemaining = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
-    } else {
-      status = 'expired';
-    }
-  }
-
-  res.json({
-    success: true,
-    data: {
-      status,
-      isPremium: is_premium && status === 'active',
-      expiresAt: premium_expires_at,
-      daysRemaining,
-    },
-  });
-});
-
 module.exports = {
   getProfile,
   updateProfile,
@@ -575,6 +497,4 @@ module.exports = {
   getFollowing,
   getFollowers,
   getStatistics,
-  upgradeToPremium,
-  getPremiumStatus,
 };

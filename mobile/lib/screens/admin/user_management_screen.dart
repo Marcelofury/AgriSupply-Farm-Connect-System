@@ -27,7 +27,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   String _searchQuery = '';
   String _sortBy = 'newest';
   String? _filterByRegion;
-  bool? _filterByPremium;
 
   // Mock data for demonstration
   final List<UserModel> _users = List.generate(
@@ -75,11 +74,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
 
       // Region filter
       if (_filterByRegion != null && user.region != _filterByRegion) {
-        return false;
-      }
-
-      // Premium filter
-      if (_filterByPremium != null && user.isPremium != _filterByPremium) {
         return false;
       }
 
@@ -136,8 +130,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
             IconButton(
               onPressed: _showFilterSheet,
               icon: Badge(
-                isLabelVisible:
-                    _filterByRegion != null || _filterByPremium != null,
+                isLabelVisible: _filterByRegion != null,
                 child: const Icon(Icons.filter_list),
               ),
             ),
@@ -257,10 +250,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                           .where((final u) => u.userType == _UserType.buyer)
                           .length
                           .toString()),
-                  Container(height: 30, width: 1, color: AppColors.grey300),
-                  _buildStatItem(
-                      'Premium',
-                      _users.where((final u) => u.isPremium).length.toString()),
                 ],
               ),
             ),
@@ -414,20 +403,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                             ),
                           ),
                         ),
-                        if (user.isPremium)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.secondaryOrange,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, size: 10, color: Colors.white),
+                        const SizedBox(width: 4),
                                 SizedBox(width: 2),
                                 Text(
                                   'PRO',
@@ -652,7 +628,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 _buildDetailItem(
                     'Joined', DateFormat('MMMM dd, yyyy').format(user.createdAt)),
                 _buildDetailItem('Status', user.isVerified ? 'Verified' : 'Pending'),
-                _buildDetailItem('Premium', user.isPremium ? 'Yes' : 'No'),
                 _buildDetailItem('Rating', '${user.rating.toStringAsFixed(1)} ⭐'),
                 const SizedBox(height: 24),
                 Row(
@@ -734,7 +709,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       onPressed: () {
                         setSheetState(() {
                           _filterByRegion = null;
-                          _filterByPremium = null;
                         });
                         setState(() {});
                       },
@@ -760,35 +734,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                             },
                           ))
                       .toList(),
-                ),
-                const SizedBox(height: 16),
-                const Text('Account Type',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('Premium'),
-                      selected: _filterByPremium ?? false,
-                      onSelected: (final selected) {
-                        setSheetState(() {
-                          _filterByPremium = selected ? true : null;
-                        });
-                        setState(() {});
-                      },
-                    ),
-                    ChoiceChip(
-                      label: const Text('Basic'),
-                      selected: _filterByPremium == false,
-                      onSelected: (final selected) {
-                        setSheetState(() {
-                          _filterByPremium = selected ? false : null;
-                        });
-                        setState(() {});
-                      },
-                    ),
-                  ],
                 ),
                 const SizedBox(height: 24),
                 SizedBox(

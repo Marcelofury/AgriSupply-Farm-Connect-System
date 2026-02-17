@@ -142,9 +142,6 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Premium Banner
-              if (!(user?.isPremium ?? false)) _buildPremiumBanner(),
-              if (!(user?.isPremium ?? false)) const SizedBox(height: 24),
 
               // Stats Cards
               _buildStatsGrid(),
@@ -186,58 +183,6 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPremiumBanner() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.secondaryOrange, AppColors.secondaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Go Premium',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Get more visibility, analytics, and promotional tools',
-                  style: TextStyle(color: Colors.white70),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, AppRoutes.premium),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppColors.secondaryOrange,
-            ),
-            child: const Text('Upgrade'),
-          ),
-        ],
       ),
     );
   }
@@ -833,25 +778,13 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             ),
             const SizedBox(height: 16),
             Text(user?.fullName ?? 'Farmer', style: Theme.of(context).textTheme.headlineMedium),
-            if (user?.isPremium ?? false)
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.secondaryOrange,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  '⭐ Premium Farmer',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
             const SizedBox(height: 32),
             _buildProfileMenuItem(Icons.person_outlined, 'Edit Profile', () => Navigator.pushNamed(context, AppRoutes.farmerProfile)),
-            _buildProfileMenuItem(Icons.star_outlined, 'Go Premium', () => Navigator.pushNamed(context, AppRoutes.premium)),
             _buildProfileMenuItem(Icons.psychology_outlined, 'AI Assistant', () => Navigator.pushNamed(context, AppRoutes.aiAssistant)),
             _buildProfileMenuItem(Icons.analytics_outlined, 'Analytics', () {}),
-            _buildProfileMenuItem(Icons.help_outline, 'Help & Support', () {}),
+            _buildProfileMenuItem(Icons.help_outline, 'Help & Support', () {
+              Navigator.pushNamed(context, AppRoutes.helpSupport);
+            }),
             const SizedBox(height: 16),
             _buildProfileMenuItem(
               Icons.logout,

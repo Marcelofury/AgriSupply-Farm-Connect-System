@@ -82,14 +82,7 @@ class UserService {
   // Verify user (admin)
   Future<void> verifyUser(final String userId) async {
     try {
-      await _apiService.update('users', userId, {
-        'is_verified': true,
-        'verified_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      // Send notification to user
-      await _sendVerificationNotification(userId);
+      await _apiService.post('/admin/users/$userId/verify');
     } catch (e) {
       throw Exception('Failed to verify user: $e');
     }
@@ -98,15 +91,7 @@ class UserService {
   // Suspend user (admin)
   Future<void> suspendUser(final String userId, {final String? reason}) async {
     try {
-      await _apiService.update('users', userId, {
-        'is_suspended': true,
-        'suspension_reason': reason,
-        'suspended_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      // Send notification to user
-      await _sendSuspensionNotification(userId, reason);
+      await _apiService.post('/admin/users/$userId/suspend', body: {'reason': reason});
     } catch (e) {
       throw Exception('Failed to suspend user: $e');
     }
@@ -115,15 +100,7 @@ class UserService {
   // Unsuspend user (admin)
   Future<void> unsuspendUser(final String userId) async {
     try {
-      await _apiService.update('users', userId, {
-        'is_suspended': false,
-        'suspension_reason': null,
-        'unsuspended_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      // Send notification to user
-      await _sendUnsuspensionNotification(userId);
+      await _apiService.post('/admin/users/$userId/unsuspend');
     } catch (e) {
       throw Exception('Failed to unsuspend user: $e');
     }
@@ -132,11 +109,7 @@ class UserService {
   // Delete user (admin)
   Future<void> deleteUser(final String userId) async {
     try {
-      // Delete related data first
-      await _deleteUserData(userId);
-      
-      // Delete user profile
-      await _apiService.deleteRecord('users', userId);
+      await _apiService.delete('/admin/users/$userId');
     } catch (e) {
       throw Exception('Failed to delete user: $e');
     }
@@ -145,41 +118,9 @@ class UserService {
   // Update user role (admin)
   Future<void> updateUserRole(final String userId, final String newRole) async {
     try {
-      await _apiService.update('users', userId, {
-        'role': newRole,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      await _apiService.put('/admin/users/$userId', body: {'role': newRole});
     } catch (e) {
       throw Exception('Failed to update user role: $e');
-    }
-  }
-
-  // Upgrade user to premium
-  Future<void> upgradeToPremium(final String userId) async {
-    try {
-      await _apiService.update('users', userId, {
-        'is_premium': true,
-        'premium_since': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      // Send notification to user
-      await _sendPremiumNotification(userId);
-    } catch (e) {
-      throw Exception('Failed to upgrade to premium: $e');
-    }
-  }
-
-  // Downgrade from premium
-  Future<void> downgradeFromPremium(final String userId) async {
-    try {
-      await _apiService.update('users', userId, {
-        'is_premium': false,
-        'premium_expired_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      throw Exception('Failed to downgrade from premium: $e');
     }
   }
 
@@ -193,7 +134,6 @@ class UserService {
       final buyers = users.where((final u) => u.role == UserRole.buyer).length;
       final admins = users.where((final u) => u.role == UserRole.admin).length;
       final verified = users.where((final u) => u.isVerified).length;
-      final premium = users.where((final u) => u.isPremium).length;
       final suspended = users.where((final u) => u.isSuspended).length;
 
       // Users by region
@@ -280,11 +220,7 @@ class UserService {
   // Follow farmer
   Future<void> followFarmer(final String userId, final String farmerId) async {
     try {
-      await _apiService.insert('farmer_followers', {
-        'user_id': userId,
-        'farmer_id': farmerId,
-        'created_at': DateTime.now().toIso8601String(),
-      });
+      await _apiService.post('/users/farmers/$farmerId/follow');
     } catch (e) {
       throw Exception('Failed to follow farmer: $e');
     }
@@ -293,15 +229,7 @@ class UserService {
   // Unfollow farmer
   Future<void> unfollowFarmer(final String userId, final String farmerId) async {
     try {
-      final followers = await _apiService.query(
-        'farmer_followers',
-        filters: {'user_id': userId, 'farmer_id': farmerId},
-        limit: 1,
-      );
-
-      if (followers.isNotEmpty) {
-        await _apiService.deleteRecord('farmer_followers', followers[0]['id'] as String);
-      }
+      await _apiService.delete('/users/farmers/$farmerId/follow');
     } catch (e) {
       throw Exception('Failed to unfollow farmer: $e');
     }

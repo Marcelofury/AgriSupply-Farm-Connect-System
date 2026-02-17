@@ -25,7 +25,6 @@ class UserProvider extends ChangeNotifier {
   String? _selectedRole;
   String? _selectedRegion;
   bool? _verifiedOnly;
-  bool? _premiumOnly;
   String _searchQuery = '';
 
   // Statistics
@@ -34,7 +33,6 @@ class UserProvider extends ChangeNotifier {
   int _totalBuyers = 0;
   int _totalAdmins = 0;
   int _verifiedUsers = 0;
-  int _premiumUsers = 0;
 
   // Getters
   UsersStatus get status => _status;
@@ -47,7 +45,6 @@ class UserProvider extends ChangeNotifier {
   String? get selectedRole => _selectedRole;
   String? get selectedRegion => _selectedRegion;
   bool? get verifiedOnly => _verifiedOnly;
-  bool? get premiumOnly => _premiumOnly;
   String get searchQuery => _searchQuery;
 
   int get totalUsers => _totalUsers;
@@ -55,7 +52,6 @@ class UserProvider extends ChangeNotifier {
   int get totalBuyers => _totalBuyers;
   int get totalAdmins => _totalAdmins;
   int get verifiedUsers => _verifiedUsers;
-  int get premiumUsers => _premiumUsers;
 
   // Fetch all users (admin)
   Future<void> fetchAllUsers() async {
@@ -277,32 +273,6 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  // Upgrade user to premium
-  Future<bool> upgradeToPremium(final String userId) async {
-    _errorMessage = null;
-
-    try {
-      await _userService.upgradeToPremium(userId);
-
-      final index = _users.indexWhere((final u) => u.id == userId);
-      if (index >= 0) {
-        _users[index] = _users[index].copyWith(isPremium: true);
-      }
-
-      if (_selectedUser?.id == userId) {
-        _selectedUser = _selectedUser!.copyWith(isPremium: true);
-      }
-
-      _premiumUsers = _users.where((final u) => u.isPremium).length;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
-
   // Filter users based on current filters
   List<UserModel> _filterUsers(final List<UserModel> users) {
     var filtered = users;
@@ -320,11 +290,6 @@ class UserProvider extends ChangeNotifier {
     // Filter by verified status
     if (_verifiedOnly ?? false) {
       filtered = filtered.where((final u) => u.isVerified).toList();
-    }
-
-    // Filter by premium status
-    if (_premiumOnly ?? false) {
-      filtered = filtered.where((final u) => u.isPremium).toList();
     }
 
     // Filter by search query
@@ -357,11 +322,6 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setPremiumFilter(final bool? premium) {
-    _premiumOnly = premium;
-    notifyListeners();
-  }
-
   void setSearchQuery(final String query) {
     _searchQuery = query;
     notifyListeners();
@@ -371,7 +331,6 @@ class UserProvider extends ChangeNotifier {
     _selectedRole = null;
     _selectedRegion = null;
     _verifiedOnly = null;
-    _premiumOnly = null;
     _searchQuery = '';
     notifyListeners();
   }
@@ -382,7 +341,6 @@ class UserProvider extends ChangeNotifier {
     _totalBuyers = _users.where((final u) => u.role == UserRole.buyer).length;
     _totalAdmins = _users.where((final u) => u.role == UserRole.admin).length;
     _verifiedUsers = _users.where((final u) => u.isVerified).length;
-    _premiumUsers = _users.where((final u) => u.isPremium).length;
   }
 
   void setSelectedUser(final UserModel? user) {

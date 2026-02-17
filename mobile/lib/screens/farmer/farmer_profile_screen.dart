@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
@@ -244,34 +245,16 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _user?.isPremium ?? false
-                            ? AppColors.secondaryOrange.withOpacity(0.1)
-                            : AppColors.grey100,
+                        color: AppColors.grey100,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (_user?.isPremium ?? false)
-                            const Icon(
-                              Icons.star,
-                              size: 14,
-                              color: AppColors.secondaryOrange,
-                            ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _user?.isPremium ?? false
-                                ? 'Premium Farmer'
-                                : 'Basic Farmer',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: _user?.isPremium ?? false
-                                  ? AppColors.secondaryOrange
-                                  : AppColors.grey600,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      child: const Text(
+                        'Verified Farmer',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.grey600,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -431,7 +414,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       icon: Icons.help,
                       title: 'Help & Support',
                       subtitle: 'Get help with using the app',
-                      onTap: () {},
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
                     ),
                     _buildMenuItem(
                       icon: Icons.info,

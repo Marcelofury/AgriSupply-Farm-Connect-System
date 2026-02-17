@@ -287,21 +287,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Premium Users',
-                      value: '89',
-                      change: '+25%',
-                      icon: Icons.star,
-                      color: AppColors.secondaryOrange,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
                       title: 'Active Users',
                       value: '1.2K',
                       change: '+8%',
                       icon: Icons.people,
                       color: AppColors.success,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildStatCard(
+                      title: 'New Users',
+                      value: '156',
+                      change: '+12%',
+                      icon: Icons.person_add,
+                      color: AppColors.info,
                     ),
                   ),
                 ],

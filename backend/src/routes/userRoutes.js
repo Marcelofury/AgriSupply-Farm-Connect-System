@@ -107,18 +107,4 @@ router.get('/followers', authenticate, userController.getFollowers);
  */
 router.get('/statistics', authenticate, userController.getStatistics);
 
-/**
- * @route   PUT /api/v1/users/premium
- * @desc    Upgrade to premium
- * @access  Private
- */
-router.put('/premium', authenticate, userController.upgradeToPremium);
-
-/**
- * @route   GET /api/v1/users/premium/status
- * @desc    Get premium subscription status
- * @access  Private
- */
-router.get('/premium/status', authenticate, userController.getPremiumStatus);
-
 module.exports = router;

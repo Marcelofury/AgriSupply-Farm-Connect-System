@@ -39,7 +39,6 @@ class AuthProvider extends ChangeNotifier {
   bool get isFarmer => _user?.userType == 'farmer';
   bool get isBuyer => _user?.userType == 'buyer';
   bool get isAdmin => _user?.userType == 'admin';
-  bool get isPremium => _user?.isPremium ?? false;
 
   Future<void> _initializeAuth() async {
     _setLoading(true);
@@ -374,24 +373,6 @@ class AuthProvider extends ChangeNotifier {
         bio: bio,
       );
 
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _errorMessage = _parseError(e);
-      _setLoading(false);
-      return false;
-    }
-  }
-
-  Future<bool> upgradeToPremium() async {
-    if (_user == null) return false;
-
-    _setLoading(true);
-    _clearError();
-
-    try {
-      await _authService.upgradeToPremium(userId: _user!.id);
-      _user = _user!.copyWith(isPremium: true);
       _setLoading(false);
       return true;
     } catch (e) {
