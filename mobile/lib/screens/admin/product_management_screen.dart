@@ -496,13 +496,13 @@ class _ProductCard extends StatelessWidget {
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,
-                  placeholder: (_, final __) => ColoredBox(
+                  placeholder: (_, final __) => const ColoredBox(
                     color: AppColors.grey200,
-                    child: const Icon(Icons.image, color: AppColors.grey400),
+                    child: Icon(Icons.image, color: AppColors.grey400),
                   ),
-                  errorWidget: (_, final __, final ___) => ColoredBox(
+                  errorWidget: (_, final __, final ___) => const ColoredBox(
                     color: AppColors.grey200,
-                    child: const Icon(Icons.broken_image, color: AppColors.grey400),
+                    child: Icon(Icons.broken_image, color: AppColors.grey400),
                   ),
                 ),
               ),
