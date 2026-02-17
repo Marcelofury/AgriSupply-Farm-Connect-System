@@ -75,7 +75,7 @@ class PaymentMethodsScreen extends StatefulWidget {
 
 class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   final List<PaymentMethodItem> _paymentMethods = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -109,17 +109,17 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.info.withOpacity(0.3)),
             ),
-            child: Row(
+            child: const Row(
               children: [
                 Icon(
                   Icons.info_outline,
                   color: AppColors.info,
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Your payment information is securely stored and encrypted',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.info,
                       fontSize: 13,
                     ),
@@ -145,7 +145,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddPaymentMethodDialog(),
+        onPressed: _showAddPaymentMethodDialog,
         backgroundColor: AppColors.primaryGreen,
         icon: const Icon(Icons.add),
         label: const Text('Add Method'),
@@ -158,7 +158,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.payment_outlined,
             size: 80,
             color: AppColors.grey400,
@@ -183,7 +183,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => _showAddPaymentMethodDialog(),
+            onPressed: _showAddPaymentMethodDialog,
             icon: const Icon(Icons.add),
             label: const Text('Add Payment Method'),
             style: ElevatedButton.styleFrom(
