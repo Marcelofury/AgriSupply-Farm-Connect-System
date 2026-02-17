@@ -302,7 +302,7 @@ class HelpSupportScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('We\'d love to hear your thoughts!'),
+            const Text("We'd love to hear your thoughts!"),
             const SizedBox(height: 16),
             TextField(
               controller: feedbackController,
