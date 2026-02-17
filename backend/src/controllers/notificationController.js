@@ -378,9 +378,19 @@ const sendNotification = async (userId, notification) => {
       logger.error('Send notification error:', error);
     }
 
-    // TODO: Send push notification via Firebase
-    // TODO: Send email notification if enabled
-    // TODO: Send SMS notification if enabled
+// Send actual notifications
+  try {
+    await notificationService.sendNotificationToUser(userId, {
+      title: notification.title,
+      body: notification.message,
+      type: notification.type,
+      referenceId: notification.reference_id,
+      data: notification.data || {},
+    });
+  } catch (error) {
+    logger.error('Failed to send notification:', error);
+    // Don't fail the request if external notification fails
+  }
 
   } catch (error) {
     logger.error('Send notification error:', error);
