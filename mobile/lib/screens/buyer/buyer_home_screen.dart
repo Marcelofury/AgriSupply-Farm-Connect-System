@@ -525,12 +525,12 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
             _buildProfileMenuItem(
               icon: Icons.location_on_outlined,
               title: 'Delivery Addresses',
-              onTap: () {},
+              onTap: () => Navigator.pushNamed(context, AppRoutes.deliveryAddresses),
             ),
             _buildProfileMenuItem(
               icon: Icons.payment_outlined,
               title: 'Payment Methods',
-              onTap: () {},
+              onTap: () => Navigator.pushNamed(context, AppRoutes.paymentMethods),
             ),
             _buildProfileMenuItem(
               icon: Icons.notifications_outlined,
@@ -541,7 +541,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
             _buildProfileMenuItem(
               icon: Icons.help_outline,
               title: 'Help & Support',
-              onTap: () {},
+              onTap: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
             ),
             _buildProfileMenuItem(
               icon: Icons.info_outlined,

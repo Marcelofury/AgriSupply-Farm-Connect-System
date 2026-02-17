@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
@@ -100,17 +103,50 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      // TODO: Upload image to Supabase storage
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile image update coming soon'),
-          behavior: SnackBarBehavior.floating,
-        ),
+    try {
+      final picker = ImagePicker();
+      final image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
       );
+
+      if (image == null) return;
+
+      setState(() => _isLoading = true);
+
+      // Upload to Supabase Storage
+      final storageService = StorageService();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.currentUser?.id;
+
+      if (userId == null) {
+        _showError('User not found');
+        return;
+      }
+
+      final imageUrl = await storageService.uploadProfilePicture(
+        imageFile: File(image.path),
+        userId: userId,
+      );
+
+      // Update user profile with new image URL
+      // TODO: Update user profile in database with imageUrl
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile image updated successfully'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      _showError('Failed to upload image: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

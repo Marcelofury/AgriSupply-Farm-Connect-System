@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../models/order_model.dart';
 import '../../providers/order_provider.dart';
@@ -482,7 +483,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
             child: const Text('Contact Support'),
           ),
         ),
