@@ -82,7 +82,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 - **Backend:** Supabase
 - **Maps:** Google Maps Flutter
 - **Payments:** MTN MoMo, Airtel Money, Flutterwave
-- **AI:** OpenAI GPT-4
+- **AI:** Groq Llama 3.1 70B
 - **Push Notifications:** Firebase Cloud Messaging
 
 ### Backend API (Node.js)
