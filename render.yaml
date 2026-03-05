@@ -28,10 +28,22 @@ services:
         generateValue: true
       - key: JWT_REFRESH_EXPIRES_IN
         value: 30d
-      - key: OPENAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
-      - key: OPENAI_MODEL
-        value: gpt-4
+      - key: GROQ_MODEL
+        value: llama-3.1-70b-versatile
+      - key: GROQ_VISION_MODEL
+        value: llama-3.2-90b-vision-preview
+      - key: MARZPAY_API_KEY
+        sync: false
+      - key: MARZPAY_API_SECRET
+        sync: false
+      - key: MARZPAY_API_URL
+        value: https://wallet.wearemarz.com/api/v1
+      - key: MARZPAY_CALLBACK_URL
+        value: https://agrisupply-backend.onrender.com/api/v1/payments/marzpay/callback
+      - key: APP_URL
+        value: https://agrisupply-backend.onrender.com
       - key: MTN_API_KEY
         sync: false
       - key: MTN_API_SECRET
