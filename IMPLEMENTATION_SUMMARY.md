@@ -99,7 +99,7 @@
 - API URLs (dev/prod)
 - Google Maps API
 - Firebase config
-- OpenAI API key
+- Groq API key
 - Payment gateway keys
 
 ### 7. **ESLint Dependencies** ✅ FIXED
