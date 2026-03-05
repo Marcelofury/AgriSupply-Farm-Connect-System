@@ -2,9 +2,9 @@ import '../models/order_model.dart';
 import 'api_service.dart';
 
 enum PaymentProvider {
-  relworxMobile, // Unified mobile money (MTN & Airtel via Relworx)
-  mtnMobile,     // Legacy - prefer relworxMobile
-  airtelMoney,   // Legacy - prefer relworxMobile
+  marzPay,       // Unified mobile money (MTN & Airtel via MarzPay)
+  mtnMobile,     // Legacy - prefer marzPay
+  airtelMoney,   // Legacy - prefer marzPay
   card,
   cashOnDelivery,
 }
@@ -35,8 +35,8 @@ class PaymentService {
   }) async {
     try {
       switch (provider) {
-        case PaymentProvider.relworxMobile:
-          return await _initiateRelworxPayment(orderId, amount, phoneNumber);
+        case PaymentProvider.marzPay:
+          return await _initiateMarzPayPayment(orderId, amount, phoneNumber);
         case PaymentProvider.mtnMobile:
           return await _initiateMTNPayment(orderId, amount, phoneNumber);
         case PaymentProvider.airtelMoney:
@@ -54,8 +54,8 @@ class PaymentService {
     }
   }
 
-  // Relworx Mobile Money payment (Unified MTN & Airtel)
-  Future<PaymentResult> _initiateRelworxPayment(
+  // MarzPay Mobile Money payment (Unified MTN & Airtel)
+  Future<PaymentResult> _initiateMarzPayPayment(
     final String orderId,
     final double amount,
     final String phoneNumber,
@@ -64,7 +64,7 @@ class PaymentService {
       // Use the unified /payments/initiate endpoint
       final response = await _apiService.post('/payments/initiate', body: {
         'orderId': orderId,
-        'method': 'relworx_mobile',
+        'method': 'marzpay_mobile',
         'phone': phoneNumber,
       });
 
