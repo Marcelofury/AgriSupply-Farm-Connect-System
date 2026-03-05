@@ -43,14 +43,25 @@ SUPABASE_ANON_KEY=<your-supabase-anon-key>
 SUPABASE_SERVICE_ROLE_KEY=<your-supabase-service-role-key>
 ```
 
+**Payment Provider (MarzPay - Unified Mobile Money):**
+```
+MARZPAY_API_KEY=marz_7BVnXgqDxUjVpNhk
+MARZPAY_API_SECRET=gXYmE569Xj0VMm0z4lGCaTVEXCet6f6Q
+MARZPAY_API_URL=https://wallet.wearemarz.com/api/v1
+MARZPAY_CALLBACK_URL=https://agrisupply-backend.onrender.com/api/v1/payments/marzpay/callback
+APP_URL=https://agrisupply-backend.onrender.com
+GROQ_API_KEY=<your-groq-api-key>
+GROQ_MODEL=llama-3.1-70b-versatile
+GROQ_VISION_MODEL=llama-3.2-90b-vision-preview
+```
+
 **Optional but Recommended:**
 ```
-OPENAI_API_KEY=<your-openai-key>
-MTN_API_KEY=<your-mtn-key>
-MTN_API_SECRET=<your-mtn-secret>
-MTN_SUBSCRIPTION_KEY=<your-mtn-subscription-key>
-AIRTEL_API_KEY=<your-airtel-key>
-AIRTEL_API_SECRET=<your-airtel-secret>
+MTN_API_KEY=<your-mtn-key-legacy>
+MTN_API_SECRET=<your-mtn-secret-legacy>
+MTN_SUBSCRIPTION_KEY=<your-mtn-subscription-key-legacy>
+AIRTEL_API_KEY=<your-airtel-key-legacy>
+AIRTEL_API_SECRET=<your-airtel-secret-legacy>
 FLUTTERWAVE_PUBLIC_KEY=<your-flw-public-key>
 FLUTTERWAVE_SECRET_KEY=<your-flw-secret-key>
 FLUTTERWAVE_ENCRYPTION_KEY=<your-flw-encryption-key>
@@ -87,9 +98,13 @@ After deployment, you'll get a URL like: `https://agrisupply-backend.onrender.co
 Update these environment variables with your Render URL:
 
 ```
+MARZPAY_CALLBACK_URL=https://agrisupply-backend.onrender.com/api/v1/payments/marzpay/callback
+APP_URL=https://agrisupply-backend.onrender.com
 MTN_CALLBACK_URL=https://agrisupply-backend.onrender.com/api/v1/payments/mtn/callback
 AIRTEL_CALLBACK_URL=https://agrisupply-backend.onrender.com/api/v1/payments/airtel/callback
 ```
+
+**Note:** MarzPay is the recommended unified payment gateway for both MTN and Airtel mobile money.
 
 ### 7. Deploy
 
