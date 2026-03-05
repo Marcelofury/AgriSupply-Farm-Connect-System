@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../config/theme.dart';
-import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 
 class PaymentMethodItem {
