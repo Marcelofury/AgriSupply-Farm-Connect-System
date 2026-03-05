@@ -62,7 +62,14 @@ OTP_EXPIRES_IN=10
 # PAYMENT PROVIDERS
 # =============================================================================
 
-# MTN Mobile Money Uganda
+# MarzPay Payment Gateway (Unified Mobile Money - MTN & Airtel Uganda)
+MARZPAY_API_KEY=your-marzpay-api-key
+MARZPAY_API_SECRET=your-marzpay-api-secret
+MARZPAY_API_URL=https://wallet.wearemarz.com/api/v1
+MARZPAY_CALLBACK_URL=https://api.agrisupply.ug/api/v1/payments/marzpay/callback
+APP_URL=https://api.agrisupply.ug
+
+# MTN Mobile Money Uganda (Legacy - prefer MarzPay for unified solution)
 MTN_API_URL=https://sandbox.momodeveloper.mtn.com
 MTN_API_KEY=your-mtn-api-key
 MTN_API_SECRET=your-mtn-api-secret
@@ -70,7 +77,7 @@ MTN_SUBSCRIPTION_KEY=your-mtn-subscription-key
 MTN_ENVIRONMENT=sandbox
 MTN_CALLBACK_URL=https://api.agrisupply.ug/api/v1/payments/callback/mtn
 
-# Airtel Money Uganda
+# Airtel Money Uganda (Legacy - prefer MarzPay for unified solution)
 AIRTEL_API_URL=https://openapiuat.airtel.africa
 AIRTEL_API_KEY=your-airtel-api-key
 AIRTEL_API_SECRET=your-airtel-api-secret
@@ -88,11 +95,10 @@ FLUTTERWAVE_REDIRECT_URL=https://app.agrisupply.ug/payment/callback
 # AI SERVICES
 # =============================================================================
 
-# OpenAI API
-OPENAI_API_KEY=your-openai-api-key
-OPENAI_ORGANIZATION=your-org-id
-OPENAI_MODEL=gpt-4-turbo-preview
-OPENAI_MAX_TOKENS=1000
+# Groq API (Fast & Free Alternative to OpenAI)
+GROQ_API_KEY=your-groq-api-key
+GROQ_MODEL=llama-3.1-70b-versatile
+GROQ_VISION_MODEL=llama-3.2-90b-vision-preview
 
 # AI usage limits per user per day
 AI_DAILY_CHAT_LIMIT=50
