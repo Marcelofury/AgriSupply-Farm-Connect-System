@@ -40,11 +40,11 @@ router.post('/mtn/callback', paymentController.mtnCallback);
 router.post('/airtel/callback', paymentController.airtelCallback);
 
 /**
- * @route   POST /api/v1/payments/relworx/callback
- * @desc    Relworx payment callback/webhook
+ * @route   POST /api/v1/payments/marzpay/callback
+ * @desc    MarzPay payment callback/webhook
  * @access  Public (Webhook)
  */
-router.post('/relworx/callback', paymentController.relworxCallback);
+router.post('/marzpay/callback', paymentController.marzpayCallback);
 
 /**
  * @route   POST /api/v1/payments/validate-phone
@@ -55,17 +55,17 @@ router.post('/validate-phone', authenticate, paymentController.validatePhone);
 
 /**
  * @route   GET /api/v1/payments/wallet-balance
- * @desc    Check Relworx wallet balance (Admin only)
+ * @desc    Check MarzPay wallet balance (Admin only)
  * @access  Private (Admin)
  */
 router.get('/wallet-balance', authenticate, paymentController.checkWalletBalance);
 
 /**
- * @route   GET /api/v1/payments/relworx-transactions
- * @desc    Get Relworx transaction history (Admin only)
+ * @route   GET /api/v1/payments/marzpay-transactions
+ * @desc    Get MarzPay transaction history (Admin only)
  * @access  Private (Admin)
  */
-router.get('/relworx-transactions', authenticate, paymentController.getRelworxTransactions);
+router.get('/marzpay-transactions', authenticate, paymentController.getMarzPayTransactions);
 
 /**
  * @route   POST /api/v1/payments/card/callback

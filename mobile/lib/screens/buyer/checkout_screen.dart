@@ -97,7 +97,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         cartProvider.clearCart();
         
         if (_selectedPaymentMethod == PaymentMethod.mobileMoney) {
-          // Initiate Relworx payment
+          // Initiate MarzPay payment
           await _initiatePayment(order.id, order.total);
         } else {
           // COD - show success
@@ -193,7 +193,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final result = await paymentService.initiatePayment(
         orderId: orderId,
         amount: amount,
-        provider: PaymentProvider.relworxMobile,
+        provider: PaymentProvider.marzPay,
         phoneNumber: _phoneController.text.trim(),
       );
 

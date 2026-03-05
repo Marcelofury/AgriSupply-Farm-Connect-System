@@ -3,7 +3,7 @@ const { supabase } = require('../config/supabase');
 const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { formatPhoneNumber, getMobileMoneyProvider, generateOrderNumber } = require('../utils/helpers');
 const logger = require('../utils/logger');
-const relworxService = require('../services/relworxService');
+const marzpayService = require('../services/marzpayService');
 
 // Payment provider configurations
 const MTN_API_URL = process.env.MTN_ENVIRONMENT === 'production'
@@ -44,8 +44,8 @@ const initiatePayment = asyncHandler(async (req, res) => {
   const transactionRef = `TXN-${generateOrderNumber()}`;
 
   switch (method) {
-    case 'relworx_mobile': // New unified mobile money via Relworx
-      paymentResult = await initiateRelworxPayment(order, phone, transactionRef);
+    case 'marzpay': // Unified mobile money via MarzPay
+      paymentResult = await initiateMarzPayPayment(order, phone, transactionRef);
       break;
     case 'mtn_mobile':
       paymentResult = await initiateMTNPayment(order, phone, transactionRef);
@@ -103,42 +103,42 @@ const initiatePayment = asyncHandler(async (req, res) => {
 });
 
 /**
- * Initiate Relworx Mobile Money payment (MTN & Airtel Uganda)
+ * Initiate MarzPay Mobile Money payment (MTN & Airtel Uganda)
  */
-const initiateRelworxPayment = async (order, phone, transactionRef) => {
-  const formattedPhone = relworxService.formatPhoneNumber(phone);
+const initiateMarzPayPayment = async (order, phone, transactionRef) => {
+  const formattedPhone = marzpayService.formatPhoneNumber(phone);
   
   if (!formattedPhone) {
     throw new ApiError(400, 'Invalid phone number format. Use: +256... or 0...');
   }
 
-  const provider = relworxService.getProvider(phone);
+  const provider = marzpayService.getProvider(phone);
   if (provider === 'UNKNOWN') {
     throw new ApiError(400, 'Phone number must be MTN (77/78/76) or Airtel (70/75/74) Uganda');
   }
 
   try {
     // Optional: Validate phone number before payment
-    const validation = await relworxService.validateMobileNumber(formattedPhone);
+    const validation = await marzpayService.validateMobileNumber(formattedPhone);
     logger.info(`Phone validation result for ${formattedPhone}:`, validation);
 
     // Request payment
-    const result = await relworxService.requestPayment({
+    const result = await marzpayService.collectMoney({
       reference: transactionRef,
-      msisdn: formattedPhone,
+      phoneNumber: formattedPhone,
       currency: 'UGX',
       amount: order.total,
-      description: `AgriSupply Order #${order.order_number}`,
+      reason: `AgriSupply Order #${order.order_number}`,
     });
 
     return {
       status: 'pending',
       message: result.message || 'Payment request sent. Please approve on your phone.',
-      providerRef: result.internalReference,
+      providerRef: result.reference,
       provider: provider,
     };
   } catch (error) {
-    logger.error('Relworx payment error:', error.message);
+    logger.error('MarzPay payment error:', error.message);
     throw error; // Re-throw ApiError from service
   }
 };
@@ -449,21 +449,21 @@ const airtelCallback = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Relworx callback/webhook (if supported by Relworx)
- * @route   POST /api/v1/payments/relworx/callback
- * @note    Relworx may send callbacks for payment status updates
+ * @desc    MarzPay callback/webhook
+ * @route   POST /api/v1/payments/marzpay/callback
+ * @note    MarzPay sends callbacks for payment status updates
  */
-const relworxCallback = asyncHandler(async (req, res) => {
-  logger.info('Relworx callback received:', req.body);
+const marzpayCallback = asyncHandler(async (req, res) => {
+  logger.info('MarzPay callback received:', req.body);
 
-  // Relworx callback payload structure (adapt based on actual callback format)
+  // MarzPay callback payload structure
   const { customer_reference, internal_reference, status, amount, provider } = req.body;
 
   if (!customer_reference && !internal_reference) {
     return res.status(400).json({ success: false, message: 'Missing reference' });
   }
 
-  // Map Relworx status to our status
+  // Map MarzPay status to our status
   let paymentStatus = 'pending';
   if (status === 'success' || status === 'successful') {
     paymentStatus = 'completed';
@@ -529,15 +529,15 @@ const validatePhone = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Phone number is required');
   }
 
-  const formattedPhone = relworxService.formatPhoneNumber(phone);
+  const formattedPhone = marzpayService.formatPhoneNumber(phone);
   if (!formattedPhone) {
     throw new ApiError(400, 'Invalid phone number format');
   }
 
-  const provider = relworxService.getProvider(phone);
+  const provider = marzpayService.getProvider(phone);
   
-  // Call Relworx validation
-  const validation = await relworxService.validateMobileNumber(formattedPhone);
+  // Call MarzPay validation
+  const validation = await marzpayService.validateMobileNumber(formattedPhone);
 
   res.json({
     success: true,
@@ -552,14 +552,14 @@ const validatePhone = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Check Relworx wallet balance
+ * @desc    Check MarzPay wallet balance
  * @route   GET /api/v1/payments/wallet-balance
  * @access  Private (Admin)
  */
 const checkWalletBalance = asyncHandler(async (req, res) => {
   const { currency = 'UGX' } = req.query;
 
-  const balance = await relworxService.checkWalletBalance(currency);
+  const balance = await marzpayService.getWalletBalance(currency);
 
   res.json({
     success: true,
@@ -568,12 +568,12 @@ const checkWalletBalance = asyncHandler(async (req, res) => {
 });
 
 /**
- * @desc    Get Relworx transaction history
- * @route   GET /api/v1/payments/relworx-transactions
+ * @desc    Get MarzPay transaction history
+ * @route   GET /api/v1/payments/marzpay-transactions
  * @access  Private (Admin)
  */
-const getRelworxTransactions = asyncHandler(async (req, res) => {
-  const history = await relworxService.getTransactionHistory();
+const getMarzPayTransactions = asyncHandler(async (req, res) => {
+  const history = await marzpayService.getTransactionHistory();
 
   res.json({
     success: true,
@@ -635,10 +635,10 @@ const verifyPayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Payment not found');
   }
 
-  // For Relworx, check status via API
-  if (payment.method === 'relworx_mobile' && payment.status === 'pending') {
+  // For MarzPay, check status via API
+  if (payment.method === 'marzpay' && payment.status === 'pending') {
     try {
-      const statusData = await relworxService.checkRequestStatus(payment.provider_reference || transactionId);
+      const statusData = await marzpayService.checkTransactionStatus(payment.provider_reference || transactionId);
 
       let paymentStatus = 'pending';
       if (statusData.status === 'success') {
@@ -665,7 +665,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
         payment.status = paymentStatus;
       }
     } catch (error) {
-      logger.error('Verify Relworx payment error:', error);
+      logger.error('Verify MarzPay payment error:', error);
     }
   }
 
@@ -743,7 +743,7 @@ const getPaymentMethods = asyncHandler(async (req, res) => {
     success: true,
     data: [
       {
-        id: 'relworx_mobile',
+        id: 'marzpay',
         name: 'Mobile Money',
         icon: 'mobile_money',
         description: 'Pay with MTN or Airtel Mobile Money',
@@ -757,7 +757,7 @@ const getPaymentMethods = asyncHandler(async (req, res) => {
         icon: 'mtn',
         description: 'Pay with MTN Mobile Money (Legacy)',
         phonePrefixes: ['77', '78', '76'],
-        deprecated: true, // Use relworx_mobile instead
+        deprecated: true, // Use marzpay instead
       },
       {
         id: 'airtel_money',
@@ -765,7 +765,7 @@ const getPaymentMethods = asyncHandler(async (req, res) => {
         icon: 'airtel',
         description: 'Pay with Airtel Money (Legacy)',
         phonePrefixes: ['70', '75', '74'],
-        deprecated: true, // Use relworx_mobile instead
+        deprecated: true, // Use marzpay instead
       },
       {
         id: 'card',
@@ -901,10 +901,10 @@ module.exports = {
   mtnCallback,
   airtelCallback,
   cardCallback,
-  relworxCallback,
+  marzpayCallback,
   validatePhone,
   checkWalletBalance,
-  getRelworxTransactions,
+  getMarzPayTransactions,
   verifyPayment,
   retryPayment,
   getPaymentMethods,
