@@ -20,7 +20,7 @@ Before deploying, ensure you have:
 
 - [ ] Supabase project created
 - [ ] Payment provider accounts (MTN, Airtel, Flutterwave)
-- [ ] OpenAI API key
+- [ ] Groq API key
 - [ ] Firebase project (for push notifications)
 - [ ] Domain name configured
 - [ ] SSL certificates
@@ -312,8 +312,8 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 JWT_SECRET=your-production-jwt-secret-minimum-32-characters
 JWT_EXPIRES_IN=7d
 
-# OpenAI
-OPENAI_API_KEY=sk-...
+# Groq
+GROQ_API_KEY=gsk_...
 
 # MTN Mobile Money (Production)
 MTN_API_KEY=your-mtn-production-key
