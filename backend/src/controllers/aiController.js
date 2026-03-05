@@ -5,19 +5,20 @@ const { processFile } = require('../middleware/uploadMiddleware');
 const constants = require('../config/constants');
 const logger = require('../utils/logger');
 
-// Initialize OpenAI client (lazy initialization)
-let openai = null;
+// Initialize Groq client (uses OpenAI SDK for compatibility)
+let groqClient = null;
 
-const getOpenAIClient = () => {
-  if (!openai) {
-    if (!process.env.OPENAI_API_KEY) {
+const getGroqClient = () => {
+  if (!groqClient) {
+    if (!process.env.GROQ_API_KEY) {
       throw new ApiError(503, 'AI service is not configured. Please contact administrator.');
     }
-    openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    groqClient = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
     });
   }
-  return openai;
+  return groqClient;
 };
 
 // System prompt for farming assistant
@@ -69,9 +70,9 @@ const chat = asyncHandler(async (req, res) => {
     { role: 'user', content: message },
   ];
 
-  // Call OpenAI API
+  // Call Groq API
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: constants.ai.model,
       messages,
       max_tokens: constants.ai.maxTokens,
@@ -111,7 +112,7 @@ const chat = asyncHandler(async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('OpenAI chat error:', error);
+    logger.error('Groq chat error:', error);
     throw new ApiError(500, 'Failed to get AI response');
   }
 });
@@ -146,8 +147,8 @@ const analyzeImage = asyncHandler(async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
-      model: 'gpt-4-vision-preview',
+    const completion = await getGroqClient().chat.completions.create({
+      model: constants.ai.visionModel,
       messages: [
         {
           role: 'system',
@@ -190,7 +191,7 @@ Be specific and practical in your advice.`,
       },
     });
   } catch (error) {
-    logger.error('OpenAI vision error:', error);
+    logger.error('Groq vision error:', error);
     throw new ApiError(500, 'Failed to analyze image');
   }
 });
@@ -296,7 +297,7 @@ ${issues ? `Also address these specific issues: ${issues}` : ''}
 Provide practical advice specific to small-scale farming in Uganda.`;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -346,7 +347,7 @@ Consider current season: ${season || 'normal season'}
 Make tips practical and actionable for small-scale farmers.`;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -397,7 +398,7 @@ For each crop, analyze:
 Note: These are predictions based on typical seasonal patterns and market knowledge. Actual prices may vary.`;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -448,7 +449,7 @@ Include:
 Keep advice practical for small-scale farmers with limited resources.`;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
+    const completion = await getGroqClient().chat.completions.create({
       model: constants.ai.model,
       messages: [
         { role: 'system', content: FARMING_SYSTEM_PROMPT },
@@ -490,8 +491,8 @@ const identifyPest = asyncHandler(async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
-      model: 'gpt-4-vision-preview',
+    const completion = await getGroqClient().chat.completions.create({
+      model: constants.ai.visionModel,
       messages: [
         {
           role: 'system',
@@ -551,8 +552,8 @@ const diagnosePlantDisease = asyncHandler(async (req, res) => {
   const mimeType = req.file.mimetype;
 
   try {
-    const completion = await getOpenAIClient().chat.completions.create({
-      model: 'gpt-4-vision-preview',
+    const completion = await getGroqClient().chat.completions.create({
+      model: constants.ai.visionModel,
       messages: [
         {
           role: 'system',
