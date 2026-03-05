@@ -27,7 +27,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   String _selectedRegion = 'Central';
   String _selectedDistrict = 'Kampala';
-  String _selectedPaymentMethod = PaymentMethod.mobileMoney;
+  final String _selectedPaymentMethod = PaymentMethod.mobileMoney;
   bool _isLoading = false;
 
   final List<String> _regions = [
@@ -110,7 +110,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         _showError(orderProvider.errorMessage ?? 'Failed to place order');
       }
-    } catch (e) {
+    } catch (final e) {
       _showError('An unexpected error occurred');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -184,7 +184,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Future<void> _initiatePayment(String orderId, double amount) async {
+  Future<void> _initiatePayment(final String orderId, final double amount) async {
     try {
       // Show payment dialog
       _showPaymentDialog(orderId);
@@ -381,7 +381,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       items: _regions,
                       onChanged: (final value) {
                         setState(() {
-                          _selectedRegion = value!;
+                          _selectedRegion = value;
                           _selectedDistrict = _districts[value]!.first;
                         });
                       },
@@ -394,7 +394,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       value: _selectedDistrict,
                       items: _districts[_selectedRegion]!,
                       onChanged: (final value) {
-                        setState(() => _selectedDistrict = value!);
+                        setState(() => _selectedDistrict = value);
                       },
                     ),
                   ),
@@ -572,7 +572,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Radio<String>(
               value: value,
               groupValue: _selectedPaymentMethod,
-              onChanged: (final value) => setState(() => _selectedPaymentMethod = value!),
+              onChanged: (final value) => setState(() => _selectedPaymentMethod = value),
               activeColor: AppColors.primaryGreen,
             ),
           ],
