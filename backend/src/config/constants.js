@@ -123,9 +123,10 @@ module.exports = {
     'system',
   ],
 
-  // AI Configuration
+  // AI Configuration (Groq)
   ai: {
-    model: process.env.OPENAI_MODEL || 'gpt-4',
+    model: process.env.GROQ_MODEL || 'llama-3.1-70b-versatile',
+    visionModel: process.env.GROQ_VISION_MODEL || 'llama-3.2-90b-vision-preview',
     maxTokens: 1000,
     temperature: 0.7,
     systemPrompt: `You are an AI farming assistant for AgriSupply, helping Ugandan farmers with:
