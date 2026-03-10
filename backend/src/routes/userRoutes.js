@@ -72,6 +72,18 @@ router.get('/farmers', optionalAuth, userController.getFarmers);
  */
 router.get('/farmers/:id', optionalAuth, userController.getFarmerProfile);
 
+/** * @route   GET /api/v1/users/farmers/:id/analytics
+ * @desc    Get farmer analytics
+ * @access  Private
+ */
+router.get('/farmers/:id/analytics', authenticate, userController.getFarmerAnalytics);
+
+/** * @route   GET /api/v1/users/farmers/:id/analytics
+ * @desc    Get farmer analytics
+ * @access  Private
+ */
+router.get('/farmers/:id/analytics', authenticate, userController.getFarmerAnalytics);
+
 /**
  * @route   POST /api/v1/users/farmers/:id/follow
  * @desc    Follow a farmer
