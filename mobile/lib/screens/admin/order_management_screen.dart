@@ -175,7 +175,7 @@ class _OrderManagementScreenState extends State<OrderManagementScreen>
   }
 
   void _showOrderDetails(final OrderModel order) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -400,7 +400,7 @@ class _OrderManagementScreenState extends State<OrderManagementScreen>
   }
 
   void _showFilterSheet() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -643,7 +643,7 @@ class _OrderDetailsSheet extends StatelessWidget {
   });
   final OrderModel order;
   final ScrollController scrollController;
-  final Function(String) onUpdateStatus;
+  final void Function(String) onUpdateStatus;
 
   @override
   Widget build(final BuildContext context) {

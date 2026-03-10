@@ -422,7 +422,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   void _showClearAllDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Clear All Notifications'),
@@ -460,7 +460,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   void _showNotificationSettings() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

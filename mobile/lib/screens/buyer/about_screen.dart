@@ -366,7 +366,7 @@ class AboutScreen extends StatelessWidget {
   }
 
   void _showTerms(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Terms & Conditions'),
@@ -392,7 +392,7 @@ class AboutScreen extends StatelessWidget {
   }
 
   void _showPrivacy(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Privacy Policy'),

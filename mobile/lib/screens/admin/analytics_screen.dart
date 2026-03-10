@@ -67,7 +67,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         body: RefreshIndicator(
           onRefresh: () async {
             setState(() => _isLoading = true);
-            await Future.delayed(const Duration(seconds: 1));
+            await Future<void>.delayed(const Duration(seconds: 1));
             setState(() => _isLoading = false);
           },
           child: ListView(

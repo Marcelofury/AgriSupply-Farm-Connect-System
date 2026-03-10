@@ -16,7 +16,6 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
-  final bool _isLoading = false;
   bool _isTyping = false;
 
   final List<String> _quickQuestions = [
@@ -518,7 +517,7 @@ How can I help you today?''',
   }
 
   void _clearChat() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('New Chat'),
@@ -544,7 +543,7 @@ How can I help you today?''',
   }
 
   void _showChatHistory() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -583,7 +582,7 @@ How can I help you today?''',
   }
 
   void _showSettings() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -629,7 +628,7 @@ How can I help you today?''',
   }
 
   void _showAttachmentOptions() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

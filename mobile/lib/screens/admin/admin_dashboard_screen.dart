@@ -853,7 +853,7 @@ class _SettingsTab extends StatelessWidget {
                 title: 'Logout',
                 isDestructive: true,
                 onTap: () {
-                  showDialog(
+                  showDialog<void>(
                     context: context,
                     builder: (final context) => AlertDialog(
                       title: const Text('Logout'),

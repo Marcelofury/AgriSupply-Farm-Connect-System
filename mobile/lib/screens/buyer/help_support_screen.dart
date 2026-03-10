@@ -250,7 +250,7 @@ class HelpSupportScreen extends StatelessWidget {
   void _showReportDialog(final BuildContext context) {
     final issueController = TextEditingController();
     
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Report an Issue'),
@@ -295,7 +295,7 @@ class HelpSupportScreen extends StatelessWidget {
   void _showFeedbackDialog(final BuildContext context) {
     final feedbackController = TextEditingController();
     
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Send Feedback'),
@@ -338,7 +338,7 @@ class HelpSupportScreen extends StatelessWidget {
   }
 
   void _showTutorial(final BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('App Tutorial'),

@@ -217,7 +217,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
   }
 
   void _showProductDetails(final ProductModel product) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -394,7 +394,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
   }
 
   void _showFilterSheet() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
