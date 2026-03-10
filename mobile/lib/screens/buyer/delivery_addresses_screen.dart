@@ -266,20 +266,95 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
     );
   }
 
+  // Get region from selected district
+  String _getRegionFromDistrict(final String district) {
+    const districts = {
+      'Central': [
+        'Buikwe', 'Bukomansimbi', 'Butambala', 'Buvuma', 'Gomba', 'Kalangala', 
+        'Kalungi', 'Kampala', 'Kayunga', 'Kiboga', 'Kyankwanzi', 'Luwero', 
+        'Lwengo', 'Lyantonde', 'Masaka', 'Mityana', 'Mpigi', 'Mubende', 
+        'Mukono', 'Nakaseke', 'Nakasongola', 'Rakai', 'Sembabule', 'Wakiso'
+      ],
+      'Eastern': [
+        'Amuria', 'Budaka', 'Bududa', 'Bugiri', 'Bugweri', 'Bukwa', 'Bulambuli', 
+        'Busia', 'Butaleja', 'Butebo', 'Buyende', 'Iganga', 'Jinja', 'Kaberamaido', 
+        'Kalaki', 'Kaliro', 'Kamuli', 'Kapchorwa', 'Kapelebyong', 'Katakwi', 
+        'Kibuku', 'Kumi', 'Kween', 'Luuka', 'Manafwa', 'Mayuge', 'Mbale', 
+        'Namayingo', 'Namisindwa', 'Namutumba', 'Ngora', 'Pallisa', 'Serere', 
+        'Sironko', 'Soroti', 'Tororo'
+      ],
+      'Northern': [
+        'Abim', 'Adjumani', 'Agago', 'Alebtong', 'Amudat', 'Amuru', 'Apac', 
+        'Arua', 'Dokolo', 'Gulu', 'Kaabong', 'Kitgum', 'Koboko', 'Kole', 
+        'Kotido', 'Lamwo', 'Lira', 'Maracha', 'Moroto', 'Moyo', 'Nabilatuk', 
+        'Napak', 'Nebbi', 'Ngora', 'Nwoya', 'Obongi', 'Omoro', 'Otuke', 
+        'Oyam', 'Pader', 'Pakwach', 'Yumbe', 'Zombo'
+      ],
+      'Western': [
+        'Buhweju', 'Buliisa', 'Bundibugyo', 'Bunyangabu', 'Bushenyi', 'Butobo', 
+        'Hoima', 'Ibanda', 'Isingiro', 'Kabale', 'Kabarole', 'Kagadi', 'Kakumiro', 
+        'Kamwenge', 'Kanungu', 'Kasese', 'Kibaale', 'Kikuube', 'Kiruhura', 
+        'Kiryandongo', 'Kisoro', 'Kitagwenda', 'Kyegegwa', 'Kyenjojo', 'Masindi', 
+        'Mbarara', 'Mitooma', 'Ntoroko', 'Ntungamo', 'Rubanda', 'Rubirizi', 
+        'Rukiga', 'Rukungiri', 'Rwampara', 'Sheema'
+      ],
+    };
+
+    for (final entry in districts.entries) {
+      if (entry.value.contains(district)) {
+        return entry.key;
+      }
+    }
+    return 'Central'; // Default fallback
+  }
+
+  // Get all districts across all regions for flat list
+  List<String> _getAllDistricts() {
+    const districts = {
+      'Central': [
+        'Buikwe', 'Bukomansimbi', 'Butambala', 'Buvuma', 'Gomba', 'Kalangala', 
+        'Kalungi', 'Kampala', 'Kayunga', 'Kiboga', 'Kyankwanzi', 'Luwero', 
+        'Lwengo', 'Lyantonde', 'Masaka', 'Mityana', 'Mpigi', 'Mubende', 
+        'Mukono', 'Nakaseke', 'Nakasongola', 'Rakai', 'Sembabule', 'Wakiso'
+      ],
+      'Eastern': [
+        'Amuria', 'Budaka', 'Bududa', 'Bugiri', 'Bugweri', 'Bukwa', 'Bulambuli', 
+        'Busia', 'Butaleja', 'Butebo', 'Buyende', 'Iganga', 'Jinja', 'Kaberamaido', 
+        'Kalaki', 'Kaliro', 'Kamuli', 'Kapchorwa', 'Kapelebyong', 'Katakwi', 
+        'Kibuku', 'Kumi', 'Kween', 'Luuka', 'Manafwa', 'Mayuge', 'Mbale', 
+        'Namayingo', 'Namisindwa', 'Namutumba', 'Ngora', 'Pallisa', 'Serere', 
+        'Sironko', 'Soroti', 'Tororo'
+      ],
+      'Northern': [
+        'Abim', 'Adjumani', 'Agago', 'Alebtong', 'Amudat', 'Amuru', 'Apac', 
+        'Arua', 'Dokolo', 'Gulu', 'Kaabong', 'Kitgum', 'Koboko', 'Kole', 
+        'Kotido', 'Lamwo', 'Lira', 'Maracha', 'Moroto', 'Moyo', 'Nabilatuk', 
+        'Napak', 'Nebbi', 'Ngora', 'Nwoya', 'Obongi', 'Omoro', 'Otuke', 
+        'Oyam', 'Pader', 'Pakwach', 'Yumbe', 'Zombo'
+      ],
+      'Western': [
+        'Buhweju', 'Buliisa', 'Bundibugyo', 'Bunyangabu', 'Bushenyi', 'Butobo', 
+        'Hoima', 'Ibanda', 'Isingiro', 'Kabale', 'Kabarole', 'Kagadi', 'Kakumiro', 
+        'Kamwenge', 'Kanungu', 'Kasese', 'Kibaale', 'Kikuube', 'Kiruhura', 
+        'Kiryandongo', 'Kisoro', 'Kitagwenda', 'Kyegegwa', 'Kyenjojo', 'Masindi', 
+        'Mbarara', 'Mitooma', 'Ntoroko', 'Ntungamo', 'Rubanda', 'Rubirizi', 
+        'Rukiga', 'Rukungiri', 'Rwampara', 'Sheema'
+      ],
+    };
+    final allDistricts = <String>[];
+    for (final districtList in districts.values) {
+      allDistricts.addAll(districtList);
+    }
+    allDistricts.sort();
+    return allDistricts;
+  }
+
   void _showAddAddressDialog() {
     final labelController = TextEditingController();
     final addressController = TextEditingController();
     final phoneController = TextEditingController();
     var selectedRegion = 'Central';
     var selectedDistrict = 'Kampala';
-
-    final regions = ['Central', 'Eastern', 'Northern', 'Western'];
-    final districts = {
-      'Central': ['Kampala', 'Wakiso', 'Mukono', 'Mpigi', 'Luwero'],
-      'Eastern': ['Jinja', 'Mbale', 'Soroti', 'Tororo', 'Iganga'],
-      'Northern': ['Gulu', 'Lira', 'Arua', 'Kitgum', 'Apac'],
-      'Western': ['Mbarara', 'Kabale', 'Fort Portal', 'Masindi', 'Hoima'],
-    };
 
     showDialog(
       context: context,
@@ -305,35 +380,15 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
+                // District selection (auto-detects region)
                 DropdownButtonFormField<String>(
-                  initialValue: selectedRegion,
-                  decoration: const InputDecoration(
-                    labelText: 'Region',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: regions.map((final region) {
-                    return DropdownMenuItem(
-                      value: region,
-                      child: Text(region),
-                    );
-                  }).toList(),
-                  onChanged: (final value) {
-                    if (value != null) {
-                      setState(() {
-                        selectedRegion = value;
-                        selectedDistrict = districts[value]!.first;
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  initialValue: selectedDistrict,
+                  value: selectedDistrict,
                   decoration: const InputDecoration(
                     labelText: 'District',
                     border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.location_city),
                   ),
-                  items: districts[selectedRegion]!.map((final district) {
+                  items: _getAllDistricts().map((final district) {
                     return DropdownMenuItem(
                       value: district,
                       child: Text(district),
@@ -341,9 +396,65 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                   }).toList(),
                   onChanged: (final value) {
                     if (value != null) {
-                      setState(() => selectedDistrict = value);
+                      setState(() {
+                        selectedDistrict = value;
+                        // Auto-detect and update region
+                        selectedRegion = _getRegionFromDistrict(value);
+                      });
                     }
                   },
+                ),
+                const SizedBox(height: 16),
+                // Region (auto-filled, read-only)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.grey100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.grey300),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.map_outlined, color: AppColors.grey600, size: 20),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Region (Auto-detected)',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.grey600,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            selectedRegion,
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Auto',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
@@ -397,11 +508,164 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
   }
 
   void _showEditAddressDialog(final DeliveryAddress address) {
-    // Similar to add, but with existing values
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Edit address functionality'),
-        backgroundColor: AppColors.info,
+    final labelController = TextEditingController(text: address.label);
+    final addressController = TextEditingController(text: address.fullAddress);
+    final phoneController = TextEditingController(text: address.phone ?? '');
+    var selectedRegion = address.region;
+    var selectedDistrict = address.district;
+
+    showDialog(
+      context: context,
+      builder: (final context) => StatefulBuilder(
+        builder: (final context, final setState) => AlertDialog(
+          title: const Text('Edit Delivery Address'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomTextField(
+                  controller: labelController,
+                  label: 'Label',
+                  hint: 'e.g., Home, Office',
+                  prefixIcon: Icons.label_outlined,
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  controller: addressController,
+                  label: 'Full Address',
+                  hint: 'Street, Building, Landmark',
+                  prefixIcon: Icons.location_on_outlined,
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 16),
+                // District selection (auto-detects region)
+                DropdownButtonFormField<String>(
+                  value: selectedDistrict,
+                  decoration: const InputDecoration(
+                    labelText: 'District',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.location_city),
+                  ),
+                  items: _getAllDistricts().map((final district) {
+                    return DropdownMenuItem(
+                      value: district,
+                      child: Text(district),
+                    );
+                  }).toList(),
+                  onChanged: (final value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedDistrict = value;
+                        selectedRegion = _getRegionFromDistrict(value);
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Region (auto-filled, read-only)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.grey100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.grey300),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.map_outlined, color: AppColors.grey600, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Region (Auto-detected)',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColors.grey600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              selectedRegion,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Auto',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  controller: phoneController,
+                  label: 'Phone Number',
+                  hint: '+256 XXX XXX XXX',
+                  prefixIcon: Icons.phone_outlined,
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (labelController.text.isNotEmpty &&
+                    addressController.text.isNotEmpty) {
+                  final updatedAddress = DeliveryAddress(
+                    id: address.id,
+                    label: labelController.text,
+                    fullAddress: addressController.text,
+                    region: selectedRegion,
+                    district: selectedDistrict,
+                    phone: phoneController.text.isNotEmpty
+                        ? phoneController.text
+                        : null,
+                    isDefault: address.isDefault,
+                  );
+
+                  this.setState(() {
+                    final index = _addresses.indexWhere((a) => a.id == address.id);
+                    if (index != -1) {
+                      _addresses[index] = updatedAddress;
+                    }
+                  });
+                  Navigator.pop(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Address updated successfully'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        ),
       ),
     );
   }

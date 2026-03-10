@@ -155,7 +155,7 @@ const googleAuth = asyncHandler(async (req, res) => {
         id: data.user.id,
         email: data.user.email,
         full_name: data.user.user_metadata.full_name || data.user.email.split('@')[0],
-        avatar_url: data.user.user_metadata.avatar_url,
+        photo_url: data.user.user_metadata.avatar_url,
         role,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

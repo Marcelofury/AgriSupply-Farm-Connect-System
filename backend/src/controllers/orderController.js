@@ -57,7 +57,7 @@ const getFarmerOrders = asyncHandler(async (req, res) => {
       *,
       order:order_id (
         id, order_number, status, payment_status, shipping_address, created_at,
-        buyer:buyer_id (id, full_name, phone, avatar_url)
+        buyer:buyer_id (id, full_name, phone, photo_url)
       ),
       product:product_id (id, name, images, price, unit)
     `, { count: 'exact' })
@@ -94,11 +94,11 @@ const getOrderById = asyncHandler(async (req, res) => {
     .from('orders')
     .select(`
       *,
-      buyer:buyer_id (id, full_name, phone, avatar_url),
+      buyer:buyer_id (id, full_name, phone, photo_url),
       order_items (
         *,
         product:product_id (id, name, images, price, unit),
-        farmer:farmer_id (id, full_name, phone, avatar_url, region)
+        farmer:farmer_id (id, full_name, phone, photo_url, region)
       )
     `)
     .eq('id', id)

@@ -519,13 +519,13 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       icon: Icons.smart_toy,
                       title: 'AI Assistant',
                       subtitle: 'Get farming advice and market insights',
-                      onTap: () => Navigator.pushNamed(context, '/ai-assistant'),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.aiAssistant),
                     ),
                     _buildMenuItem(
                       icon: Icons.analytics,
                       title: 'Analytics',
                       subtitle: 'View your sales and performance data',
-                      onTap: () => Navigator.pushNamed(context, '/farmer/analytics'),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.farmerAnalytics),
                     ),
                     _buildMenuItem(
                       icon: Icons.notifications,

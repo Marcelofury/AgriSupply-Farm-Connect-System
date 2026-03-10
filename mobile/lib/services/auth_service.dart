@@ -520,7 +520,7 @@ class AuthService {
     try {
       final path = 'profiles/$userId/avatar.jpg';
       return await _apiService.uploadFile(
-        bucket: 'avatars',
+        bucket: 'profile-photos',
         path: path,
         fileBytes: imageBytes,
         contentType: 'image/jpeg',

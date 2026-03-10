@@ -21,9 +21,9 @@ const getProducts = asyncHandler(async (req, res) => {
     .from('products')
     .select(`
       *,
-      farmer:farmer_id (id, full_name, avatar_url, region, is_verified)
+      farmer:farmer_id (id, full_name, photo_url, region, is_verified)
     `, { count: 'exact' })
-    .eq('is_active', true);
+    .eq('status', 'active');
 
   if (category) {
     query = query.eq('category', category);
@@ -83,9 +83,9 @@ const searchProducts = asyncHandler(async (req, res) => {
     .from('products')
     .select(`
       *,
-      farmer:farmer_id (id, full_name, avatar_url, region, is_verified)
+      farmer:farmer_id (id, full_name, photo_url, region, is_verified)
     `, { count: 'exact' })
-    .eq('is_active', true)
+    .eq('status', 'active')
     .or(`name.ilike.%${q}%,description.ilike.%${q}%,category.ilike.%${q}%`)
     .order('rating', { ascending: false })
     .range(offset, offset + limitNum - 1);
@@ -112,9 +112,9 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
     .from('products')
     .select(`
       *,
-      farmer:farmer_id (id, full_name, avatar_url, region, is_verified)
+      farmer:farmer_id (id, full_name, photo_url, region, is_verified)
     `)
-    .eq('is_active', true)
+    .eq('status', 'active')
     .eq('is_featured', true)
     .order('rating', { ascending: false })
     .limit(parseInt(limit));
@@ -146,7 +146,7 @@ const getCategories = asyncHandler(async (req, res) => {
           .from('products')
           .select('*', { count: 'exact', head: true })
           .eq('category', cat.id)
-          .eq('is_active', true);
+          .eq('status', 'active');
         return { ...cat, count };
       })
     );
@@ -186,7 +186,7 @@ const getMyProducts = asyncHandler(async (req, res) => {
     .eq('farmer_id', farmerId);
 
   if (isActive !== undefined) {
-    query = query.eq('is_active', isActive === 'true');
+    query = query.eq('status', isActive === 'true' ? 'active' : 'draft');
   }
 
   const { data, count, error } = await query
@@ -215,7 +215,7 @@ const getProductById = asyncHandler(async (req, res) => {
     .from('products')
     .select(`
       *,
-      farmer:farmer_id (id, full_name, avatar_url, region, district, is_verified, rating, phone)
+      farmer:farmer_id (id, full_name, photo_url, region, district, is_verified, rating, phone)
     `)
     .eq('id', id)
     .single();
@@ -227,7 +227,7 @@ const getProductById = asyncHandler(async (req, res) => {
   // Increment view count
   await supabase
     .from('products')
-    .update({ views: (data.views || 0) + 1 })
+    .update({ views_count: (data.views_count || 0) + 1 })
     .eq('id', id);
 
   // Get related products
@@ -236,7 +236,7 @@ const getProductById = asyncHandler(async (req, res) => {
     .select('id, name, images, price, unit, rating')
     .eq('category', data.category)
     .neq('id', id)
-    .eq('is_active', true)
+    .eq('status', 'active')
     .limit(4);
 
   // Check if user has favorited this product
@@ -353,7 +353,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   }
 
   // Prepare updates
-  const allowedUpdates = ['name', 'description', 'category', 'price', 'unit', 'quantity', 'is_organic', 'is_active', 'harvest_date', 'expiry_date'];
+  const allowedUpdates = ['name', 'description', 'category', 'price', 'unit', 'quantity', 'is_organic', 'status', 'harvest_date', 'expiry_date'];
   const filteredUpdates = {};
   
   for (const key of allowedUpdates) {
@@ -368,10 +368,6 @@ const updateProduct = asyncHandler(async (req, res) => {
         filteredUpdates[key] = updates[key];
       }
     }
-  }
-
-  if (updates.name) {
-    filteredUpdates.slug = slugify(updates.name);
   }
 
   filteredUpdates.updated_at = new Date().toISOString();
@@ -579,7 +575,7 @@ const getProductReviews = asyncHandler(async (req, res) => {
     .from('product_reviews')
     .select(`
       *,
-      user:user_id (id, full_name, avatar_url)
+      user:user_id (id, full_name, photo_url)
     `, { count: 'exact' })
     .eq('product_id', id)
     .order('created_at', { ascending: false })
@@ -651,7 +647,7 @@ const addReview = asyncHandler(async (req, res) => {
     })
     .select(`
       *,
-      user:user_id (id, full_name, avatar_url)
+      user:user_id (id, full_name, photo_url)
     `)
     .single();
 
@@ -717,7 +713,7 @@ const updateReview = asyncHandler(async (req, res) => {
     .eq('id', reviewId)
     .select(`
       *,
-      user:user_id (id, full_name, avatar_url)
+      user:user_id (id, full_name, photo_url)
     `)
     .single();
 
@@ -886,7 +882,7 @@ const getFavorites = asyncHandler(async (req, res) => {
     .select(`
       product:product_id (
         *,
-        farmer:farmer_id (id, full_name, avatar_url, region, is_verified)
+        farmer:farmer_id (id, full_name, photo_url, region, is_verified)
       )
     `, { count: 'exact' })
     .eq('user_id', userId)

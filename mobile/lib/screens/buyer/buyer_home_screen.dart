@@ -546,7 +546,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
             _buildProfileMenuItem(
               icon: Icons.info_outlined,
               title: 'About',
-              onTap: () {},
+              onTap: () => Navigator.pushNamed(context, AppRoutes.about),
             ),
             const SizedBox(height: 16),
             _buildProfileMenuItem(
@@ -580,10 +580,13 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
       title: Text(
         title,
         style: TextStyle(
-          color: isDestructive ? AppColors.error : null,
+          color: isDestructive ? AppColors.error : AppColors.grey900,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: AppColors.grey600,
+      ),
       onTap: onTap,
     );
   }

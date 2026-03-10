@@ -62,18 +62,18 @@ const uploadPhoto = asyncHandler(async (req, res) => {
   }
 
   const userId = req.user.id;
-  const fileInfo = processFile(req.file, 'avatars');
+  const fileInfo = processFile(req.file, 'profile-photos');
 
   // Delete old photo if exists
-  if (req.user.avatar_url) {
-    const oldPath = req.user.avatar_url.split('/').pop();
-    await deleteFile('avatars', oldPath);
+  if (req.user.photo_url) {
+    const oldPath = req.user.photo_url.split('/').pop();
+    await deleteFile('profile-photos', oldPath);
   }
 
   // Upload new photo
   const uploadResult = await uploadFile(
     fileInfo.buffer,
-    'avatars',
+    'profile-photos',
     fileInfo.filePath,
     fileInfo.contentType
   );
@@ -86,7 +86,7 @@ const uploadPhoto = asyncHandler(async (req, res) => {
   const { data, error } = await supabase
     .from('users')
     .update({
-      avatar_url: uploadResult.publicUrl,
+      photo_url: uploadResult.publicUrl,
       updated_at: new Date().toISOString(),
     })
     .eq('id', userId)
@@ -114,15 +114,15 @@ const uploadPhoto = asyncHandler(async (req, res) => {
 const deletePhoto = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
-  if (req.user.avatar_url) {
-    const oldPath = req.user.avatar_url.split('/').pop();
-    await deleteFile('avatars', oldPath);
+  if (req.user.photo_url) {
+    const oldPath = req.user.photo_url.split('/').pop();
+    await deleteFile('profile-photos', oldPath);
   }
 
   const { error } = await supabase
     .from('users')
     .update({
-      avatar_url: null,
+      photo_url: null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', userId);
@@ -182,7 +182,7 @@ const getFarmers = asyncHandler(async (req, res) => {
 
   let query = supabase
     .from('users')
-    .select('id, full_name, avatar_url, region, district, bio, is_verified, rating, total_sales, created_at', { count: 'exact' })
+    .select('id, full_name, photo_url, region, district, bio, is_verified, rating, total_sales, created_at', { count: 'exact' })
     .eq('role', 'farmer')
     .eq('is_suspended', false);
 
@@ -222,7 +222,7 @@ const getFarmerProfile = asyncHandler(async (req, res) => {
 
   const { data: farmer, error } = await supabase
     .from('users')
-    .select('id, full_name, avatar_url, region, district, bio, is_verified, rating, total_sales, created_at')
+    .select('id, full_name, photo_url, region, district, bio, is_verified, rating, total_sales, created_at')
     .eq('id', id)
     .eq('role', 'farmer')
     .single();
@@ -236,7 +236,7 @@ const getFarmerProfile = asyncHandler(async (req, res) => {
     .from('products')
     .select('id, name, images, price, unit, category, rating')
     .eq('farmer_id', id)
-    .eq('is_active', true)
+    .eq('status', 'active')
     .limit(10);
 
   // Get follower count
@@ -359,7 +359,7 @@ const getFollowing = asyncHandler(async (req, res) => {
     .from('farmer_followers')
     .select(`
       farmer:farmer_id (
-        id, full_name, avatar_url, region, district, bio, is_verified, rating
+        id, full_name, photo_url, region, district, bio, is_verified, rating
       )
     `, { count: 'exact' })
     .eq('follower_id', userId)
@@ -391,7 +391,7 @@ const getFollowers = asyncHandler(async (req, res) => {
     .from('farmer_followers')
     .select(`
       follower:follower_id (
-        id, full_name, avatar_url, region
+        id, full_name, photo_url, region
       )
     `, { count: 'exact' })
     .eq('farmer_id', userId)
@@ -518,7 +518,7 @@ const getFarmerAnalytics = asyncHandler(async (req, res) => {
     .from('products')
     .select('*', { count: 'exact', head: true })
     .eq('farmer_id', farmerId)
-    .eq('is_active', true);
+    .eq('status', 'active');
 
   // Get orders statistics
   const { data: orders } = await supabase
@@ -545,10 +545,10 @@ const getFarmerAnalytics = asyncHandler(async (req, res) => {
   // Get top products
   const { data: topProducts } = await supabase
     .from('products')
-    .select('id, name, images, price, sold_count')
+    .select('id, name, images, price, quantity_sold')
     .eq('farmer_id', farmerId)
-    .eq('is_active', true)
-    .order('sold_count', { ascending: false })
+    .eq('status', 'active')
+    .order('quantity_sold', { ascending: false })
     .limit(5);
 
   // Get recent orders
@@ -585,8 +585,8 @@ const getFarmerAnalytics = asyncHandler(async (req, res) => {
     total_reviews: reviews?.length || 0,
     top_products: topProducts?.map(p => ({
       name: p.name,
-      sold: p.sold_count || 0,
-      revenue: (p.sold_count || 0) * parseFloat(p.price || 0),
+      sold: p.quantity_sold || 0,
+      revenue: (p.quantity_sold || 0) * parseFloat(p.price || 0),
       image: p.images?.[0] || null,
     })) || [],
     recent_orders: recentOrders?.map(o => ({
