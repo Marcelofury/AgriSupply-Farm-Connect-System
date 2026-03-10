@@ -262,7 +262,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   : RefreshIndicator(
                       onRefresh: () async {
                         setState(() => _isLoading = true);
-                        await Future.delayed(const Duration(seconds: 1));
+                        await Future<void>.delayed(const Duration(seconds: 1));
                         setState(() => _isLoading = false);
                       },
                       child: ListView.builder(
@@ -544,7 +544,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   void _showUserDetails(final UserModel user) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -663,7 +663,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   void _showFilterSheet() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -748,7 +748,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   void _verifyUser(final UserModel user) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Verify User'),
@@ -776,7 +776,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   void _suspendUser(final UserModel user) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Suspend User'),
@@ -805,7 +805,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   void _deleteUser(final UserModel user) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Delete User'),
