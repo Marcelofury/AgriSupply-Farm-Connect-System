@@ -17,6 +17,8 @@ class FarmerDashboardScreen extends StatefulWidget {
 
 class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
   int _currentIndex = 0;
+  List<FlSpot> _salesChartData = [];
+  List<String> _chartDays = [];
 
   @override
   void initState() {
@@ -32,7 +34,53 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     if (authProvider.currentUser != null) {
       await productProvider.fetchFarmerProducts(authProvider.currentUser!.id);
       await orderProvider.fetchFarmerOrders(authProvider.currentUser!.id);
+      _calculateSalesData(orderProvider);
     }
+  }
+
+  void _calculateSalesData(OrderProvider orderProvider) {
+    // Get orders from last 7 days
+    final now = DateTime.now();
+    final salesByDay = <String, double>{};
+    final days = <String>[];
+    
+    // Initialize last 7 days with 0
+    for (int i = 6; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      final dayKey = '${date.month}/${date.day}';
+      final dayLabel = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][date.weekday - 1];
+      days.add(dayLabel);
+      salesByDay[dayKey] = 0;
+    }
+    
+    // Calculate sales for each day
+    for (final order in orderProvider.farmerOrders) {
+      if (order.status == 'delivered' || order.status == 'completed') {
+        final orderDate = order.createdAt;
+        final daysSince = now.difference(orderDate).inDays;
+        
+        if (daysSince < 7) {
+          final dayKey = '${orderDate.month}/${orderDate.day}';
+          salesByDay[dayKey] = (salesByDay[dayKey] ?? 0) + order.total;
+        }
+      }
+    }
+    
+    // Convert to chart data
+    final spots = <FlSpot>[];
+    final maxSale = salesByDay.values.isEmpty ? 100000.0 : salesByDay.values.reduce((a, b) => a > b ? a : b);
+    var index = 0;
+    
+    for (final entry in salesByDay.entries) {
+      final normalizedValue = maxSale > 0 ? ((entry.value / maxSale) * 6).toDouble() : 0.0;
+      spots.add(FlSpot(index.toDouble(), normalizedValue));
+      index++;
+    }
+    
+    setState(() {
+      _salesChartData = spots.isEmpty ? [FlSpot.zero] : spots;
+      _chartDays = days;
+    });
   }
 
   @override
@@ -345,53 +393,54 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
           ),
         ],
       ),
-      child: LineChart(
-        LineChartData(
-          gridData: const FlGridData(show: false),
-          titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(),
-            rightTitles: const AxisTitles(),
-            topTitles: const AxisTitles(),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (final value, final meta) {
-                  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                  if (value.toInt() < days.length) {
-                    return Text(
-                      days[value.toInt()],
-                      style: const TextStyle(fontSize: 10),
-                    );
-                  }
-                  return const Text('');
-                },
+      child: _salesChartData.isEmpty
+          ? const Center(
+              child: Text(
+                'No sales data available',
+                style: TextStyle(color: AppColors.grey600),
+              ),
+            )
+          : LineChart(
+              LineChartData(
+                gridData: const FlGridData(show: false),
+                titlesData: FlTitlesData(
+                  leftTitles: const AxisTitles(),
+                  rightTitles: const AxisTitles(),
+                  topTitles: const AxisTitles(),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (final value, final meta) {
+                        final index = value.toInt();
+                        if (index >= 0 && index < _chartDays.length) {
+                          return Text(
+                            _chartDays[index],
+                            style: const TextStyle(fontSize: 10),
+                          );
+                        }
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                minY: 0,
+                maxY: 7,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: _salesChartData,
+                    isCurved: true,
+                    color: AppColors.primaryGreen,
+                    barWidth: 3,
+                    dotData: const FlDotData(show: true),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: AppColors.primaryGreen.withOpacity(0.1),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            LineChartBarData(
-              spots: const [
-                FlSpot(0, 3),
-                FlSpot(1, 4),
-                FlSpot(2, 3.5),
-                FlSpot(3, 5),
-                FlSpot(4, 4),
-                FlSpot(5, 6),
-                FlSpot(6, 5.5),
-              ],
-              isCurved: true,
-              color: AppColors.primaryGreen,
-              barWidth: 3,
-              dotData: const FlDotData(show: false),
-              belowBarData: BarAreaData(
-                show: true,
-                color: AppColors.primaryGreen.withOpacity(0.1),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
