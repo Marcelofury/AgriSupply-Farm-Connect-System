@@ -290,7 +290,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             'Analytics',
             Icons.analytics,
             AppColors.info,
-            () {},
+            () => Navigator.pushNamed(context, AppRoutes.farmerAnalytics),
           ),
         ),
       ],
