@@ -351,7 +351,7 @@ class CartScreen extends StatelessWidget {
   }
 
   void _showClearCartDialog(final BuildContext context, final CartProvider cartProvider) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Clear Cart'),
