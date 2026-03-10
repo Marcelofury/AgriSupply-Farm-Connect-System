@@ -64,7 +64,7 @@ class PaymentService {
       // Use the unified /payments/initiate endpoint
       final response = await _apiService.post('/payments/initiate', body: {
         'orderId': orderId,
-        'method': 'marzpay_mobile',
+        'method': 'marzpay',
         'phone': phoneNumber,
       });
 

@@ -24,8 +24,6 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     'How can I improve my soil quality?',
     'Current market prices for vegetables',
     'Tips for organic farming',
-    'How to prevent crop diseases?',
-    'Best practices for irrigation',
   ];
 
   @override

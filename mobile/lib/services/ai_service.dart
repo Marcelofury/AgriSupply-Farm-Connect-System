@@ -104,46 +104,30 @@ conversation back to farming-related topics.
     final List<AIMessage>? conversationHistory,
   }) async {
     try {
-      final messages = <Map<String, dynamic>>[
-        {'role': 'system', 'content': _systemPrompt},
-      ];
-
-      // Add conversation history
-      if (conversationHistory != null) {
-        for (final msg in conversationHistory.take(10)) {
-          messages.add({
-            'role': msg.role,
-            'content': msg.content,
-          });
-        }
-      }
-
-      // Add current message
-      if (imageBase64 != null) {
-        messages.add({
-          'role': 'user',
-          'content': [
-            {'type': 'text', 'text': message},
-            {
-              'type': 'image_url',
-              'image_url': {'url': 'data:image/jpeg;base64,$imageBase64'}
-            },
-          ],
-        });
-      } else {
-        messages.add({'role': 'user', 'content': message});
-      }
-
-      final response = await _apiService.post('/ai/chat', body: {
-        'messages': messages,
+      final body = <String, dynamic>{
+        'message': message,
         'user_id': userId,
-        'session_id': sessionId,
-        'model': 'gpt-4o-mini',
-        'max_tokens': 1000,
-        'temperature': 0.7,
+      };
+
+      if (sessionId != null) body['session_id'] = sessionId;
+      if (imageBase64 != null) body['image'] = imageBase64;
+
+      final response = await _apiService.post('/ai/chat', body: body);
+
+      return (response['response'] ?? response['message'] ?? response['content'] ?? "I apologize, but I couldn't generate a response. Please try again.") as String;
+    } catch (e) {
+      throw Exception('Failed to get AI response: $e');
+    }
+  }
+
+  // Simple chat method
+  Future<String> chat(String message) async {
+    try {
+      final response = await _apiService.post('/ai/chat', body: {
+        'message': message,
       });
 
-      return (response['content'] ?? response['message'] ?? "I apologize, but I couldn't generate a response. Please try again.") as String;
+      return (response['response'] ?? response['message'] ?? response['content'] ?? "I apologize, but I couldn't generate a response. Please try again.") as String;
     } catch (e) {
       throw Exception('Failed to get AI response: $e');
     }
@@ -289,14 +273,6 @@ conversation back to farming-related topics.
     } catch (e) {
       throw Exception('Failed to delete chat session: $e');
     }
-  }
-
-  // Simple chat method - alias for sendMessage
-  Future<String> chat(final String message) async {
-    return sendMessage(
-      message: message,
-      userId: 'anonymous',
-    );
   }
 
   // Quick questions for the AI assistant

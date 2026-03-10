@@ -9,6 +9,7 @@ import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/otp_verification_screen.dart';
 import '../screens/auth/register_screen.dart';
+import '../screens/buyer/about_screen.dart';
 import '../screens/buyer/buyer_home_screen.dart';
 import '../screens/buyer/buyer_orders_screen.dart';
 import '../screens/buyer/buyer_profile_screen.dart';
@@ -23,6 +24,7 @@ import '../screens/common/help_support_screen.dart';
 import '../screens/common/notifications_screen.dart';
 import '../screens/farmer/add_product_screen.dart';
 import '../screens/farmer/ai_assistant_screen.dart';
+import '../screens/farmer/farmer_analytics_screen.dart';
 import '../screens/farmer/farmer_dashboard_screen.dart';
 import '../screens/farmer/farmer_orders_screen.dart';
 import '../screens/farmer/farmer_products_screen.dart';
@@ -49,6 +51,7 @@ class AppRoutes {
   static const String helpSupport = '/buyer/help-support';
   static const String deliveryAddresses = '/buyer/delivery-addresses';
   static const String paymentMethods = '/buyer/payment-methods';
+  static const String about = '/about';
 
   // Farmer Routes
   static const String farmerDashboard = '/farmer/dashboard';
@@ -58,6 +61,7 @@ class AppRoutes {
   static const String farmerProducts = '/farmer/products';
   static const String farmerProfile = '/farmer/profile';
   static const String aiAssistant = '/farmer/ai-assistant';
+  static const String farmerAnalytics = '/farmer/analytics';
 
   // Admin Routes
   static const String adminDashboard = '/admin/dashboard';
@@ -118,6 +122,8 @@ class AppRoutes {
         return _buildRoute(const DeliveryAddressesScreen(), settings);
       case paymentMethods:
         return _buildRoute(const PaymentMethodsScreen(), settings);
+      case about:
+        return _buildRoute(const AboutScreen(), settings);
 
       // Farmer Routes
       case farmerDashboard:
@@ -135,6 +141,8 @@ class AppRoutes {
         return _buildRoute(const FarmerProfileScreen(), settings);
       case aiAssistant:
         return _buildRoute(const AIAssistantScreen(), settings);
+      case farmerAnalytics:
+        return _buildRoute(const FarmerAnalyticsScreen(), settings);
 
       // Admin Routes
       case adminDashboard:

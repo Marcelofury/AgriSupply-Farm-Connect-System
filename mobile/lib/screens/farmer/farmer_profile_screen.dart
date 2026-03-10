@@ -8,6 +8,7 @@ import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
@@ -79,11 +80,65 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
 
-    if (image != null) {
-      setState(() => _profileImage = File(image.path));
+    if (image == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.currentUser?.id;
+
+      if (userId == null) {
+        _showError('User not found');
+        return;
+      }
+
+      // Upload to Supabase Storage
+      final storageService = StorageService();
+      final imageUrl = await storageService.uploadProfilePicture(
+        imageFile: File(image.path),
+        userId: userId,
+      );
+
+      // Update profile with new image URL
+      final result = await authProvider.updateProfile(
+        photoUrl: imageUrl,
+      );
+
+      if (mounted) {
+        if (result) {
+          setState(() => _profileImage = File(image.path));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile image updated successfully'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        } else {
+          _showError('Failed to update profile image');
+        }
+      }
+    } catch (e) {
+      _showError('Failed to upload image: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+      ),
+    );
   }
 
   Future<void> _saveProfile() async {

@@ -27,7 +27,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   String _selectedRegion = 'Central';
   String _selectedDistrict = 'Kampala';
-  final String _selectedPaymentMethod = PaymentMethod.mobileMoney;
+  String _selectedPaymentMethod = PaymentMethod.mobileMoney;
   bool _isLoading = false;
 
   final List<String> _regions = [
@@ -103,14 +103,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           // COD - show success
           _showSuccessDialog(order.id);
         }
-        } else {
-          // Cash on delivery - go to success
-          _showSuccessDialog(order.id);
-        }
       } else {
         _showError(orderProvider.errorMessage ?? 'Failed to place order');
       }
-    } catch (final e) {
+    } catch (e) {
       _showError('An unexpected error occurred');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -380,10 +376,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       value: _selectedRegion,
                       items: _regions,
                       onChanged: (final value) {
-                        setState(() {
-                          _selectedRegion = value;
-                          _selectedDistrict = _districts[value]!.first;
-                        });
+                        if (value != null) {
+                          setState(() {
+                            _selectedRegion = value;
+                            _selectedDistrict = _districts[value]!.first;
+                          });
+                        }
                       },
                     ),
                   ),
@@ -394,7 +392,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       value: _selectedDistrict,
                       items: _districts[_selectedRegion]!,
                       onChanged: (final value) {
-                        setState(() => _selectedDistrict = value);
+                        if (value != null) {
+                          setState(() => _selectedDistrict = value);
+                        }
                       },
                     ),
                   ),
@@ -572,7 +572,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Radio<String>(
               value: value,
               groupValue: _selectedPaymentMethod,
-              onChanged: (final value) => setState(() => _selectedPaymentMethod = value),
+              onChanged: (final value) {
+                if (value != null) {
+                  setState(() => _selectedPaymentMethod = value);
+                }
+              },
               activeColor: AppColors.primaryGreen,
             ),
           ],

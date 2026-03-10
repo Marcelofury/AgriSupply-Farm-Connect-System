@@ -134,6 +134,7 @@ class UserService {
       final buyers = users.where((final u) => u.role == UserRole.buyer).length;
       final admins = users.where((final u) => u.role == UserRole.admin).length;
       final verified = users.where((final u) => u.isVerified).length;
+      final premium = 0; // Premium feature tracking not implemented yet
       final suspended = users.where((final u) => u.isSuspended).length;
 
       // Users by region

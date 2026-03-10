@@ -132,16 +132,22 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
       );
 
       // Update user profile with new image URL
-      // TODO: Update user profile in database with imageUrl
+      final result = await authProvider.updateProfile(
+        photoUrl: imageUrl,
+      );
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile image updated successfully'),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (result) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile image updated successfully'),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else {
+          _showError('Failed to update profile image in database');
+        }
       }
     } catch (e) {
       _showError('Failed to upload image: $e');

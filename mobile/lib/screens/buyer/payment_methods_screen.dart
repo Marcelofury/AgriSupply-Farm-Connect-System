@@ -12,40 +12,36 @@ class PaymentMethodItem {
   });
 
   final String id;
-  final String type; // 'mobile_money', 'card'
+  final String type; // 'marzpay', 'cash'
   final Map<String, String> details;
   final bool isDefault;
 
   String get displayName {
     switch (type) {
-      case 'mtn':
-        return 'MTN Mobile Money';
-      case 'airtel':
-        return 'Airtel Money';
-      case 'card':
-        return 'Card';
+      case 'marzpay':
+        return 'Mobile Money (MTN & Airtel)';
+      case 'cash':
+        return 'Cash on Delivery';
       default:
         return type;
     }
   }
 
   String get displayDetails {
-    if (type == 'mtn' || type == 'airtel') {
-      return details['phone'] ?? '';
-    } else if (type == 'card') {
-      return '**** **** **** ${details['last4'] ?? ''}';
+    if (type == 'marzpay') {
+      return details['phone'] ?? 'Mobile Money Payment';
+    } else if (type == 'cash') {
+      return 'Pay when you receive your order';
     }
     return '';
   }
 
   IconData get icon {
     switch (type) {
-      case 'mtn':
+      case 'marzpay':
         return Icons.phone_android;
-      case 'airtel':
-        return Icons.phone_android;
-      case 'card':
-        return Icons.credit_card;
+      case 'cash':
+        return Icons.money;
       default:
         return Icons.payment;
     }
@@ -53,12 +49,10 @@ class PaymentMethodItem {
 
   Color get color {
     switch (type) {
-      case 'mtn':
-        return const Color(0xFFFFCC00);
-      case 'airtel':
-        return const Color(0xFFED1C24);
-      case 'card':
-        return AppColors.info;
+      case 'marzpay':
+        return const Color(0xFF4CAF50);
+      case 'cash':
+        return AppColors.warning;
       default:
         return AppColors.grey600;
     }
