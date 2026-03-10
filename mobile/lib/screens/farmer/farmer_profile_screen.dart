@@ -433,7 +433,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       icon: Icons.analytics,
                       title: 'Analytics',
                       subtitle: 'View your sales and performance data',
-                      onTap: () => Navigator.pushNamed(context, '/farmer-analytics'),
+                      onTap: () => Navigator.pushNamed(context, '/farmer/analytics'),
                     ),
                     _buildMenuItem(
                       icon: Icons.notifications,
