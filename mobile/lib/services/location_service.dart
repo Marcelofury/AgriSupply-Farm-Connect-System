@@ -1,5 +1,13 @@
 import 'package:geolocator/geolocator.dart';
 
+/// LocationService - Handles geolocation features
+/// 
+/// Note: For delivery addresses, it's recommended to use district-based
+/// region detection instead of GPS, as users might be traveling or
+/// temporarily in a different location. GPS is useful for:
+/// - "Products near me" distance calculations
+/// - Delivery tracking
+/// - Finding nearby farmers/buyers
 class LocationService {
   factory LocationService() => _instance;
   LocationService._internal();
