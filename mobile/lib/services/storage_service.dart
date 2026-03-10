@@ -59,7 +59,7 @@ class StorageService {
   }) async {
     return uploadImage(
       imageFile: imageFile,
-      bucket: 'profiles',
+      bucket: 'profile-photos',
       path: userId,
     );
   }
