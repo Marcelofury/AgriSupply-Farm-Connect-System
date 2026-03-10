@@ -665,7 +665,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   void _showDeleteDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Delete Product'),
