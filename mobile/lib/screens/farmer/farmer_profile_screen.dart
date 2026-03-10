@@ -8,6 +8,7 @@ import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/api_service.dart';
 import '../../services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -28,6 +29,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   final _farmNameController = TextEditingController();
   final _farmDescriptionController = TextEditingController();
   final _addressController = TextEditingController();
+  final ApiService _apiService = ApiService();
 
   String _selectedRegion = '';
   String _selectedDistrict = '';
@@ -199,7 +201,8 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      final profileData = {
+      // Update profile via API
+      await _apiService.put('/users/${authProvider.currentUser?.id}', body: {
         'full_name': _nameController.text.trim(),
         'phone': _phoneController.text.trim(),
         'farm_name': _farmNameController.text.trim(),
@@ -207,7 +210,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
         'address': _addressController.text.trim(),
         'region': _selectedRegion,
         'district': _selectedDistrict,
-      };
+      });
 
       final success = await authProvider.updateProfile(
         fullName: _nameController.text.trim(),
@@ -722,7 +725,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   }
 
   void _showLogoutDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Logout'),
