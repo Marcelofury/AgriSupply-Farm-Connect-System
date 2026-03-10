@@ -138,8 +138,39 @@ const getOrderById = asyncHandler(async (req, res) => {
  * @route   POST /api/v1/orders
  */
 const createOrder = asyncHandler(async (req, res) => {
-  const { items, shippingAddress, paymentMethod, notes } = req.body;
+  // Accept both mobile (deliveryAddress) and web (shippingAddress) formats
+  const { items, deliveryAddress, shippingAddress, paymentMethod, notes } = req.body;
   const buyerId = req.user.id;
+
+  // Get user's region for delivery calculation
+  const { data: buyer } = await supabase
+    .from('users')
+    .select('region')
+    .eq('id', buyerId)
+    .single();
+
+  // Normalize address format - accept both string and object
+  let normalizedAddress;
+  let buyerRegion;
+  
+  if (shippingAddress) {
+    // Web format: object with region
+    normalizedAddress = shippingAddress;
+    buyerRegion = shippingAddress.region;
+  } else if (deliveryAddress) {
+    // Mobile format: simple string or object
+    if (typeof deliveryAddress === 'string') {
+      normalizedAddress = {
+        address: deliveryAddress,
+        region: buyer?.region || 'Central',
+      };
+    } else {
+      normalizedAddress = deliveryAddress;
+    }
+    buyerRegion = normalizedAddress.region || buyer?.region || 'Central';
+  } else {
+    throw new ApiError(400, 'Delivery address is required');
+  }
 
   // Validate and fetch products
   const productIds = items.map(item => item.productId);
@@ -159,7 +190,7 @@ const createOrder = asyncHandler(async (req, res) => {
   for (const item of items) {
     const product = products.find(p => p.id === item.productId);
     
-    if (product.quantity < item.quantity) {
+    if (product.quantity_available < item.quantity) {
       throw new ApiError(400, `Insufficient quantity for ${product.name}`);
     }
 
@@ -177,7 +208,6 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   // Calculate delivery fee
-  const buyerRegion = shippingAddress.region;
   const uniqueFarmerRegions = [...new Set(products.map(p => p.farmer.region))];
   let deliveryFee = 0;
   
@@ -201,7 +231,7 @@ const createOrder = asyncHandler(async (req, res) => {
       subtotal,
       delivery_fee: deliveryFee,
       total,
-      shipping_address: shippingAddress,
+      shipping_address: normalizedAddress,
       notes,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -238,7 +268,7 @@ const createOrder = asyncHandler(async (req, res) => {
     const product = products.find(p => p.id === item.productId);
     await supabase
       .from('products')
-      .update({ quantity: product.quantity - item.quantity })
+      .update({ quantity_available: product.quantity_available - item.quantity })
       .eq('id', item.productId);
   }
 

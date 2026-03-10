@@ -27,8 +27,8 @@ const register = asyncHandler(async (req, res) => {
     throw new ApiError(400, authError.message);
   }
 
-  // Wait briefly for trigger to create profile
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Wait briefly for trigger to create profile (2s for Supabase trigger execution)
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   // Fetch the profile created by the database trigger
   const { data: profile, error: profileError } = await supabase
