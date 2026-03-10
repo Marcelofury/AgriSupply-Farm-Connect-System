@@ -129,7 +129,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _showPaymentDialog(final String orderId) {
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (final context) => AlertDialog(
@@ -209,6 +209,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
+  // Unused legacy payment dialog - kept for reference
+  /*
   void _showPaymentDialog_old(final String orderId) {
     showDialog(
       context: context,
@@ -253,9 +255,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
   }
+  */
 
   void _showSuccessDialog(final String orderId) {
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (final context) => AlertDialog(
