@@ -123,18 +123,26 @@ const productValidators = {
       .isIn(constants.productCategories.map(c => c.id))
       .withMessage('Invalid category'),
     body('price')
-      .isFloat({ min: 0 })
+      .custom((value) => {
+        const num = parseFloat(value);
+        return !isNaN(num) && num >= 0;
+      })
       .withMessage('Price must be a positive number'),
     body('unit')
       .isIn(['kg', 'g', 'piece', 'bunch', 'liter', 'dozen', 'bag', 'crate'])
       .withMessage('Invalid unit'),
     body('quantity')
-      .isInt({ min: 0 })
+      .custom((value) => {
+        const num = parseInt(value);
+        return !isNaN(num) && num >= 0;
+      })
       .withMessage('Quantity must be a non-negative integer'),
     body('isOrganic')
       .optional()
-      .isBoolean()
-      .withMessage('isOrganic must be a boolean'),
+      .custom((value) => {
+        return value === 'true' || value === 'false' || typeof value === 'boolean';
+      })
+      .withMessage('isOrganic must be a boolean or string "true"/"false"'),
   ],
   
   update: [
@@ -153,11 +161,17 @@ const productValidators = {
       .withMessage('Invalid category'),
     body('price')
       .optional()
-      .isFloat({ min: 0 })
+      .custom((value) => {
+        const num = parseFloat(value);
+        return !isNaN(num) && num >= 0;
+      })
       .withMessage('Price must be a positive number'),
     body('quantity')
       .optional()
-      .isInt({ min: 0 })
+      .custom((value) => {
+        const num = parseInt(value);
+        return !isNaN(num) && num >= 0;
+      })
       .withMessage('Quantity must be a non-negative integer'),
   ],
   
