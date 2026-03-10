@@ -475,7 +475,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen>
   }
 
   void _showDeleteDialog(final ProductModel product) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Delete Product'),
