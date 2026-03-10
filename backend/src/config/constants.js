@@ -24,8 +24,8 @@ module.exports = {
   upload: {
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // 5MB
     allowedTypes: (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/png,image/webp').split(','),
-    productImagesPath: 'products',
-    profilePhotosPath: 'avatars',
+    productImagesPath: 'product-images',
+    profilePhotosPath: 'profile-photos',
     documentsPath: 'documents',
   },
 
