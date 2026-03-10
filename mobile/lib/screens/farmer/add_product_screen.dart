@@ -177,7 +177,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         _showError('Failed to save product');
       }
     } catch (e) {
-      _showError('An unexpected error occurred');
+      _showError('Error creating product: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

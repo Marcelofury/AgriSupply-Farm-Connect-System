@@ -138,6 +138,8 @@ class ProductService {
       final data = response['data'] ?? response;
       return ProductModel.fromJson(data as Map<String, dynamic>);
     } catch (e) {
+      // Log detailed error for debugging
+      print('Product creation error: $e');
       throw Exception('Failed to create product: $e');
     }
   }
