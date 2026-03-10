@@ -32,10 +32,35 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
 
   final List<String> _regions = ['Central', 'Eastern', 'Northern', 'Western'];
   final Map<String, List<String>> _districts = {
-    'Central': ['Kampala', 'Wakiso', 'Mukono', 'Mpigi', 'Luwero'],
-    'Eastern': ['Jinja', 'Mbale', 'Soroti', 'Tororo', 'Iganga'],
-    'Northern': ['Gulu', 'Lira', 'Arua', 'Kitgum', 'Apac'],
-    'Western': ['Mbarara', 'Kabale', 'Fort Portal', 'Masindi', 'Hoima'],
+    'Central': [
+      'Buikwe', 'Bukomansimbi', 'Butambala', 'Buvuma', 'Gomba', 'Kalangala', 
+      'Kalungi', 'Kampala', 'Kayunga', 'Kiboga', 'Kyankwanzi', 'Luwero', 
+      'Lwengo', 'Lyantonde', 'Masaka', 'Mityana', 'Mpigi', 'Mubende', 
+      'Mukono', 'Nakaseke', 'Nakasongola', 'Rakai', 'Sembabule', 'Wakiso'
+    ],
+    'Eastern': [
+      'Amuria', 'Budaka', 'Bududa', 'Bugiri', 'Bugweri', 'Bukwa', 'Bulambuli', 
+      'Busia', 'Butaleja', 'Butebo', 'Buyende', 'Iganga', 'Jinja', 'Kaberamaido', 
+      'Kalaki', 'Kaliro', 'Kamuli', 'Kapchorwa', 'Kapelebyong', 'Katakwi', 
+      'Kibuku', 'Kumi', 'Kween', 'Luuka', 'Manafwa', 'Mayuge', 'Mbale', 
+      'Namayingo', 'Namisindwa', 'Namutumba', 'Ngora', 'Pallisa', 'Serere', 
+      'Sironko', 'Soroti', 'Tororo'
+    ],
+    'Northern': [
+      'Abim', 'Adjumani', 'Agago', 'Alebtong', 'Amudat', 'Amuru', 'Apac', 
+      'Arua', 'Dokolo', 'Gulu', 'Kaabong', 'Kitgum', 'Koboko', 'Kole', 
+      'Kotido', 'Lamwo', 'Lira', 'Maracha', 'Moroto', 'Moyo', 'Nabilatuk', 
+      'Napak', 'Nebbi', 'Ngora', 'Nwoya', 'Obongi', 'Omoro', 'Otuke', 
+      'Oyam', 'Pader', 'Pakwach', 'Yumbe', 'Zombo'
+    ],
+    'Western': [
+      'Buhweju', 'Buliisa', 'Bundibugyo', 'Bunyangabu', 'Bushenyi', 'Butobo', 
+      'Hoima', 'Ibanda', 'Isingiro', 'Kabale', 'Kabarole', 'Kagadi', 'Kakumiro', 
+      'Kamwenge', 'Kanungu', 'Kasese', 'Kibaale', 'Kikuube', 'Kiruhura', 
+      'Kiryandongo', 'Kisoro', 'Kitagwenda', 'Kyegegwa', 'Kyenjojo', 'Masindi', 
+      'Mbarara', 'Mitooma', 'Ntoroko', 'Ntungamo', 'Rubanda', 'Rubirizi', 
+      'Rukiga', 'Rukungiri', 'Rwampara', 'Sheema'
+    ],
   };
 
   @override
