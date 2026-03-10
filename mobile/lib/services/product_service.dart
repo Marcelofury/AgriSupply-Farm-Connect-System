@@ -124,7 +124,7 @@ class ProductService {
       final fields = <String, String>{
         'name': product.name,
         'description': product.description,
-        'category': product.category,
+        'category': ProductCategory.toId(product.category), // Convert to backend ID
         'price': product.price.toString(),
         'unit': product.unit,
         'quantity': product.quantity.toString(),
