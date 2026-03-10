@@ -37,7 +37,6 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
 
   UserModel? _user;
 
-  final List<String> _regions = ['Central', 'Eastern', 'Northern', 'Western'];
   final Map<String, List<String>> _districts = {
     'Central': [
       'Buikwe', 'Bukomansimbi', 'Butambala', 'Buvuma', 'Gomba', 'Kalangala', 
@@ -87,9 +86,35 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
       _farmNameController.text = _user!.farmName ?? '';
       _farmDescriptionController.text = _user!.farmDescription ?? '';
       _addressController.text = _user!.address ?? '';
-      _selectedRegion = _user!.region ?? '';
-      _selectedDistrict = _user!.district ?? '';
+      
+      // Auto-detect region from district
+      if (_user!.district != null && _user!.district!.isNotEmpty) {
+        _selectedDistrict = _user!.district!;
+        _selectedRegion = _getRegionFromDistrict(_selectedDistrict);
+      } else if (_user!.region != null && _user!.region!.isNotEmpty) {
+        _selectedRegion = _user!.region!;
+      }
     }
+  }
+
+  // Get region from selected district
+  String _getRegionFromDistrict(final String district) {
+    for (final entry in _districts.entries) {
+      if (entry.value.contains(district)) {
+        return entry.key;
+      }
+    }
+    return 'Central'; // Default fallback
+  }
+
+  // Get all districts across all regions for flat list
+  List<String> _getAllDistricts() {
+    final allDistricts = <String>[];
+    for (final districts in _districts.values) {
+      allDistricts.addAll(districts);
+    }
+    allDistricts.sort();
+    return allDistricts;
   }
 
   @override
@@ -398,38 +423,77 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                   // Location
                   _buildSectionHeader('Location'),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildDropdown(
-                          label: 'Region',
-                          value: _selectedRegion.isEmpty ? null : _selectedRegion,
-                          items: _regions,
-                          enabled: _isEditing,
-                          onChanged: (final value) {
-                            setState(() {
-                              _selectedRegion = value ?? '';
-                              _selectedDistrict = '';
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildDropdown(
-                          label: 'District',
-                          value: _selectedDistrict.isEmpty
-                              ? null
-                              : _selectedDistrict,
-                          items: _districts[_selectedRegion] ?? [],
-                          enabled: _isEditing && _selectedRegion.isNotEmpty,
-                          onChanged: (final value) {
-                            setState(() => _selectedDistrict = value ?? '');
-                          },
-                        ),
-                      ),
-                    ],
+                  
+                  // District selection (auto-detects region)
+                  _buildDropdown(
+                    label: 'District',
+                    value: _selectedDistrict.isEmpty ? null : _selectedDistrict,
+                    items: _getAllDistricts(),
+                    enabled: _isEditing,
+                    onChanged: (final value) {
+                      setState(() {
+                        _selectedDistrict = value ?? '';
+                        // Auto-detect and update region
+                        if (value != null && value.isNotEmpty) {
+                          _selectedRegion = _getRegionFromDistrict(value);
+                        }
+                      });
+                    },
                   ),
+                  const SizedBox(height: 16),
+                  
+                  // Region (auto-filled, read-only)
+                  if (_selectedRegion.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.grey300),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.map_outlined, color: AppColors.grey600, size: 20),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Region (Auto-detected)',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.grey600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _selectedRegion,
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'Auto',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: 16),
                   CustomTextField(
                     controller: _addressController,
