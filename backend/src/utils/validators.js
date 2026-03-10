@@ -231,20 +231,33 @@ const orderValidators = {
     body('items.*.quantity')
       .isInt({ min: 1 })
       .withMessage('Quantity must be at least 1'),
-    body('shippingAddress')
-      .notEmpty()
-      .withMessage('Shipping address is required'),
+    // Accept both mobile (deliveryAddress string) and web (shippingAddress object) formats
+    body()
+      .custom((value) => {
+        if (!value.deliveryAddress && !value.shippingAddress) {
+          throw new Error('Either deliveryAddress or shippingAddress is required');
+        }
+        return true;
+      }),
+    body('deliveryAddress')
+      .optional()
+      .isString()
+      .isLength({ min: 5 })
+      .withMessage('Delivery address must be at least 5 characters'),
     body('shippingAddress.region')
+      .optional()
       .isIn(constants.uganda.regions)
       .withMessage('Invalid region'),
     body('shippingAddress.district')
-      .notEmpty()
-      .withMessage('District is required'),
+      .optional()
+      .isString()
+      .withMessage('District must be a string'),
     body('shippingAddress.address')
+      .optional()
       .isLength({ min: 5, max: 200 })
       .withMessage('Address must be between 5 and 200 characters'),
     body('paymentMethod')
-      .isIn(['mtn_mobile', 'airtel_money', 'card', 'cash_on_delivery'])
+      .isIn(['mtn_mobile', 'airtel_money', 'card', 'cash_on_delivery', 'marzpay'])
       .withMessage('Invalid payment method'),
   ],
   
