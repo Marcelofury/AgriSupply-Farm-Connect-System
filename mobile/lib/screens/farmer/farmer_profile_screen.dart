@@ -661,11 +661,15 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
             color: enabled ? AppColors.grey100 : AppColors.grey100,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: DropdownButton<String>(
+          child: DropdownButtonFormField<String>(
             value: value,
             hint: Text('Select $label'),
             isExpanded: true,
-            underline: const SizedBox.shrink(),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+            menuMaxHeight: 400, // Prevent overflow by limiting dropdown height
             items: items
                 .map((final item) => DropdownMenuItem(
                       value: item,

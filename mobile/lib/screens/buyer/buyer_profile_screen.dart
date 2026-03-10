@@ -514,10 +514,14 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
             color: AppColors.grey100,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: DropdownButton<String>(
+          child: DropdownButtonFormField<String>(
             value: value,
             isExpanded: true,
-            underline: const SizedBox.shrink(),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+            menuMaxHeight: 400, // Prevent overflow by limiting dropdown height
             items: items.map((final item) {
               return DropdownMenuItem(value: item, child: Text(item));
             }).toList(),
