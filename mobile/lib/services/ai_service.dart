@@ -71,7 +71,9 @@ class ChatSession {
 class AIService {
   final ApiService _apiService = ApiService();
 
-  // System prompt for farming assistant
+  // Note: System prompt is handled by the backend API
+  // Kept here for reference only
+  /*
   static const String _systemPrompt = '''
 You are AgriSupply AI, a helpful farming assistant for farmers in Uganda. 
 You provide advice on:
@@ -94,6 +96,7 @@ Be friendly, supportive, and encouraging to farmers.
 If asked about topics outside of farming and agriculture, politely redirect the 
 conversation back to farming-related topics.
 ''';
+  */
 
   // Send message and get AI response
   Future<String> sendMessage({
@@ -152,8 +155,8 @@ conversation back to farming-related topics.
       return {
         'crop_name': response['crop_name'],
         'health_status': response['health_status'],
-        'issues': response['issues'] ?? [],
-        'recommendations': response['recommendations'] ?? [],
+        'issues': response['issues'] ?? <dynamic>[],
+        'recommendations': response['recommendations'] ?? <dynamic>[],
         'confidence': response['confidence'] ?? 0.0,
       };
     } catch (e) {
