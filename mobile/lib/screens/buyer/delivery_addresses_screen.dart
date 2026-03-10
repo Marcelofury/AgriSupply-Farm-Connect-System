@@ -35,7 +35,6 @@ class DeliveryAddressesScreen extends StatefulWidget {
 
 class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
   final List<DeliveryAddress> _addresses = [];
-  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -356,7 +355,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
     var selectedRegion = 'Central';
     var selectedDistrict = 'Kampala';
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => StatefulBuilder(
         builder: (final context, final setState) => AlertDialog(
@@ -514,7 +513,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
     var selectedRegion = address.region;
     var selectedDistrict = address.district;
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => StatefulBuilder(
         builder: (final context, final setState) => AlertDialog(
@@ -671,7 +670,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
   }
 
   void _deleteAddress(final DeliveryAddress address) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Delete Address'),
