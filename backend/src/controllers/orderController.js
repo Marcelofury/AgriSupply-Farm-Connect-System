@@ -241,7 +241,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
   if (orderError) {
     logger.error('Create order error:', orderError);
-    throw new ApiError(400, 'Failed to create order');
+    throw new ApiError(400, `Failed to create order: ${orderError.message || JSON.stringify(orderError)}`);
   }
 
   // Create order items
@@ -260,7 +260,7 @@ const createOrder = asyncHandler(async (req, res) => {
     // Rollback order
     await supabase.from('orders').delete().eq('id', order.id);
     logger.error('Create order items error:', itemsError);
-    throw new ApiError(400, 'Failed to create order items');
+    throw new ApiError(400, `Failed to create order items: ${itemsError.message || JSON.stringify(itemsError)}`);
   }
 
   // Update product quantities
