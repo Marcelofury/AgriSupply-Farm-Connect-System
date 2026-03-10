@@ -150,7 +150,7 @@ module.exports = {
 
   // AI Configuration (Groq)
   ai: {
-    model: process.env.GROQ_MODEL || 'llama-3.1-70b-versatile',
+    model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
     visionModel: process.env.GROQ_VISION_MODEL || 'llama-3.2-90b-vision-preview',
     maxTokens: 1000,
     temperature: 0.7,
