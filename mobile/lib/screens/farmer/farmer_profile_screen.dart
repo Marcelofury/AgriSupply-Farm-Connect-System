@@ -229,7 +229,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
         ),
         body: Consumer<AuthProvider>(
           builder: (final context, final authProvider, final child) {
-            _user = authProvider.user;
+            final user = authProvider.user;
 
             return Form(
               key: _formKey,
@@ -245,14 +245,14 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                           backgroundColor: AppColors.grey200,
                           backgroundImage: _profileImage != null
                               ? FileImage(_profileImage!)
-                              : (_user?.photoUrl != null
-                                  ? NetworkImage(_user!.photoUrl!)
+                              : (user?.photoUrl != null
+                                  ? NetworkImage(user!.photoUrl!)
                                   : null) as ImageProvider?,
                           child: _profileImage == null &&
-                                  _user?.photoUrl == null
+                                  user?.photoUrl == null
                               ? Text(
-                                  _user?.fullName.isNotEmpty ?? false
-                                      ? _user!.fullName[0].toUpperCase()
+                                  user?.fullName.isNotEmpty ?? false
+                                      ? user!.fullName[0].toUpperCase()
                                       : 'F',
                                   style: const TextStyle(
                                     fontSize: 48,
@@ -288,7 +288,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      _user?.fullName ?? 'Farmer',
+                      user?.fullName ?? 'Farmer',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
@@ -415,13 +415,16 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                   const SizedBox(height: 32),
 
                   // Save Button
-                  if (_isEditing)
+                  if (_isEditing) ...[
                     CustomButton(
                       text: 'Save Changes',
                       onPressed: _saveProfile,
                     ),
+                    const SizedBox(height: 32),
+                  ],
 
                   if (!_isEditing) ...[
+                    const SizedBox(height: 16),
                     // Menu Items
                     _buildMenuItem(
                       icon: Icons.smart_toy,
