@@ -171,8 +171,8 @@ class AppRoutes {
     }
   }
 
-  static MaterialPageRoute _buildRoute(final Widget page, final RouteSettings settings) {
-    return MaterialPageRoute(
+  static MaterialPageRoute<dynamic> _buildRoute(final Widget page, final RouteSettings settings) {
+    return MaterialPageRoute<dynamic>(
       builder: (_) => page,
       settings: settings,
     );
