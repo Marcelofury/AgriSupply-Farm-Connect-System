@@ -517,19 +517,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
 
                   if (!_isEditing) ...[
                     const SizedBox(height: 16),
-                    // Menu Items
-                    _buildMenuItem(
-                      icon: Icons.smart_toy,
-                      title: 'AI Assistant',
-                      subtitle: 'Get farming advice and market insights',
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.aiAssistant),
-                    ),
-                    _buildMenuItem(
-                      icon: Icons.analytics,
-                      title: 'Analytics',
-                      subtitle: 'View your sales and performance data',
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.farmerAnalytics),
-                    ),
+                    // Account Actions
                     _buildMenuItem(
                       icon: Icons.notifications,
                       title: 'Notifications',
@@ -537,24 +525,10 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       onTap: () => Navigator.pushNamed(context, '/notifications'),
                     ),
                     _buildMenuItem(
-                      icon: Icons.help,
-                      title: 'Help & Support',
-                      subtitle: 'Get help with using the app',
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.helpSupport),
-                    ),
-                    _buildMenuItem(
                       icon: Icons.info,
                       title: 'About',
                       subtitle: 'Learn more about AgriSupply',
                       onTap: () {},
-                    ),
-                    const SizedBox(height: 16),
-                    _buildMenuItem(
-                      icon: Icons.logout,
-                      title: 'Logout',
-                      subtitle: 'Sign out of your account',
-                      isDestructive: true,
-                      onTap: _showLogoutDialog,
                     ),
                   ],
                   const SizedBox(height: 32),
