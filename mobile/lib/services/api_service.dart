@@ -145,7 +145,7 @@ class ApiService {
     final String? contentType,
   }) async {
     try {
-      final response = await _supabase.storage.from(bucket).uploadBinary(
+      await _supabase.storage.from(bucket).uploadBinary(
         path,
         fileBytes is Uint8List ? fileBytes : Uint8List.fromList(fileBytes),
         fileOptions: FileOptions(
@@ -274,9 +274,9 @@ class ApiService {
   // Subscribe to realtime changes
   RealtimeChannel subscribe(
     final String table, {
-    required final Function(Map<String, dynamic> payload) onInsert,
-    final Function(Map<String, dynamic> payload)? onUpdate,
-    final Function(Map<String, dynamic> payload)? onDelete,
+    required final void Function(Map<String, dynamic> payload) onInsert,
+    final void Function(Map<String, dynamic> payload)? onUpdate,
+    final void Function(Map<String, dynamic> payload)? onDelete,
   }) {
     return _supabase
         .channel('public:$table')
