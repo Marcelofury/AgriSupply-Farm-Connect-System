@@ -69,13 +69,13 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Create indexes for users
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_phone ON users(phone);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_users_region ON users(region);
-CREATE INDEX idx_users_is_verified ON users(is_verified);
-CREATE INDEX idx_users_is_premium ON users(is_premium);
-CREATE INDEX idx_users_full_name_trgm ON users USING gin(full_name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_region ON users(region);
+CREATE INDEX IF NOT EXISTS idx_users_is_verified ON users(is_verified);
+CREATE INDEX IF NOT EXISTS idx_users_is_premium ON users(is_premium);
+CREATE INDEX IF NOT EXISTS idx_users_full_name_trgm ON users USING gin(full_name gin_trgm_ops);
 
 -- ============================================
 -- 2. PRODUCTS TABLE
@@ -134,14 +134,14 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- Create indexes for products
-CREATE INDEX idx_products_farmer_id ON products(farmer_id);
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_status ON products(status);
-CREATE INDEX idx_products_price ON products(price);
-CREATE INDEX idx_products_is_featured ON products(is_featured);
-CREATE INDEX idx_products_rating ON products(rating);
-CREATE INDEX idx_products_name_trgm ON products USING gin(name gin_trgm_ops);
-CREATE INDEX idx_products_description_trgm ON products USING gin(description gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_products_farmer_id ON products(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+CREATE INDEX IF NOT EXISTS idx_products_price ON products(price);
+CREATE INDEX IF NOT EXISTS idx_products_is_featured ON products(is_featured);
+CREATE INDEX IF NOT EXISTS idx_products_rating ON products(rating);
+CREATE INDEX IF NOT EXISTS idx_products_name_trgm ON products USING gin(name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_products_description_trgm ON products USING gin(description gin_trgm_ops);
 
 -- ============================================
 -- 3. ORDERS TABLE
@@ -198,12 +198,12 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- Create indexes for orders
-CREATE INDEX idx_orders_order_number ON orders(order_number);
-CREATE INDEX idx_orders_buyer_id ON orders(buyer_id);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_orders_payment_status ON orders(payment_status);
-CREATE INDEX idx_orders_delivery_region ON orders(delivery_region);
-CREATE INDEX idx_orders_created_at ON orders(created_at);
+CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_buyer_id ON orders(buyer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_delivery_region ON orders(delivery_region);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 
 -- ============================================
 -- 4. ORDER ITEMS TABLE
@@ -229,9 +229,9 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 -- Create indexes for order items
-CREATE INDEX idx_order_items_order_id ON order_items(order_id);
-CREATE INDEX idx_order_items_product_id ON order_items(product_id);
-CREATE INDEX idx_order_items_farmer_id ON order_items(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_farmer_id ON order_items(farmer_id);
 
 -- ============================================
 -- 5. ORDER STATUS HISTORY
@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS order_status_history (
 );
 
 -- Create index
-CREATE INDEX idx_order_status_history_order_id ON order_status_history(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_status_history_order_id ON order_status_history(order_id);
 
 -- ============================================
 -- 6. PAYMENTS TABLE
@@ -287,10 +287,10 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 -- Create indexes for payments
-CREATE INDEX idx_payments_order_id ON payments(order_id);
-CREATE INDEX idx_payments_user_id ON payments(user_id);
-CREATE INDEX idx_payments_status ON payments(status);
-CREATE INDEX idx_payments_provider_reference ON payments(provider_reference);
+CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
+CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+CREATE INDEX IF NOT EXISTS idx_payments_provider_reference ON payments(provider_reference);
 
 -- ============================================
 -- 7. REFUNDS TABLE
@@ -315,9 +315,9 @@ CREATE TABLE IF NOT EXISTS refunds (
 );
 
 -- Create indexes
-CREATE INDEX idx_refunds_payment_id ON refunds(payment_id);
-CREATE INDEX idx_refunds_order_id ON refunds(order_id);
-CREATE INDEX idx_refunds_user_id ON refunds(user_id);
+CREATE INDEX IF NOT EXISTS idx_refunds_payment_id ON refunds(payment_id);
+CREATE INDEX IF NOT EXISTS idx_refunds_order_id ON refunds(order_id);
+CREATE INDEX IF NOT EXISTS idx_refunds_user_id ON refunds(user_id);
 
 -- ============================================
 -- 8. NOTIFICATIONS TABLE
@@ -338,10 +338,10 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- Create indexes
-CREATE INDEX idx_notifications_user_id ON notifications(user_id);
-CREATE INDEX idx_notifications_type ON notifications(type);
-CREATE INDEX idx_notifications_is_read ON notifications(is_read);
-CREATE INDEX idx_notifications_created_at ON notifications(created_at);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications(type);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);
 
 -- ============================================
 -- 9. NOTIFICATION PREFERENCES
@@ -366,7 +366,7 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
 );
 
 -- Create index
-CREATE INDEX idx_notification_preferences_user_id ON notification_preferences(user_id);
+CREATE INDEX IF NOT EXISTS idx_notification_preferences_user_id ON notification_preferences(user_id);
 
 -- ============================================
 -- 10. USER DEVICES (for Push Notifications)
@@ -386,8 +386,8 @@ CREATE TABLE IF NOT EXISTS user_devices (
 );
 
 -- Create indexes
-CREATE INDEX idx_user_devices_user_id ON user_devices(user_id);
-CREATE INDEX idx_user_devices_device_token ON user_devices(device_token);
+CREATE INDEX IF NOT EXISTS idx_user_devices_user_id ON user_devices(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_devices_device_token ON user_devices(device_token);
 
 -- ============================================
 -- 11. PRODUCT REVIEWS
@@ -414,9 +414,9 @@ CREATE TABLE IF NOT EXISTS product_reviews (
 );
 
 -- Create indexes
-CREATE INDEX idx_product_reviews_product_id ON product_reviews(product_id);
-CREATE INDEX idx_product_reviews_user_id ON product_reviews(user_id);
-CREATE INDEX idx_product_reviews_rating ON product_reviews(rating);
+CREATE INDEX IF NOT EXISTS idx_product_reviews_product_id ON product_reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_reviews_user_id ON product_reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_product_reviews_rating ON product_reviews(rating);
 
 -- ============================================
 -- 12. PRODUCT FAVORITES
@@ -431,8 +431,8 @@ CREATE TABLE IF NOT EXISTS product_favorites (
 );
 
 -- Create indexes
-CREATE INDEX idx_product_favorites_user_id ON product_favorites(user_id);
-CREATE INDEX idx_product_favorites_product_id ON product_favorites(product_id);
+CREATE INDEX IF NOT EXISTS idx_product_favorites_user_id ON product_favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_product_favorites_product_id ON product_favorites(product_id);
 
 -- ============================================
 -- 13. FARMER FOLLOWERS
@@ -447,8 +447,8 @@ CREATE TABLE IF NOT EXISTS farmer_followers (
 );
 
 -- Create indexes
-CREATE INDEX idx_farmer_followers_farmer_id ON farmer_followers(farmer_id);
-CREATE INDEX idx_farmer_followers_follower_id ON farmer_followers(follower_id);
+CREATE INDEX IF NOT EXISTS idx_farmer_followers_farmer_id ON farmer_followers(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_farmer_followers_follower_id ON farmer_followers(follower_id);
 
 -- ============================================
 -- 14. AI CHAT SESSIONS
@@ -465,7 +465,7 @@ CREATE TABLE IF NOT EXISTS ai_chat_sessions (
 );
 
 -- Create index
-CREATE INDEX idx_ai_chat_sessions_user_id ON ai_chat_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_chat_sessions_user_id ON ai_chat_sessions(user_id);
 
 -- ============================================
 -- 15. AI USAGE TRACKING
@@ -481,9 +481,9 @@ CREATE TABLE IF NOT EXISTS ai_usage (
 );
 
 -- Create indexes
-CREATE INDEX idx_ai_usage_user_id ON ai_usage(user_id);
-CREATE INDEX idx_ai_usage_feature ON ai_usage(feature);
-CREATE INDEX idx_ai_usage_created_at ON ai_usage(created_at);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_user_id ON ai_usage(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_feature ON ai_usage(feature);
+CREATE INDEX IF NOT EXISTS idx_ai_usage_created_at ON ai_usage(created_at);
 
 -- ============================================
 -- 16. CART ITEMS
@@ -501,8 +501,8 @@ CREATE TABLE IF NOT EXISTS cart_items (
 );
 
 -- Create indexes
-CREATE INDEX idx_cart_items_user_id ON cart_items(user_id);
-CREATE INDEX idx_cart_items_product_id ON cart_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_cart_items_user_id ON cart_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON cart_items(product_id);
 
 -- ============================================
 -- 17. SYSTEM SETTINGS
@@ -559,8 +559,8 @@ CREATE TABLE IF NOT EXISTS farmer_payouts (
 );
 
 -- Create indexes
-CREATE INDEX idx_farmer_payouts_farmer_id ON farmer_payouts(farmer_id);
-CREATE INDEX idx_farmer_payouts_status ON farmer_payouts(status);
+CREATE INDEX IF NOT EXISTS idx_farmer_payouts_farmer_id ON farmer_payouts(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_farmer_payouts_status ON farmer_payouts(status);
 
 -- ============================================
 -- FUNCTIONS & TRIGGERS
@@ -576,38 +576,47 @@ END;
 $$ language 'plpgsql';
 
 -- Apply updated_at trigger to tables
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_products_updated_at ON products;
 CREATE TRIGGER update_products_updated_at
     BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_orders_updated_at ON orders;
 CREATE TRIGGER update_orders_updated_at
     BEFORE UPDATE ON orders
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_payments_updated_at ON payments;
 CREATE TRIGGER update_payments_updated_at
     BEFORE UPDATE ON payments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_notification_preferences_updated_at ON notification_preferences;
 CREATE TRIGGER update_notification_preferences_updated_at
     BEFORE UPDATE ON notification_preferences
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_product_reviews_updated_at ON product_reviews;
 CREATE TRIGGER update_product_reviews_updated_at
     BEFORE UPDATE ON product_reviews
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_cart_items_updated_at ON cart_items;
 CREATE TRIGGER update_cart_items_updated_at
     BEFORE UPDATE ON cart_items
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_ai_chat_sessions_updated_at ON ai_chat_sessions;
 CREATE TRIGGER update_ai_chat_sessions_updated_at
     BEFORE UPDATE ON ai_chat_sessions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_system_settings_updated_at ON system_settings;
 CREATE TRIGGER update_system_settings_updated_at
     BEFORE UPDATE ON system_settings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -625,6 +634,7 @@ BEGIN
         ),
         total_reviews = (
             SELECT COUNT(*)
+DROP TRIGGER IF EXISTS update_product_rating_on_review ON product_reviews;
             FROM product_reviews
             WHERE product_id = COALESCE(NEW.product_id, OLD.product_id)
             AND is_visible = TRUE
@@ -643,6 +653,7 @@ CREATE OR REPLACE FUNCTION update_followers_count()
 RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
+DROP TRIGGER IF EXISTS update_followers_count_trigger ON farmer_followers;
         UPDATE users SET followers_count = followers_count + 1 WHERE id = NEW.farmer_id;
         UPDATE users SET following_count = following_count + 1 WHERE id = NEW.follower_id;
     ELSIF TG_OP = 'DELETE' THEN
@@ -720,21 +731,12 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
-ALTER TABLE product_reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE product_favorites ENABLE ROW LEVEL SECURITY;
-ALTER TABLE farmer_followers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_chat_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_usage ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cart_items ENABLE ROW LEVEL SECURITY;
-
--- Users policies
+DROP POLICY IF EXISTS "Users can view public profiles" ON users;
 CREATE POLICY "Users can view public profiles"
     ON users FOR SELECT
     USING (is_deleted = FALSE AND is_suspended = FALSE);
 
+DROP POLICY IF EXISTS "Users can insert own profile during signup" ON users;
 CREATE POLICY "Users can insert own profile during signup"
     ON users FOR INSERT
     WITH CHECK (
@@ -742,28 +744,47 @@ CREATE POLICY "Users can insert own profile during signup"
         auth.role() = 'service_role'
     );
 
+DROP POLICY IF EXISTS "Users can update own profile" ON users;
 CREATE POLICY "Users can update own profile"
     ON users FOR UPDATE
     USING (auth.uid() = id);
 
 -- Products policies
+DROP POLICY IF EXISTS "Anyone can view active products" ON products;
 CREATE POLICY "Anyone can view active products"
     ON products FOR SELECT
     USING (status = 'active');
 
+DROP POLICY IF EXISTS "Farmers can manage own products" ON products;
 CREATE POLICY "Farmers can manage own products"
     ON products FOR ALL
     USING (auth.uid() = farmer_id);
 
 -- Orders policies
+DROP POLICY IF EXISTS "Users can view own orders" ON orders;
 CREATE POLICY "Users can view own orders"
     ON orders FOR SELECT
     USING (auth.uid() = buyer_id);
 
+DROP POLICY IF EXISTS "Farmers can view orders with their products" ON order_items;
 CREATE POLICY "Farmers can view orders with their products"
     ON order_items FOR SELECT
     USING (auth.uid() = farmer_id);
 
+-- Notifications policies
+DROP POLICY IF EXISTS "Users can manage own notifications" ON notifications;
+CREATE POLICY "Users can manage own notifications"
+    ON notifications FOR ALL
+    USING (auth.uid() = user_id);
+
+-- Cart policies
+DROP POLICY IF EXISTS "Users can manage own cart" ON cart_items;
+CREATE POLICY "Users can manage own cart"
+    ON cart_items FOR ALL
+    USING (auth.uid() = user_id);
+
+-- AI Chat policies
+DROP POLICY IF EXISTS "Users can manage own AI sessions" ON ai_chat_sessions;
 -- Notifications policies
 CREATE POLICY "Users can manage own notifications"
     ON notifications FOR ALL
