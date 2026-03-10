@@ -71,7 +71,7 @@ class StorageService {
   }) async {
     return uploadMultipleImages(
       imageFiles: imageFiles,
-      bucket: 'products',
+      bucket: 'product-images',
       path: productId,
     );
   }
