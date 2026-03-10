@@ -272,12 +272,12 @@ const createProduct = asyncHandler(async (req, res) => {
   // Process uploaded images
   const images = [];
   if (req.files && req.files.length > 0) {
-    const processedFiles = processFiles(req.files, 'products');
+    const processedFiles = processFiles(req.files, 'product-images');
     
     for (const file of processedFiles) {
       const uploadResult = await uploadFile(
         file.buffer,
-        'products',
+        'product-images',
         file.filePath,
         file.contentType
       );
@@ -291,7 +291,6 @@ const createProduct = asyncHandler(async (req, res) => {
   const productData = {
     farmer_id: farmerId,
     name,
-    slug: slugify(name),
     description,
     category,
     price: parseFloat(price),
@@ -299,7 +298,6 @@ const createProduct = asyncHandler(async (req, res) => {
     quantity_available: parseInt(quantity),
     is_organic: isOrganic === 'true',
     images,
-    region: req.user.region,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -426,12 +424,12 @@ const addImages = asyncHandler(async (req, res) => {
 
   // Process and upload new images
   const newImages = [];
-  const processedFiles = processFiles(req.files, 'products');
+  const processedFiles = processFiles(req.files, 'product-images');
   
   for (const file of processedFiles) {
     const uploadResult = await uploadFile(
       file.buffer,
-      'products',
+      'product-images',
       file.filePath,
       file.contentType
     );
