@@ -248,7 +248,7 @@ class AuthService {
 
       // Wait a moment for the trigger to create the profile
       print('[AuthService] Waiting for trigger to create profile...');
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
 
       // Try to get the profile - if it fails, the trigger didn't work
       print('[AuthService] Attempting to fetch user profile...');
@@ -546,7 +546,7 @@ class AuthService {
       await _apiService.deleteRecord('users', userId);
       
       // Delete auth user (requires admin privileges or RPC call)
-      await _supabase.rpc('delete_user', params: {'user_id': userId});
+      await _supabase.rpc<void>('delete_user', params: {'user_id': userId});
       
       await signOut();
     } catch (e) {
