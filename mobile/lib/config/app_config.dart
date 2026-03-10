@@ -16,9 +16,7 @@ class AppConfig {
   static const String mobileMoneyApiUrl = 'YOUR_MOBILE_MONEY_API_URL';
   static const String mobileMoneyApiKey = 'YOUR_MOBILE_MONEY_API_KEY';
 
-  // AI Service Configuration
-  static const String aiServiceUrl = 'YOUR_AI_SERVICE_URL';
-  static const String aiServiceKey = 'YOUR_AI_SERVICE_KEY';
+  // Note: AI Chat uses the main API endpoint (apiBaseUrl/ai/chat) - no separate config needed
 
   // Default pagination
   static const int defaultPageSize = 20;
