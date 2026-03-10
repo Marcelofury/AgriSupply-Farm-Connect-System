@@ -4,6 +4,7 @@ const productController = require('../controllers/productController');
 const { authenticate, optionalAuth, requireFarmer } = require('../middleware/authMiddleware');
 const { handleValidation } = require('../middleware/errorMiddleware');
 const { uploadMultiple } = require('../middleware/uploadMiddleware');
+const { optionalUploadMultiple } = require('../middleware/optionalUploadMiddleware');
 const { productValidators } = require('../utils/validators');
 
 /**
@@ -69,7 +70,7 @@ router.post(
   '/',
   authenticate,
   requireFarmer,
-  uploadMultiple('images', 5),
+  optionalUploadMultiple('images', 5), // Now accepts both JSON and multipart
   productValidators.create,
   handleValidation,
   productController.createProduct
