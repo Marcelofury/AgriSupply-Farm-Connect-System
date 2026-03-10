@@ -688,7 +688,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
       if (paymentMethod != null && mounted) {
         // Process payment
-        await Future.delayed(const Duration(seconds: 2));
+        await Future<void>.delayed(const Duration(seconds: 2));
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
