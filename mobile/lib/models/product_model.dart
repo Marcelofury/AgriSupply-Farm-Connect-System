@@ -28,7 +28,7 @@ class ProductModel {
       farmerRating: (json['farmer_rating'] as num?)?.toDouble() ?? 0.0,
       name: json['name'] as String,
       description: json['description'] as String,
-      category: json['category'] as String,
+      category: ProductCategory.fromId(json['category'] as String), // Convert from backend ID
       price: (json['price'] as num).toDouble(),
       unit: json['unit'] as String,
       quantity: (json['quantity'] as num).toDouble(),
@@ -111,7 +111,7 @@ class ProductModel {
       'farmer_rating': farmerRating,
       'name': name,
       'description': description,
-      'category': category,
+      'category': ProductCategory.toId(category), // Convert to backend ID
       'price': price,
       'unit': unit,
       'quantity': quantity,
@@ -234,6 +234,72 @@ class ProductCategory {
     beverages,
     other,
   ];
+
+  // Convert display name to backend ID
+  static String toId(final String displayName) {
+    switch (displayName) {
+      case vegetables:
+        return 'vegetables';
+      case fruits:
+        return 'fruits';
+      case grains:
+        return 'grains';
+      case legumes:
+        return 'legumes';
+      case tubers:
+        return 'tubers';
+      case dairy:
+        return 'dairy';
+      case poultry:
+        return 'meat'; // Backend combines meat & poultry
+      case meat:
+        return 'meat';
+      case fish:
+        return 'fish';
+      case herbs:
+        return 'spices'; // Backend uses 'spices' for herbs & spices
+      case nuts:
+        return 'other'; // Backend doesn't have nuts category
+      case honey:
+        return 'other'; // Backend doesn't have honey category
+      case beverages:
+        return 'coffee'; // Backend uses 'coffee' for beverages
+      case other:
+        return 'other';
+      default:
+        return 'other';
+    }
+  }
+
+  // Convert backend ID to display name
+  static String fromId(final String id) {
+    switch (id) {
+      case 'vegetables':
+        return vegetables;
+      case 'fruits':
+        return fruits;
+      case 'grains':
+        return grains;
+      case 'legumes':
+        return legumes;
+      case 'tubers':
+        return tubers;
+      case 'dairy':
+        return dairy;
+      case 'meat':
+        return meat;
+      case 'fish':
+        return fish;
+      case 'spices':
+        return herbs;
+      case 'coffee':
+        return beverages;
+      case 'other':
+        return other;
+      default:
+        return other;
+    }
+  }
 
   static String getIcon(final String category) {
     switch (category) {
