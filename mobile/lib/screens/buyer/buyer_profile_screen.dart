@@ -30,7 +30,6 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
   bool _isLoading = false;
   bool _isEditing = false;
 
-  final List<String> _regions = ['Central', 'Eastern', 'Northern', 'Western'];
   final Map<String, List<String>> _districts = {
     'Central': [
       'Buikwe', 'Bukomansimbi', 'Butambala', 'Buvuma', 'Gomba', 'Kalangala', 
@@ -77,9 +76,34 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
       _emailController.text = user.email;
       _phoneController.text = user.phone ?? '';
       _addressController.text = user.address ?? '';
-      if (user.region != null) _selectedRegion = user.region!;
-      if (user.district != null) _selectedDistrict = user.district!;
+      if (user.district != null) {
+        _selectedDistrict = user.district!;
+        // Auto-detect region from district
+        _selectedRegion = _getRegionFromDistrict(_selectedDistrict);
+      } else if (user.region != null) {
+        _selectedRegion = user.region!;
+      }
     }
+  }
+
+  // Get region from selected district
+  String _getRegionFromDistrict(final String district) {
+    for (final entry in _districts.entries) {
+      if (entry.value.contains(district)) {
+        return entry.key;
+      }
+    }
+    return 'Central'; // Default fallback
+  }
+
+  // Get all districts across all regions for flat list
+  List<String> _getAllDistricts() {
+    final allDistricts = <String>[];
+    for (final districts in _districts.values) {
+      allDistricts.addAll(districts);
+    }
+    allDistricts.sort();
+    return allDistricts;
   }
 
   @override
@@ -351,33 +375,71 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
                 const SizedBox(height: 16),
 
                 if (_isEditing) ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildDropdown(
-                          label: 'Region',
-                          value: _selectedRegion,
-                          items: _regions,
-                          onChanged: (final value) {
-                            setState(() {
-                              _selectedRegion = value!;
-                              _selectedDistrict = _districts[value]!.first;
-                            });
-                          },
+                  // District selection (auto-detects region)
+                  _buildDropdown(
+                    label: 'District',
+                    value: _selectedDistrict,
+                    items: _getAllDistricts(),
+                    onChanged: (final value) {
+                      setState(() {
+                        _selectedDistrict = value!;
+                        // Auto-detect and update region
+                        _selectedRegion = _getRegionFromDistrict(value);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Region (auto-filled, read-only)
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.grey300),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.map_outlined, color: AppColors.grey600, size: 20),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Region (Auto-detected)',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppColors.grey600,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _selectedRegion,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildDropdown(
-                          label: 'District',
-                          value: _selectedDistrict,
-                          items: _districts[_selectedRegion]!,
-                          onChanged: (final value) {
-                            setState(() => _selectedDistrict = value!);
-                          },
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGreen.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'Auto',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 32),
 
