@@ -484,6 +484,122 @@ const getStatistics = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * @desc    Get farmer analytics
+ * @route   GET /api/v1/users/farmers/:id/analytics
+ */
+const getFarmerAnalytics = asyncHandler(async (req, res) => {
+  const { id: farmerId } = req.params;
+  const { period = '7days' } = req.query;
+
+  // Calculate date range based on period
+  const now = new Date();
+  let startDate = new Date();
+  
+  switch (period) {
+    case '7days':
+      startDate.setDate(now.getDate() - 7);
+      break;
+    case '30days':
+      startDate.setDate(now.getDate() - 30);
+      break;
+    case '90days':
+      startDate.setDate(now.getDate() - 90);
+      break;
+    case 'year':
+      startDate.setFullYear(now.getFullYear() - 1);
+      break;
+    default:
+      startDate.setDate(now.getDate() - 7);
+  }
+
+  // Get total products
+  const { count: totalProducts } = await supabase
+    .from('products')
+    .select('*', { count: 'exact', head: true })
+    .eq('farmer_id', farmerId)
+    .eq('is_active', true);
+
+  // Get orders statistics
+  const { data: orders } = await supabase
+    .from('orders')
+    .select('id, total, status, created_at')
+    .contains('items', [{ farmer_id: farmerId }])
+    .gte('created_at', startDate.toISOString());
+
+  const activeOrders = orders?.filter(o => ['pending', 'confirmed', 'processing'].includes(o.status)).length || 0;
+  const completedOrders = orders?.filter(o => o.status === 'delivered').length || 0;
+  const totalRevenue = orders?.filter(o => o.status === 'delivered')
+    .reduce((sum, o) => sum + parseFloat(o.total || 0), 0) || 0;
+
+  // Get product reviews
+  const { data: reviews } = await supabase
+    .from('product_reviews')
+    .select('rating, products!inner(farmer_id)')
+    .eq('products.farmer_id', farmerId);
+
+  const averageRating = reviews && reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : 0;
+
+  // Get top products
+  const { data: topProducts } = await supabase
+    .from('products')
+    .select('id, name, images, price, sold_count')
+    .eq('farmer_id', farmerId)
+    .eq('is_active', true)
+    .order('sold_count', { ascending: false })
+    .limit(5);
+
+  // Get recent orders
+  const { data: recentOrders } = await supabase
+    .from('orders')
+    .select('id, order_number, buyer:buyer_id(full_name), total, status, created_at')
+    .contains('items', [{ farmer_id: farmerId }])
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  // Generate sales data for chart
+  const salesData = {};
+  const daysToShow = period === 'year' ? 12 : (period === '90days' ? 12 : 7);
+  for (let i = 0; i < daysToShow; i++) {
+    const date = new Date(now);
+    if (period === 'year') {
+      date.setMonth(date.getMonth() - i);
+      const key = date.toLocaleDateString('en-US', { month: 'short' });
+      salesData[key] = 0;
+    } else {
+      date.setDate(date.getDate() - i);
+      const key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      salesData[key] = 0;
+    }
+  }
+
+  res.json({
+    success: true,
+    total_products: totalProducts || 0,
+    active_orders: activeOrders,
+    completed_orders: completedOrders,
+    total_revenue: totalRevenue,
+    average_rating: averageRating,
+    total_reviews: reviews?.length || 0,
+    top_products: topProducts?.map(p => ({
+      name: p.name,
+      sold: p.sold_count || 0,
+      revenue: (p.sold_count || 0) * parseFloat(p.price || 0),
+      image: p.images?.[0] || null,
+    })) || [],
+    recent_orders: recentOrders?.map(o => ({
+      order_number: o.order_number,
+      buyer_name: o.buyer?.full_name || 'Customer',
+      total: parseFloat(o.total || 0),
+      status: o.status,
+      date: o.created_at,
+    })) || [],
+    sales_data: salesData,
+  });
+});
+
 module.exports = {
   getProfile,
   updateProfile,
@@ -497,4 +613,5 @@ module.exports = {
   getFollowing,
   getFollowers,
   getStatistics,
+  getFarmerAnalytics,
 };
