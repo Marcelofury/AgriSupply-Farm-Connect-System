@@ -424,30 +424,6 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                   if (!_isEditing) ...[
                     // Menu Items
                     _buildMenuItem(
-                      icon: Icons.workspace_premium,
-                      title: 'Upgrade to Premium',
-                      subtitle: 'Get more features and priority listing',
-                      onTap: () => Navigator.pushNamed(context, '/premium'),
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.secondaryOrange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'PRO',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    _buildMenuItem(
                       icon: Icons.smart_toy,
                       title: 'AI Assistant',
                       subtitle: 'Get farming advice and market insights',

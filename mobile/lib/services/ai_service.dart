@@ -127,7 +127,12 @@ conversation back to farming-related topics.
         'message': message,
       });
 
-      return (response['response'] ?? response['message'] ?? response['content'] ?? "I apologize, but I couldn't generate a response. Please try again.") as String;
+      // Backend returns: { success: true, data: { message: "...", sessionId: "..." } }
+      if (response['data'] != null && response['data']['message'] != null) {
+        return response['data']['message'] as String;
+      }
+      
+      return response['message'] as String? ?? "I apologize, but I couldn't generate a response. Please try again.";
     } catch (e) {
       throw Exception('Failed to get AI response: $e');
     }
