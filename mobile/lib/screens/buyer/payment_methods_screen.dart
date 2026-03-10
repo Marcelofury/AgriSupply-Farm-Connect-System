@@ -68,7 +68,6 @@ class PaymentMethodsScreen extends StatefulWidget {
 
 class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   final List<PaymentMethodItem> _paymentMethods = [];
-  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -284,7 +283,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   }
 
   void _showAddPaymentMethodDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Add Payment Method'),
@@ -376,7 +375,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     final phoneController = TextEditingController();
     final nameController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: Text('Add ${provider == 'mtn' ? 'MTN' : 'Airtel'} Mobile Money'),
@@ -442,7 +441,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     final expiryController = TextEditingController();
     final cvvController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Add Card'),
@@ -555,7 +554,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   }
 
   void _deletePaymentMethod(final PaymentMethodItem method) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
         title: const Text('Remove Payment Method'),
