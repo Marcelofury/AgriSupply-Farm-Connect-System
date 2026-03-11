@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> •
-  <a href="#screenshots">Screenshots</a> •
+  <a href="#features">Features </a> •
+  <a href="#screenshots">Screenshots --coming soon</a> •
   <a href="#tech-stack">Tech Stack</a> •
   <a href="#getting-started">Getting Started</a> •
   <a href="#documentation">Documentation</a>
@@ -18,20 +18,20 @@
 
 ---
 
-## 📱 About
+##  About
 
 AgriSupply is a comprehensive digital agriculture marketplace designed specifically for Uganda. It connects farmers directly with buyers, eliminating middlemen and ensuring fair prices for both parties.
 
-### 🎯 Mission
+###  Mission
 To empower Ugandan farmers with technology that increases their income, reduces post-harvest losses, and provides access to a wider market.
 
-### 🌍 Impact
+### Targetted Impact
 - **5,000+** Registered Farmers
 - **20,000+** Active Buyers
 - **UGX 2B+** Monthly Transactions
 - **4 Regions** Covered Across Uganda
 
-## ✨ Features
+##  Features
 
 ### For Farmers 👨‍🌾
 - **Easy Product Listing** - List products with photos, descriptions, and pricing
@@ -44,7 +44,8 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 ### For Buyers 🛒
 - **Browse Products** - Explore fresh produce from verified farmers
 - **Search & Filter** - Find exactly what you need by category, region, or price
-- **Secure Payments** - Pay via MTN/Airtel Mobile Money or Card
+- **Secure Payments** - Pay via MTN/Airtel Mobile Money
+- 
 - **Order Tracking** - Track your order from farm to delivery
 - **Reviews & Ratings** - Make informed decisions with community reviews
 - **Favorites** - Save products and follow favorite farmers
@@ -79,10 +80,10 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 ### Mobile App (Flutter)
 - **Framework:** Flutter 3.16+
 - **State Management:** Provider
-- **Backend:** Supabase
+- **Backend:** supabse
 - **Maps:** Google Maps Flutter
-- **Payments:** MTN MoMo, Airtel Money, Flutterwave
-- **AI:** Groq Llama 3.1 70B
+- **Payments:** MTN MoMo, Airtel Money, MarzPay
+- **AI:** Groq Llama 3.3 70B
 - **Push Notifications:** Firebase Cloud Messaging
 
 ### Backend API (Node.js)
@@ -96,7 +97,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 
 ### Infrastructure
 - **Database:** Supabase (PostgreSQL)
-- **Hosting:** Railway / Render
+- **Hosting:**  Render
 - **CDN:** Supabase Storage
 - **Monitoring:** Sentry
 - **Analytics:** Mixpanel
@@ -249,10 +250,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- **Email:** support@agrisupply.ug
-- **Phone:** +256 700 000 000
-- **WhatsApp:** +256 700 000 000
-- **Twitter:** [@AgriSupplyUG](https://twitter.com/AgriSupplyUG)
+- **Email:** 
+- **Phone:** 
+- **WhatsApp:** 
+- **Twitter:**
 
 ## 🙏 Acknowledgments
 
@@ -263,12 +264,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<p align="center">
-  Made with ❤️ in Uganda 🇺🇬
-</p>
+
 
 <p align="center">
   <a href="https://agrisupply.ug">Website</a> •
-  <a href="https://play.google.com/store/apps/details?id=ug.agrisupply.app">Play Store</a> •
-  <a href="https://apps.apple.com/app/agrisupply">App Store</a>
+  <a href="https://play.google.com/store/apps/details?id=ug.agrisupply.app">Play Store ---pending </a> •
+  <a href="https://apps.apple.com/app/agrisupply">App Store--- Pending</a>
 </p>
