@@ -504,7 +504,7 @@ class AuthService {
       if (farmName != null) updates['farmName'] = farmName;
       if (region != null) updates['region'] = region;
       if (district != null) updates['district'] = district;
-      if (address != null) updates['address'] = address;
+      if (address != null) updates['addressLine'] = address;
       if (bio != null) updates['bio'] = bio;
 
       final response = await _apiService.put('/users/profile', body: updates);

@@ -32,6 +32,8 @@ const updateProfile = asyncHandler(async (req, res) => {
     farmDescription,
     farm_description,
     address,
+    addressLine,
+    address_line,
     photoUrl,
     photo_url,
   } = req.body;
@@ -44,6 +46,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   const resolvedFullName = fullName ?? full_name;
   const resolvedFarmName = farmName ?? farm_name;
   const resolvedFarmDescription = farmDescription ?? farm_description;
+  const resolvedAddressLine = addressLine ?? address_line ?? address;
   const resolvedPhotoUrl = photoUrl ?? photo_url;
 
   if (resolvedFullName !== undefined) updates.full_name = resolvedFullName;
@@ -52,8 +55,8 @@ const updateProfile = asyncHandler(async (req, res) => {
   if (district !== undefined) updates.district = district;
   if (bio !== undefined) updates.bio = bio;
   if (resolvedFarmName !== undefined) updates.farm_name = resolvedFarmName;
-  if (resolvedFarmDescription !== undefined) updates.farm_description = resolvedFarmDescription;
-  if (address !== undefined) updates.address = address;
+  if (resolvedFarmDescription !== undefined && bio === undefined) updates.bio = resolvedFarmDescription;
+  if (resolvedAddressLine !== undefined) updates.address_line = resolvedAddressLine;
   if (resolvedPhotoUrl !== undefined) updates.photo_url = resolvedPhotoUrl;
 
   const { data, error } = await supabase

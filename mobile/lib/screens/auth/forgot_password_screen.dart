@@ -16,35 +16,91 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _otpController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
-  bool _emailSent = false;
+  bool _otpSent = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
+    _otpController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleResetPassword() async {
+  Future<void> _handleSendOtp() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final result = await authProvider.resetPassword(
-        email: _emailController.text.trim(),
+      final result = await authProvider.signInWithPhone(
+        phone: _phoneController.text.trim(),
       );
 
       if (!mounted) return;
 
       if (result) {
-        setState(() => _emailSent = true);
+        setState(() => _otpSent = true);
       } else {
-        _showError('Failed to send reset email. Please try again.');
+        _showError(authProvider.errorMessage ?? 'Failed to send OTP. Please try again.');
       }
     } catch (e) {
+      _showError('An unexpected error occurred');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleResetWithOtp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+      final otpVerified = await authProvider.verifyOtp(
+        phone: _phoneController.text.trim(),
+        otp: _otpController.text.trim(),
+      );
+
+      if (!otpVerified) {
+        if (mounted) {
+          _showError(authProvider.errorMessage ?? 'Invalid OTP code');
+        }
+        return;
+      }
+
+      final passwordUpdated = await authProvider.updatePassword(
+        newPassword: _passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      if (passwordUpdated) {
+        await authProvider.signOut();
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password reset successful. Please sign in.'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        _showError(authProvider.errorMessage ?? 'Failed to update password');
+      }
+    } catch (_) {
       _showError('An unexpected error occurred');
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -77,7 +133,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-            child: _emailSent ? _buildSuccessView() : _buildFormView(),
+            child: _buildFormView(),
           ),
         ),
       ),
@@ -114,7 +170,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Don't worry! Enter your email address and we'll send you a link to reset your password.",
+            _otpSent
+                ? 'Enter the OTP sent to your phone, then set a new password.'
+                : 'Use your phone number to receive an OTP and reset your password.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.grey600,
                 ),
@@ -122,78 +180,121 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
           const SizedBox(height: 48),
           CustomTextField(
-            controller: _emailController,
-            label: 'Email Address',
-            hint: 'Enter your email',
-            keyboardType: TextInputType.emailAddress,
-            prefixIcon: Icons.email_outlined,
+            controller: _phoneController,
+            label: 'Phone Number',
+            hint: '07XXXXXXXX',
+            keyboardType: TextInputType.phone,
+            prefixIcon: Icons.phone_outlined,
+            enabled: !_otpSent,
             validator: (final value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your email';
+                return 'Please enter your phone number';
               }
-              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                return 'Please enter a valid email';
+              if (!RegExp(r'^(\+256|0)?[7][0-9]{8}$').hasMatch(value.trim())) {
+                return 'Please enter a valid Ugandan phone number';
               }
               return null;
             },
           ),
+          if (_otpSent) ...[
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: _otpController,
+              label: 'OTP Code',
+              hint: '6-digit code',
+              keyboardType: TextInputType.number,
+              prefixIcon: Icons.password,
+              validator: (final value) {
+                if (!_otpSent) return null;
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter the OTP code';
+                }
+                if (!RegExp(r'^\d{6}$').hasMatch(value.trim())) {
+                  return 'OTP must be 6 digits';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: _passwordController,
+              label: 'New Password',
+              hint: 'Enter new password',
+              prefixIcon: Icons.lock_outline,
+              obscureText: _obscurePassword,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  color: AppColors.grey500,
+                ),
+                onPressed: () {
+                  setState(() => _obscurePassword = !_obscurePassword);
+                },
+              ),
+              validator: (final value) {
+                if (!_otpSent) return null;
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a new password';
+                }
+                if (value.length < 8) {
+                  return 'Password must be at least 8 characters';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: _confirmPasswordController,
+              label: 'Confirm Password',
+              hint: 'Re-enter new password',
+              prefixIcon: Icons.lock,
+              obscureText: _obscureConfirmPassword,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureConfirmPassword
+                      ? Icons.visibility
+                      : Icons.visibility_off,
+                  color: AppColors.grey500,
+                ),
+                onPressed: () {
+                  setState(
+                    () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                  );
+                },
+              ),
+              validator: (final value) {
+                if (!_otpSent) return null;
+                if (value == null || value.isEmpty) {
+                  return 'Please confirm your new password';
+                }
+                if (value != _passwordController.text) {
+                  return 'Passwords do not match';
+                }
+                return null;
+              },
+            ),
+          ],
           const SizedBox(height: 32),
           CustomButton(
-            text: 'Send Reset Link',
-            onPressed: _handleResetPassword,
+            text: _otpSent ? 'Reset Password' : 'Send OTP',
+            onPressed: _otpSent ? _handleResetWithOtp : _handleSendOtp,
           ),
+          if (_otpSent) ...[
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _otpSent = false;
+                  _otpController.clear();
+                  _passwordController.clear();
+                  _confirmPasswordController.clear();
+                });
+              },
+              child: const Text('Use another phone number'),
+            ),
+          ],
         ],
       ),
-    );
-  }
-
-  Widget _buildSuccessView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 40),
-        Center(
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              Icons.mark_email_read,
-              size: 40,
-              color: AppColors.success,
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          'Check Your Email',
-          style: Theme.of(context).textTheme.displaySmall,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'We have sent a password reset link to\n${_emailController.text}',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.grey600,
-              ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 48),
-        CustomButton(
-          text: 'Back to Login',
-          onPressed: () => Navigator.pop(context),
-        ),
-        const SizedBox(height: 16),
-        TextButton(
-          onPressed: () {
-            setState(() => _emailSent = false);
-          },
-          child: const Text('Try another email'),
-        ),
-      ],
     );
   }
 }
