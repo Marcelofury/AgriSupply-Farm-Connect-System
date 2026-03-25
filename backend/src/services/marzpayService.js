@@ -462,6 +462,40 @@ const getProvider = (phone) => {
   return 'UNKNOWN';
 };
 
+/**
+ * Validate mobile number for MarzPay usage.
+ * Performs local validation so payment flows do not fail when explicit
+ * network validation is unavailable.
+ * @param {string} phone - Phone number in any supported local format
+ */
+const validateMobileNumber = async (phone) => {
+  const formattedPhone = formatPhoneNumber(phone);
+
+  if (!formattedPhone) {
+    return {
+      valid: false,
+      provider: null,
+      message: 'Invalid phone number format. Use +256... or 0...',
+    };
+  }
+
+  const provider = getProvider(formattedPhone);
+  if (provider === 'UNKNOWN' || !provider) {
+    return {
+      valid: false,
+      provider,
+      message: 'Unsupported network. Use MTN (77/78/76) or Airtel (70/75/74).',
+    };
+  }
+
+  return {
+    valid: true,
+    provider,
+    customerName: null,
+    message: 'Phone number is valid for mobile money payments',
+  };
+};
+
 module.exports = {
   collectMoney,
   sendMoney,
@@ -472,6 +506,7 @@ module.exports = {
   getTransactionHistory,
   getCollectionServices,
   getSendMoneyServices,
+  validateMobileNumber,
   formatPhoneNumber,
   getProvider,
 };

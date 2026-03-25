@@ -525,6 +525,12 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                       onTap: () => Navigator.pushNamed(context, '/notifications'),
                     ),
                     _buildMenuItem(
+                      icon: Icons.analytics_outlined,
+                      title: 'Analytics',
+                      subtitle: 'View your farm performance and insights',
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.farmerAnalytics),
+                    ),
+                    _buildMenuItem(
                       icon: Icons.info,
                       title: 'About',
                       subtitle: 'Learn more about AgriSupply',

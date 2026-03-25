@@ -126,9 +126,9 @@ const initiateMarzPayPayment = async (order, phone, transactionRef) => {
     const result = await marzpayService.collectMoney({
       reference: transactionRef,
       phoneNumber: formattedPhone,
-      currency: 'UGX',
+      country: 'UG',
       amount: order.total,
-      reason: `AgriSupply Order #${order.order_number}`,
+      description: `AgriSupply Order #${order.order_number}`,
     });
 
     return {
