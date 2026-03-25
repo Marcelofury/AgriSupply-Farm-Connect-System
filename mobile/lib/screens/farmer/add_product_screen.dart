@@ -174,7 +174,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         );
         Navigator.pop(context);
       } else {
-        _showError('Failed to save product');
+        _showError(productProvider.errorMessage ?? 'Failed to save product');
       }
     } catch (e) {
       _showError('Error creating product: $e');

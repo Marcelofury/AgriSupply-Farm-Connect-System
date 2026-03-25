@@ -132,7 +132,37 @@ class ApiService {
     if (statusCode >= 200 && statusCode < 300) {
       return body;
     } else {
-      final message = (body?['message'] ?? body?['error'] ?? 'Unknown error') as String;
+      String message = 'Unknown error';
+
+      if (body is Map<String, dynamic>) {
+        if (body['message'] is String) {
+          message = body['message'] as String;
+        }
+
+        final errorObj = body['error'];
+        if (errorObj is String) {
+          message = errorObj;
+        } else if (errorObj is Map<String, dynamic>) {
+          if (errorObj['message'] is String) {
+            message = errorObj['message'] as String;
+          }
+
+          final details = errorObj['details'];
+          if (details is List && details.isNotEmpty) {
+            final first = details.first;
+            if (first is Map<String, dynamic>) {
+              final detailMessage = first['message'];
+              final field = first['field'];
+              if (detailMessage is String && field is String) {
+                message = '$detailMessage ($field)';
+              } else if (detailMessage is String) {
+                message = detailMessage;
+              }
+            }
+          }
+        }
+      }
+
       throw ApiException(message, statusCode: statusCode);
     }
   }
