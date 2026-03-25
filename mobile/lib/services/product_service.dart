@@ -126,8 +126,8 @@ class ProductService {
         'description': product.description,
         'category': ProductCategory.toId(product.category), // Convert to backend ID
         'price': product.price.toString(),
-        'unit': product.unit,
-        'quantity': product.quantity.toString(),
+        'unit': ProductUnit.toBackend(product.unit),
+        'quantity': product.quantity.toInt().toString(),
         'isOrganic': product.isOrganic.toString(),
         'harvestDate': product.harvestDate.toIso8601String(),
         if (product.expiryDate != null) 

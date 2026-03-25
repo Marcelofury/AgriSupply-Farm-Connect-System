@@ -20,10 +20,14 @@ class ProductModel {
   });
 
   factory ProductModel.fromJson(final Map<String, dynamic> json) {
+    final quantityValue = json['quantity'] ?? json['quantity_available'] ?? json['available_quantity'] ?? 0;
+    final availableQuantityValue = json['quantity_available'] ?? json['available_quantity'] ?? json['quantity'] ?? 0;
+    final farmerData = json['farmer'] as Map<String, dynamic>?;
+
     return ProductModel(
       id: json['id'] as String,
       farmerId: json['farmer_id'] as String,
-      farmerName: json['farmer_name'] as String? ?? 'Unknown Farmer',
+      farmerName: json['farmer_name'] as String? ?? farmerData?['full_name'] as String? ?? 'Unknown Farmer',
       farmerImage: json['farmer_image'] as String?,
       farmerRating: (json['farmer_rating'] as num?)?.toDouble() ?? 0.0,
       name: json['name'] as String,
@@ -31,11 +35,11 @@ class ProductModel {
       category: ProductCategory.fromId(json['category'] as String), // Convert from backend ID
       price: (json['price'] as num).toDouble(),
       unit: json['unit'] as String,
-      quantity: (json['quantity'] as num).toDouble(),
-      availableQuantity: (json['available_quantity'] as num).toDouble(),
+      quantity: (quantityValue as num).toDouble(),
+      availableQuantity: (availableQuantityValue as num).toDouble(),
       images: (json['images'] as List?)?.cast<String>() ?? [],
-      region: json['region'] as String?,
-      district: json['district'] as String?,
+      region: json['region'] as String? ?? farmerData?['region'] as String?,
+      district: json['district'] as String? ?? farmerData?['district'] as String?,
       isOrganic: json['is_organic'] as bool? ?? false,
       isFeatured: json['is_featured'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
@@ -50,7 +54,7 @@ class ProductModel {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       status: json['status'] as String? ?? 'active',
-      views: json['views'] as int? ?? 0,
+      views: json['views_count'] as int? ?? json['views'] as int? ?? 0,
     );
   }
 
@@ -113,9 +117,9 @@ class ProductModel {
       'description': description,
       'category': ProductCategory.toId(category), // Convert to backend ID
       'price': price,
-      'unit': unit,
+      'unit': ProductUnit.toBackend(unit),
       'quantity': quantity,
-      'available_quantity': availableQuantity,
+      'quantity_available': availableQuantity,
       'images': images,
       'region': region,
       'district': district,
@@ -130,7 +134,7 @@ class ProductModel {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'status': status,
-      'views': views,
+      'views_count': views,
     };
   }
 
@@ -359,6 +363,17 @@ class ProductUnit {
     dozen,
     tray,
   ];
+
+  static String toBackend(final String unit) {
+    switch (unit) {
+      case basket:
+        return crate;
+      case tray:
+        return dozen;
+      default:
+        return unit;
+    }
+  }
 }
 
 class ProductStatus {

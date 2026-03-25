@@ -20,18 +20,41 @@ const getProfile = asyncHandler(async (req, res) => {
  * @route   PUT /api/v1/users/profile
  */
 const updateProfile = asyncHandler(async (req, res) => {
-  const { fullName, phone, region, district, bio } = req.body;
+  const {
+    fullName,
+    full_name,
+    phone,
+    region,
+    district,
+    bio,
+    farmName,
+    farm_name,
+    farmDescription,
+    farm_description,
+    address,
+    photoUrl,
+    photo_url,
+  } = req.body;
   const userId = req.user.id;
 
   const updates = {
     updated_at: new Date().toISOString(),
   };
 
-  if (fullName) updates.full_name = fullName;
-  if (phone) updates.phone = formatPhoneNumber(phone);
-  if (region) updates.region = region;
-  if (district) updates.district = district;
+  const resolvedFullName = fullName ?? full_name;
+  const resolvedFarmName = farmName ?? farm_name;
+  const resolvedFarmDescription = farmDescription ?? farm_description;
+  const resolvedPhotoUrl = photoUrl ?? photo_url;
+
+  if (resolvedFullName !== undefined) updates.full_name = resolvedFullName;
+  if (phone !== undefined) updates.phone = phone ? formatPhoneNumber(phone) : phone;
+  if (region !== undefined) updates.region = region;
+  if (district !== undefined) updates.district = district;
   if (bio !== undefined) updates.bio = bio;
+  if (resolvedFarmName !== undefined) updates.farm_name = resolvedFarmName;
+  if (resolvedFarmDescription !== undefined) updates.farm_description = resolvedFarmDescription;
+  if (address !== undefined) updates.address = address;
+  if (resolvedPhotoUrl !== undefined) updates.photo_url = resolvedPhotoUrl;
 
   const { data, error } = await supabase
     .from('users')
