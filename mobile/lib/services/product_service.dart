@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import '../models/product_model.dart';
 import 'api_service.dart';
 
@@ -110,12 +111,34 @@ class ProductService {
         final file = imageFiles[i];
         final bytes = await file.readAsBytes();
         final filename = file.path.split('/').last;
+        final extension = filename.contains('.')
+            ? filename.split('.').last.toLowerCase()
+            : '';
+
+        MediaType contentType;
+        switch (extension) {
+          case 'jpg':
+          case 'jpeg':
+            contentType = MediaType('image', 'jpeg');
+            break;
+          case 'png':
+            contentType = MediaType('image', 'png');
+            break;
+          case 'webp':
+            contentType = MediaType('image', 'webp');
+            break;
+          default:
+            throw Exception(
+              'Unsupported image format "$extension". Use JPG, PNG, or WEBP.',
+            );
+        }
         
         files.add(
           http.MultipartFile.fromBytes(
             'images',
             bytes,
             filename: filename,
+            contentType: contentType,
           ),
         );
       }

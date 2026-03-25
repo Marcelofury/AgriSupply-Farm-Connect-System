@@ -9,10 +9,19 @@ const storage = multer.memoryStorage();
 
 // File filter function
 const fileFilter = (req, file, cb) => {
-  // Check allowed types
+  // Check allowed MIME types first.
   if (constants.upload.allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
+    // Some clients may report generic MIME; allow known safe image extensions.
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    const extensionAllowed = ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
+
+    if (extensionAllowed) {
+      cb(null, true);
+      return;
+    }
+
     cb(new ApiError(400, `Invalid file type. Allowed types: ${constants.upload.allowedTypes.join(', ')}`), false);
   }
 };
