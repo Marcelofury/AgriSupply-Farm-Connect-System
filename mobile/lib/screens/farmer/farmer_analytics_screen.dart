@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,7 @@ class FarmerAnalyticsScreen extends StatefulWidget {
 
 class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
   final ApiService _apiService = ApiService();
+  Timer? _refreshTimer;
   bool _isLoading = true;
   String selectedPeriod = '7days';
 
@@ -33,10 +36,28 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
   void initState() {
     super.initState();
     _loadAnalytics();
+    _startAutoRefresh();
   }
 
-  Future<void> _loadAnalytics() async {
-    setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (mounted) {
+        _loadAnalytics(showLoader: false);
+      }
+    });
+  }
+
+  Future<void> _loadAnalytics({bool showLoader = true}) async {
+    if (showLoader) {
+      setState(() => _isLoading = true);
+    }
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -45,27 +66,43 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
       if (farmerId == null) return;
 
       // Fetch analytics from backend
-      final response = await _apiService.get('/farmers/$farmerId/analytics', 
+      final response = await _apiService.get('/users/farmers/$farmerId/analytics', 
         queryParams: {'period': selectedPeriod}
       );
 
-      if (mounted) {
-        setState(() {
-          _totalProducts = (response['total_products'] as int?) ?? 0;
-          _activeOrders = (response['active_orders'] as int?) ?? 0;
-          _completedOrders = (response['completed_orders'] as int?) ?? 0;
-          _totalRevenue = ((response['total_revenue'] as num?) ?? 0).toDouble();
-          _averageRating = ((response['average_rating'] as num?) ?? 0.0).toDouble();
-          _totalReviews = (response['total_reviews'] as int?) ?? 0;
-          _recentOrders = (response['recent_orders'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? [];
-          _topProducts = (response['top_products'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? [];
-          _salesData = (response['sales_data'] as Map<String, dynamic>?) ?? {};
-          _isLoading = false;
-        });
-      }
+      if (!mounted) return;
+
+      final recentOrdersRaw = response['recent_orders'] as List<dynamic>? ?? [];
+      final topProductsRaw = response['top_products'] as List<dynamic>? ?? [];
+      final salesDataRaw = response['sales_data'] as Map<String, dynamic>? ?? {};
+
+      setState(() {
+        _totalProducts = (response['total_products'] as int?) ?? 0;
+        _activeOrders = (response['active_orders'] as int?) ?? 0;
+        _completedOrders = (response['completed_orders'] as int?) ?? 0;
+        _totalRevenue = ((response['total_revenue'] as num?) ?? 0).toDouble();
+        _averageRating = ((response['average_rating'] as num?) ?? 0.0).toDouble();
+        _totalReviews = (response['total_reviews'] as int?) ?? 0;
+        _recentOrders = recentOrdersRaw
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item as Map))
+            .toList();
+        _topProducts = topProductsRaw
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item as Map))
+            .toList();
+        _salesData = Map<String, dynamic>.from(salesDataRaw);
+        _isLoading = false;
+      });
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load analytics: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
   }
@@ -350,16 +387,23 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
   }
 
   List<FlSpot> _getSalesSpots() {
-    // Mock data for demo - replace with actual data from API
-    return [
-      const FlSpot(0, 3),
-      const FlSpot(1, 1),
-      const FlSpot(2, 4),
-      const FlSpot(3, 2),
-      const FlSpot(4, 5),
-      const FlSpot(5, 3),
-      const FlSpot(6, 4),
-    ];
+    final values = _salesData.values
+        .map((value) => (value as num?)?.toDouble() ?? 0.0)
+        .toList();
+
+    if (values.isEmpty) {
+      return [FlSpot.zero];
+    }
+
+    final maxValue = values.reduce((a, b) => a > b ? a : b);
+    if (maxValue <= 0) {
+      return List.generate(values.length, (index) => FlSpot(index.toDouble(), 0));
+    }
+
+    return List.generate(
+      values.length,
+      (index) => FlSpot(index.toDouble(), (values[index] / maxValue) * 10),
+    );
   }
 
   Widget _buildTopProducts() {

@@ -42,12 +42,15 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
     _loadAddresses();
   }
 
-  void _loadAddresses() {
+  Future<void> _loadAddresses() async {
     // Load user's saved addresses
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    await authProvider.refreshUser();
     final user = authProvider.currentUser;
 
-    if (user != null && user.address != null) {
+    _addresses.clear();
+
+    if (user != null && user.address != null && user.address!.isNotEmpty) {
       // Add user's primary address
       _addresses.add(
         DeliveryAddress(
@@ -64,6 +67,21 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
 
     // TODO: Load additional saved addresses from backend
     setState(() {});
+  }
+
+  Future<bool> _saveAddressToDatabase(final DeliveryAddress address) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final ok = await authProvider.updateProfile(
+      address: address.fullAddress,
+      region: address.region,
+      district: address.district,
+      phone: address.phone,
+    );
+
+    if (ok) {
+      await authProvider.refreshUser();
+    }
+    return ok;
   }
 
   @override
@@ -472,7 +490,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (labelController.text.isNotEmpty &&
                     addressController.text.isNotEmpty) {
                   final newAddress = DeliveryAddress(
@@ -484,15 +502,32 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                     phone: phoneController.text.isNotEmpty
                         ? phoneController.text
                         : null,
-                    isDefault: _addresses.isEmpty,
+                    isDefault: true,
                   );
 
-                  this.setState(() => _addresses.add(newAddress));
+                  final saved = await _saveAddressToDatabase(newAddress);
+                  if (!saved) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to save address to database'),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                    return;
+                  }
+
+                  this.setState(() {
+                    _addresses
+                      ..clear()
+                      ..add(newAddress);
+                  });
                   Navigator.pop(context);
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Address added successfully'),
+                      content: Text('Address saved successfully'),
                       backgroundColor: AppColors.success,
                     ),
                   );
@@ -630,7 +665,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (labelController.text.isNotEmpty &&
                     addressController.text.isNotEmpty) {
                   final updatedAddress = DeliveryAddress(
@@ -644,6 +679,19 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                         : null,
                     isDefault: address.isDefault,
                   );
+
+                  final saved = await _saveAddressToDatabase(updatedAddress);
+                  if (!saved) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to update address in database'),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                    return;
+                  }
 
                   this.setState(() {
                     final index = _addresses.indexWhere((a) => a.id == address.id);
@@ -681,12 +729,30 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              final saved = await authProvider.updateProfile(
+                address: '',
+              );
+
+              if (!saved) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to delete address from database'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
+                return;
+              }
+
+              await authProvider.refreshUser();
               setState(() => _addresses.remove(address));
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Address deleted'),
+                  content: Text('Address deleted from database'),
                   backgroundColor: AppColors.success,
                 ),
               );
@@ -701,7 +767,20 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
     );
   }
 
-  void _setAsDefault(final DeliveryAddress address) {
+  Future<void> _setAsDefault(final DeliveryAddress address) async {
+    final saved = await _saveAddressToDatabase(address);
+    if (!saved) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to save default address to database'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() {
       for (var i = 0; i < _addresses.length; i++) {
         _addresses[i] = DeliveryAddress(
@@ -718,7 +797,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Default address updated'),
+        content: Text('Default address updated in database'),
         backgroundColor: AppColors.success,
       ),
     );

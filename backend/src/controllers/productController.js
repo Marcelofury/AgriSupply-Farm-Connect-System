@@ -14,6 +14,8 @@ const getProducts = asyncHandler(async (req, res) => {
     page, limit, category, region, minPrice, maxPrice, 
     isOrganic, farmerId, sortBy = 'created_at', sortOrder = 'desc' 
   } = req.query;
+  const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
+  const effectiveRegion = region || buyerRegion;
   
   const { page: pageNum, limit: limitNum, offset } = paginate(page, limit);
 
@@ -29,8 +31,8 @@ const getProducts = asyncHandler(async (req, res) => {
     query = query.eq('category', category);
   }
 
-  if (region) {
-    query = query.eq('farmer.region', region);
+  if (effectiveRegion) {
+    query = query.eq('farmer.region', effectiveRegion);
   }
 
   if (minPrice) {
@@ -73,13 +75,14 @@ const getProducts = asyncHandler(async (req, res) => {
  */
 const searchProducts = asyncHandler(async (req, res) => {
   const { q, page, limit } = req.query;
+  const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
   const { page: pageNum, limit: limitNum, offset } = paginate(page, limit);
 
   if (!q || q.length < 2) {
     throw new ApiError(400, 'Search query must be at least 2 characters');
   }
 
-  const { data, count, error } = await supabase
+  let query = supabase
     .from('products')
     .select(`
       *,
@@ -87,8 +90,13 @@ const searchProducts = asyncHandler(async (req, res) => {
     `, { count: 'exact' })
     .eq('status', 'active')
     .or(`name.ilike.%${q}%,description.ilike.%${q}%,category.ilike.%${q}%`)
-    .order('rating', { ascending: false })
-    .range(offset, offset + limitNum - 1);
+    .order('rating', { ascending: false });
+
+  if (buyerRegion) {
+    query = query.eq('farmer.region', buyerRegion);
+  }
+
+  const { data, count, error } = await query.range(offset, offset + limitNum - 1);
 
   if (error) {
     logger.error('Search products error:', error);
@@ -107,8 +115,9 @@ const searchProducts = asyncHandler(async (req, res) => {
  */
 const getFeaturedProducts = asyncHandler(async (req, res) => {
   const { limit = 10 } = req.query;
+  const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('products')
     .select(`
       *,
@@ -116,8 +125,13 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
     `)
     .eq('status', 'active')
     .eq('is_featured', true)
-    .order('rating', { ascending: false })
-    .limit(parseInt(limit));
+    .order('rating', { ascending: false });
+
+  if (buyerRegion) {
+    query = query.eq('farmer.region', buyerRegion);
+  }
+
+  const { data, error } = await query.limit(parseInt(limit));
 
   if (error) {
     logger.error('Get featured products error:', error);
@@ -297,6 +311,7 @@ const createProduct = asyncHandler(async (req, res) => {
     unit,
     quantity_available: parseInt(quantity),
     is_organic: isOrganic === 'true',
+    status: 'active',
     images,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

@@ -31,7 +31,15 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
   Future<void> _loadProducts() async {
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
-    await productProvider.fetchProducts();
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final buyerRegion = authProvider.currentUser?.region;
+
+    if (buyerRegion != null && buyerRegion.isNotEmpty) {
+      productProvider.setRegion(buyerRegion);
+    } else {
+      await productProvider.fetchProducts(refresh: true);
+    }
+
     await productProvider.fetchFeaturedProducts();
   }
 

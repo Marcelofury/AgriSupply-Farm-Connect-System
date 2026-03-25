@@ -172,14 +172,22 @@ const updateAddress = asyncHandler(async (req, res) => {
   const { region, district, address, landmark, coordinates } = req.body;
   const userId = req.user.id;
 
+  const latitude = coordinates && typeof coordinates === 'object'
+    ? coordinates.latitude
+    : undefined;
+  const longitude = coordinates && typeof coordinates === 'object'
+    ? coordinates.longitude
+    : undefined;
+
   const { data, error } = await supabase
     .from('users')
     .update({
       region,
       district,
-      address,
-      landmark,
-      coordinates,
+      address_line: address,
+      village: landmark,
+      latitude,
+      longitude,
       updated_at: new Date().toISOString(),
     })
     .eq('id', userId)

@@ -830,7 +830,11 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
             const SizedBox(height: 32),
             _buildProfileMenuItem(Icons.person_outlined, 'Edit Profile', () => Navigator.pushNamed(context, AppRoutes.farmerProfile)),
             _buildProfileMenuItem(Icons.psychology_outlined, 'AI Assistant', () => Navigator.pushNamed(context, AppRoutes.aiAssistant)),
-            _buildProfileMenuItem(Icons.analytics_outlined, 'Analytics', () {}),
+            _buildProfileMenuItem(
+              Icons.analytics_outlined,
+              'Analytics',
+              () => Navigator.pushNamed(context, AppRoutes.farmerAnalytics),
+            ),
             _buildProfileMenuItem(Icons.help_outline, 'Help & Support', () {
               Navigator.pushNamed(context, AppRoutes.helpSupport);
             }),

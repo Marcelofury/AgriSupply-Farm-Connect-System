@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
@@ -502,28 +501,6 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
                     const SizedBox(height: 32),
                   ],
 
-                  if (!_isEditing) ...[
-                    const SizedBox(height: 16),
-                    // Account Actions
-                    _buildMenuItem(
-                      icon: Icons.notifications,
-                      title: 'Notifications',
-                      subtitle: 'Manage your notification preferences',
-                      onTap: () => Navigator.pushNamed(context, '/notifications'),
-                    ),
-                    _buildMenuItem(
-                      icon: Icons.analytics_outlined,
-                      title: 'Analytics',
-                      subtitle: 'View your farm performance and insights',
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.farmerAnalytics),
-                    ),
-                    _buildMenuItem(
-                      icon: Icons.info,
-                      title: 'About',
-                      subtitle: 'Learn more about AgriSupply',
-                      onTap: () {},
-                    ),
-                  ],
                   const SizedBox(height: 32),
                 ],
               ),
@@ -647,51 +624,6 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildMenuItem({
-    required final IconData icon,
-    required final String title,
-    required final String subtitle,
-    required final VoidCallback onTap,
-    final Widget? trailing,
-    final bool isDestructive = false,
-  }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 4),
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isDestructive
-              ? AppColors.error.withOpacity(0.1)
-              : AppColors.grey100,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(
-          icon,
-          color: isDestructive ? AppColors.error : AppColors.grey700,
-        ),
-      ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: isDestructive ? AppColors.error : null,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.grey600,
-            ),
-      ),
-      trailing: trailing ??
-          Icon(
-            Icons.chevron_right,
-            color: isDestructive ? AppColors.error : AppColors.grey500,
-          ),
-      onTap: onTap,
     );
   }
 
