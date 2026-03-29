@@ -7,7 +7,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('About AgriSupply'),
@@ -204,11 +204,11 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildSection(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    String? content,
-    Widget? child,
+    final BuildContext context, {
+    required final IconData icon,
+    required final String title,
+    final String? content,
+    final Widget? child,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -257,7 +257,7 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureItem(IconData icon, String title, String description) {
+  Widget _buildFeatureItem(final IconData icon, final String title, final String description) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -286,7 +286,7 @@ class AboutScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.grey600,
                   ),
@@ -300,10 +300,10 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildContactItem(
-    IconData icon,
-    String label,
-    String value,
-    VoidCallback onTap,
+    final IconData icon,
+    final String label,
+    final String value,
+    final VoidCallback onTap,
   ) {
     return InkWell(
       onTap: onTap,
@@ -320,7 +320,7 @@ class AboutScreen extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.grey600,
                     ),
@@ -336,14 +336,14 @@ class AboutScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.grey400),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.grey400),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSocialButton(IconData icon, String platform, VoidCallback onTap) {
+  Widget _buildSocialButton(final IconData icon, final String platform, final VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -358,17 +358,17 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _launchUrl(String url) async {
+  Future<void> _launchUrl(final String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
-  void _showTerms(BuildContext context) {
+  void _showTerms(final BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Terms & Conditions'),
         content: const SingleChildScrollView(
           child: Text(
@@ -391,10 +391,10 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  void _showPrivacy(BuildContext context) {
+  void _showPrivacy(final BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Privacy Policy'),
         content: const SingleChildScrollView(
           child: Text(
