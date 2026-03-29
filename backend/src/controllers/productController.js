@@ -11,9 +11,47 @@ const logger = require('../utils/logger');
  */
 const getProducts = asyncHandler(async (req, res) => {
   const { 
-    page, limit, category, region, minPrice, maxPrice, 
-    isOrganic, farmerId, sortBy = 'created_at', sortOrder = 'desc' 
+    page,
+    limit,
+    category,
+    region,
+    minPrice: minPriceRaw,
+    maxPrice: maxPriceRaw,
+    min_price: minPriceLegacy,
+    max_price: maxPriceLegacy,
+    isOrganic: isOrganicRaw,
+    organic: organicLegacy,
+    farmerId,
+    sortBy: sortByRaw,
+    sort: sortLegacy,
+    sortOrder: sortOrderRaw,
   } = req.query;
+
+  const minPrice = minPriceRaw ?? minPriceLegacy;
+  const maxPrice = maxPriceRaw ?? maxPriceLegacy;
+  const isOrganic = isOrganicRaw ?? organicLegacy;
+
+  const requestedSort = sortByRaw ?? sortLegacy ?? 'created_at';
+  let normalizedSortBy = requestedSort;
+  let normalizedSortOrder = sortOrderRaw;
+
+  // Backward-compatible sort aliases for older clients.
+  if (requestedSort === 'newest') {
+    normalizedSortBy = 'created_at';
+    normalizedSortOrder = normalizedSortOrder ?? 'desc';
+  } else if (requestedSort === 'price_low') {
+    normalizedSortBy = 'price';
+    normalizedSortOrder = normalizedSortOrder ?? 'asc';
+  } else if (requestedSort === 'price_high') {
+    normalizedSortBy = 'price';
+    normalizedSortOrder = normalizedSortOrder ?? 'desc';
+  } else if (requestedSort === 'relevance') {
+    normalizedSortBy = 'rating';
+    normalizedSortOrder = normalizedSortOrder ?? 'desc';
+  }
+
+  normalizedSortOrder = normalizedSortOrder ?? 'desc';
+
   const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
   const effectiveRegion = region || buyerRegion;
   
@@ -53,8 +91,10 @@ const getProducts = asyncHandler(async (req, res) => {
 
   // Apply sorting
   const validSortFields = ['created_at', 'price', 'rating', 'name'];
-  const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
-  query = query.order(sortField, { ascending: sortOrder === 'asc' });
+  const sortField = validSortFields.includes(normalizedSortBy)
+    ? normalizedSortBy
+    : 'created_at';
+  query = query.order(sortField, { ascending: normalizedSortOrder === 'asc' });
 
   const { data, count, error } = await query.range(offset, offset + limitNum - 1);
 
@@ -74,8 +114,49 @@ const getProducts = asyncHandler(async (req, res) => {
  * @route   GET /api/v1/products/search
  */
 const searchProducts = asyncHandler(async (req, res) => {
-  const { q, page, limit } = req.query;
+  const {
+    q,
+    page,
+    limit,
+    category,
+    region,
+    minPrice: minPriceRaw,
+    maxPrice: maxPriceRaw,
+    min_price: minPriceLegacy,
+    max_price: maxPriceLegacy,
+    isOrganic: isOrganicRaw,
+    organic: organicLegacy,
+    sortBy: sortByRaw,
+    sort: sortLegacy,
+    sortOrder: sortOrderRaw,
+  } = req.query;
+
+  const minPrice = minPriceRaw ?? minPriceLegacy;
+  const maxPrice = maxPriceRaw ?? maxPriceLegacy;
+  const isOrganic = isOrganicRaw ?? organicLegacy;
+
+  const requestedSort = sortByRaw ?? sortLegacy ?? 'rating';
+  let normalizedSortBy = requestedSort;
+  let normalizedSortOrder = sortOrderRaw;
+
+  if (requestedSort === 'newest') {
+    normalizedSortBy = 'created_at';
+    normalizedSortOrder = normalizedSortOrder ?? 'desc';
+  } else if (requestedSort === 'price_low') {
+    normalizedSortBy = 'price';
+    normalizedSortOrder = normalizedSortOrder ?? 'asc';
+  } else if (requestedSort === 'price_high') {
+    normalizedSortBy = 'price';
+    normalizedSortOrder = normalizedSortOrder ?? 'desc';
+  } else if (requestedSort === 'relevance') {
+    normalizedSortBy = 'rating';
+    normalizedSortOrder = normalizedSortOrder ?? 'desc';
+  }
+
+  normalizedSortOrder = normalizedSortOrder ?? 'desc';
+
   const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
+  const effectiveRegion = region || buyerRegion;
   const { page: pageNum, limit: limitNum, offset } = paginate(page, limit);
 
   if (!q || q.length < 2) {
@@ -89,12 +170,33 @@ const searchProducts = asyncHandler(async (req, res) => {
       farmer:farmer_id (id, full_name, photo_url, region, is_verified)
     `, { count: 'exact' })
     .eq('status', 'active')
-    .or(`name.ilike.%${q}%,description.ilike.%${q}%,category.ilike.%${q}%`)
-    .order('rating', { ascending: false });
+    .or(`name.ilike.%${q}%,description.ilike.%${q}%,category.ilike.%${q}%`);
 
-  if (buyerRegion) {
-    query = query.eq('farmer.region', buyerRegion);
+  if (category) {
+    query = query.eq('category', category);
   }
+
+  if (effectiveRegion) {
+    query = query.eq('farmer.region', effectiveRegion);
+  }
+
+  if (minPrice) {
+    query = query.gte('price', parseFloat(minPrice));
+  }
+
+  if (maxPrice) {
+    query = query.lte('price', parseFloat(maxPrice));
+  }
+
+  if (isOrganic === 'true') {
+    query = query.eq('is_organic', true);
+  }
+
+  const validSortFields = ['created_at', 'price', 'rating', 'name'];
+  const sortField = validSortFields.includes(normalizedSortBy)
+    ? normalizedSortBy
+    : 'rating';
+  query = query.order(sortField, { ascending: normalizedSortOrder === 'asc' });
 
   const { data, count, error } = await query.range(offset, offset + limitNum - 1);
 

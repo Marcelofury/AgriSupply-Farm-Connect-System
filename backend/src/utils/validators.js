@@ -202,10 +202,38 @@ const productValidators = {
       .optional()
       .isFloat({ min: 0 })
       .withMessage('Minimum price must be a positive number'),
+    query('min_price')
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage('Minimum price must be a positive number'),
     query('maxPrice')
       .optional()
       .isFloat({ min: 0 })
       .withMessage('Maximum price must be a positive number'),
+    query('max_price')
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage('Maximum price must be a positive number'),
+    query('isOrganic')
+      .optional()
+      .isIn(['true', 'false'])
+      .withMessage('isOrganic must be true or false'),
+    query('organic')
+      .optional()
+      .isIn(['true', 'false'])
+      .withMessage('organic must be true or false'),
+    query('sortBy')
+      .optional()
+      .isIn(['created_at', 'price', 'rating', 'name', 'newest', 'price_low', 'price_high', 'relevance'])
+      .withMessage('Invalid sortBy value'),
+    query('sort')
+      .optional()
+      .isIn(['created_at', 'price', 'rating', 'name', 'newest', 'price_low', 'price_high', 'relevance'])
+      .withMessage('Invalid sort value'),
+    query('sortOrder')
+      .optional()
+      .isIn(['asc', 'desc'])
+      .withMessage('sortOrder must be asc or desc'),
   ],
   
   review: [
