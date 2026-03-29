@@ -50,6 +50,16 @@ class _SearchScreenState extends State<SearchScreen> {
     final query = _searchController.text.trim();
     if (query.isEmpty && _selectedCategory == null) return;
 
+    if (query.isNotEmpty && query.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter at least 2 characters to search.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _hasSearched = true;
@@ -58,23 +68,21 @@ class _SearchScreenState extends State<SearchScreen> {
     try {
       final productProvider = Provider.of<ProductProvider>(context, listen: false);
       
-      // Set filters on the provider
-      if (_selectedCategory != null) {
-        productProvider.setCategory(_selectedCategory);
-      }
-      if (_selectedRegion != null && _selectedRegion != 'All Regions') {
-        productProvider.setRegion(_selectedRegion);
-      }
-      if (_minPrice > 0 || _maxPrice < 100000) {
-        productProvider.setPriceRange(
-          _minPrice > 0 ? _minPrice : null,
-          _maxPrice < 100000 ? _maxPrice : null,
-        );
-      }
-      if (_organicOnly) {
-        productProvider.setOrganicOnly(true);
-      }
-      productProvider.setSortBy(_sortBy);
+      // Apply filters without list refresh; search request below should be a single network call.
+      productProvider.setCategory(_selectedCategory, refresh: false);
+      productProvider.setRegion(
+        _selectedRegion != null && _selectedRegion != 'All Regions'
+            ? _selectedRegion
+            : null,
+        refresh: false,
+      );
+      productProvider.setPriceRange(
+        _minPrice > 0 ? _minPrice : null,
+        _maxPrice < 100000 ? _maxPrice : null,
+        refresh: false,
+      );
+      productProvider.setOrganicOnly(_organicOnly ? true : null, refresh: false);
+      productProvider.setSortBy(_sortBy, refresh: false);
       
       // Perform search
       await productProvider.searchProducts(query);

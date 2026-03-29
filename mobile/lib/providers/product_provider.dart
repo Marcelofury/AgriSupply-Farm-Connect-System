@@ -151,18 +151,35 @@ class ProductProvider extends ChangeNotifier {
 
   // Search products
   Future<void> searchProducts(final String query) async {
-    if (query.isEmpty) {
-      _searchResults.clear();
-      notifyListeners();
-      return;
-    }
-
     _status = ProductsStatus.loading;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _searchResults = await _productService.searchProducts(query);
+      if (query.trim().isEmpty) {
+        _searchResults = await _productService.getProducts(
+          page: 1,
+          pageSize: _pageSize,
+          category: _selectedCategory,
+          region: _selectedRegion,
+          minPrice: _minPrice,
+          maxPrice: _maxPrice,
+          organicOnly: _organicOnly,
+          sortBy: _sortBy,
+        );
+      } else {
+        _searchResults = await _productService.searchProducts(
+          query,
+          page: 1,
+          pageSize: _pageSize,
+          category: _selectedCategory,
+          region: _selectedRegion,
+          minPrice: _minPrice,
+          maxPrice: _maxPrice,
+          organicOnly: _organicOnly,
+          sortBy: _sortBy,
+        );
+      }
       _status = ProductsStatus.loaded;
     } catch (e) {
       _status = ProductsStatus.error;
@@ -283,37 +300,47 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // Filter setters
-  void setCategory(final String? category) {
+  void setCategory(final String? category, {final bool refresh = true}) {
     if (_selectedCategory != category) {
       _selectedCategory = category == 'All' ? null : category;
-      fetchProducts(refresh: true);
+      if (refresh) {
+        fetchProducts(refresh: true);
+      }
     }
   }
 
-  void setRegion(final String? region) {
+  void setRegion(final String? region, {final bool refresh = true}) {
     if (_selectedRegion != region) {
       _selectedRegion = region;
-      fetchProducts(refresh: true);
+      if (refresh) {
+        fetchProducts(refresh: true);
+      }
     }
   }
 
-  void setPriceRange(final double? min, final double? max) {
+  void setPriceRange(final double? min, final double? max, {final bool refresh = true}) {
     _minPrice = min;
     _maxPrice = max;
-    fetchProducts(refresh: true);
-  }
-
-  void setOrganicOnly(final bool? value) {
-    if (_organicOnly != value) {
-      _organicOnly = value;
+    if (refresh) {
       fetchProducts(refresh: true);
     }
   }
 
-  void setSortBy(final String sortBy) {
+  void setOrganicOnly(final bool? value, {final bool refresh = true}) {
+    if (_organicOnly != value) {
+      _organicOnly = value;
+      if (refresh) {
+        fetchProducts(refresh: true);
+      }
+    }
+  }
+
+  void setSortBy(final String sortBy, {final bool refresh = true}) {
     if (_sortBy != sortBy) {
       _sortBy = sortBy;
-      fetchProducts(refresh: true);
+      if (refresh) {
+        fetchProducts(refresh: true);
+      }
     }
   }
 

@@ -8,6 +8,23 @@ import 'api_service.dart';
 class ProductService {
   final ApiService _apiService = ApiService();
 
+  Map<String, String> _mapSortParams(final String sortBy) {
+    switch (sortBy) {
+      case 'price_low':
+        return {'sortBy': 'price', 'sortOrder': 'asc'};
+      case 'price_high':
+        return {'sortBy': 'price', 'sortOrder': 'desc'};
+      case 'rating':
+      case 'relevance':
+        return {'sortBy': 'rating', 'sortOrder': 'desc'};
+      case 'name':
+        return {'sortBy': 'name', 'sortOrder': 'asc'};
+      case 'newest':
+      default:
+        return {'sortBy': 'created_at', 'sortOrder': 'desc'};
+    }
+  }
+
   // Get all products with filters
   Future<List<ProductModel>> getProducts({
     final int page = 1,
@@ -24,15 +41,14 @@ class ProductService {
       final params = <String, String>{
         'page': page.toString(),
         'limit': pageSize.toString(),
-        'status': 'active',
       };
 
-      if (category != null) params['category'] = category;
+      if (category != null) params['category'] = ProductCategory.toId(category);
       if (region != null) params['region'] = region;
-      if (minPrice != null) params['min_price'] = minPrice.toString();
-      if (maxPrice != null) params['max_price'] = maxPrice.toString();
-      if (organicOnly ?? false) params['organic'] = 'true';
-      params['sort'] = sortBy;
+      if (minPrice != null) params['minPrice'] = minPrice.toString();
+      if (maxPrice != null) params['maxPrice'] = maxPrice.toString();
+      if (organicOnly ?? false) params['isOrganic'] = 'true';
+      params.addAll(_mapSortParams(sortBy));
 
       final response = await _apiService.get('/products', queryParams: params);
       final data = (response['data'] ?? response) as List;
@@ -84,11 +100,34 @@ class ProductService {
   }
 
   // Search products
-  Future<List<ProductModel>> searchProducts(final String query) async {
+  Future<List<ProductModel>> searchProducts(
+    final String query, {
+    final int page = 1,
+    final int pageSize = 20,
+    final String? category,
+    final String? region,
+    final double? minPrice,
+    final double? maxPrice,
+    final bool? organicOnly,
+    final String sortBy = 'relevance',
+  }) async {
     try {
+      final params = <String, String>{
+        'q': query,
+        'page': page.toString(),
+        'limit': pageSize.toString(),
+      };
+
+      if (category != null) params['category'] = ProductCategory.toId(category);
+      if (region != null) params['region'] = region;
+      if (minPrice != null) params['minPrice'] = minPrice.toString();
+      if (maxPrice != null) params['maxPrice'] = maxPrice.toString();
+      if (organicOnly ?? false) params['isOrganic'] = 'true';
+      params.addAll(_mapSortParams(sortBy));
+
       final response = await _apiService.get(
         '/products/search',
-        queryParams: {'q': query},
+        queryParams: params,
       );
       final data = (response['data'] ?? response) as List;
 
@@ -265,7 +304,22 @@ class ProductService {
   Future<Map<String, int>> getCategoryCounts() async {
     try {
       final response = await _apiService.get('/products/categories');
-      return Map<String, int>.from(response as Map);
+      final rawData = response['data'] ?? response;
+
+      if (rawData is! List) {
+        return {};
+      }
+
+      final counts = <String, int>{};
+      for (final item in rawData) {
+        if (item is! Map<String, dynamic>) continue;
+        final id = item['id']?.toString();
+        if (id == null || id.isEmpty) continue;
+        final displayCategory = ProductCategory.fromId(id);
+        counts[displayCategory] = (item['count'] as num?)?.toInt() ?? 0;
+      }
+
+      return counts;
     } catch (e) {
       throw Exception('Failed to fetch category counts: $e');
     }
@@ -309,12 +363,19 @@ class ProductService {
   ) async {
     try {
       final response = await _apiService.get(
-        '/products/$productId/similar',
-        queryParams: {'category': category, 'limit': '6'},
+        '/products',
+        queryParams: {
+          'category': ProductCategory.toId(category),
+          'limit': '6',
+          ..._mapSortParams('rating'),
+        },
       );
       final data = (response['data'] ?? response) as List;
 
-      return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
+      return data
+          .map((final json) => ProductModel.fromJson(json as Map<String, dynamic>))
+          .where((final product) => product.id != productId)
+          .toList();
     } catch (e) {
       throw Exception('Failed to fetch similar products: $e');
     }

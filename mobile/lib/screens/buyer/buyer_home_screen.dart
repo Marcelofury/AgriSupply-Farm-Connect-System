@@ -129,12 +129,8 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
                             _selectedCategory =
                                 _selectedCategory == category ? null : category;
                           });
-                          if (_selectedCategory != null) {
-                            Provider.of<ProductProvider>(context, listen: false)
-                                .fetchProductsByCategory(_selectedCategory!);
-                          } else {
-                            _loadProducts();
-                          }
+                          Provider.of<ProductProvider>(context, listen: false)
+                              .setCategory(_selectedCategory);
                         },
                       ),
                     );
@@ -414,7 +410,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
           _currentIndex = 0;
         });
         Provider.of<ProductProvider>(context, listen: false)
-            .fetchProductsByCategory(category);
+            .setCategory(category);
       },
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -591,7 +587,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
           color: isDestructive ? AppColors.error : AppColors.grey900,
         ),
       ),
-      trailing: Icon(
+      trailing: const Icon(
         Icons.chevron_right,
         color: AppColors.grey600,
       ),
