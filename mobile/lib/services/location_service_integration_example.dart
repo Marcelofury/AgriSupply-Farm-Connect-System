@@ -71,7 +71,7 @@ Future<void> _detectCurrentLocation() async {
     if (!mounted) return;
     
     // Handle specific errors
-    String errorMessage = 'Failed to detect location';
+    var errorMessage = 'Failed to detect location';
     
     if (e.toString().contains('denied')) {
       errorMessage = 'Location permission denied. Please enable in settings.';
@@ -79,7 +79,7 @@ Future<void> _detectCurrentLocation() async {
       // Show dialog with option to open settings
       showDialog<void>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (final context) => AlertDialog(
           title: const Text('Location Permission'),
           content: const Text(
             'AgriSupply needs location access to automatically detect your region. '
@@ -168,7 +168,7 @@ Widget _buildRegionDropdownWithGPS() {
           value: _selectedRegion.isEmpty ? null : _selectedRegion,
           items: _regions,
           enabled: _isEditing,
-          onChanged: (value) {
+          onChanged: (final value) {
             setState(() {
               _selectedRegion = value ?? '';
               _selectedDistrict = '';

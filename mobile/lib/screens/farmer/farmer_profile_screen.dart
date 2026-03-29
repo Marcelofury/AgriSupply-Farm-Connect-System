@@ -181,7 +181,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -606,7 +606,7 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             hint: Text('Select $label'),
             isExpanded: true,
             decoration: const InputDecoration(

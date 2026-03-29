@@ -124,7 +124,7 @@ conversation back to farming-related topics.
   }
 
   // Simple chat method
-  Future<String> chat(String message) async {
+  Future<String> chat(final String message) async {
     try {
       final response = await _apiService.post('/ai/chat', body: {
         'message': message,

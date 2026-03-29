@@ -132,7 +132,7 @@ class ApiService {
     if (statusCode >= 200 && statusCode < 300) {
       return body;
     } else {
-      String message = 'Unknown error';
+      var message = 'Unknown error';
 
       if (body is Map<String, dynamic>) {
         if (body['message'] is String) {

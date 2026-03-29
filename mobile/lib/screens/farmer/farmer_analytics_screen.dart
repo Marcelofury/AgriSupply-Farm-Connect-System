@@ -26,7 +26,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
   int _activeOrders = 0;
   int _completedOrders = 0;
   double _totalRevenue = 0;
-  double _averageRating = 0.0;
+  double _averageRating = 0;
   int _totalReviews = 0;
   List<Map<String, dynamic>> _recentOrders = [];
   List<Map<String, dynamic>> _topProducts = [];
@@ -47,14 +47,14 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
 
   void _startAutoRefresh() {
     _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (final timer) {
       if (mounted) {
         _loadAnalytics(showLoader: false);
       }
     });
   }
 
-  Future<void> _loadAnalytics({bool showLoader = true}) async {
+  Future<void> _loadAnalytics({final bool showLoader = true}) async {
     if (showLoader) {
       setState(() => _isLoading = true);
     }
@@ -85,11 +85,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
         _totalReviews = (response['total_reviews'] as int?) ?? 0;
         _recentOrders = recentOrdersRaw
             .whereType<Map>()
-            .map((item) => Map<String, dynamic>.from(item as Map))
+            .map((final item) => Map<String, dynamic>.from(item))
             .toList();
         _topProducts = topProductsRaw
             .whereType<Map>()
-            .map((item) => Map<String, dynamic>.from(item as Map))
+            .map((final item) => Map<String, dynamic>.from(item))
             .toList();
         _salesData = Map<String, dynamic>.from(salesDataRaw);
         _isLoading = false;
@@ -108,7 +108,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Analytics'),
@@ -118,11 +118,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
         actions: [
           PopupMenuButton<String>(
             initialValue: selectedPeriod,
-            onSelected: (value) {
+            onSelected: (final value) {
               setState(() => selectedPeriod = value);
               _loadAnalytics();
             },
-            itemBuilder: (context) => [
+            itemBuilder: (final context) => [
               const PopupMenuItem(value: '7days', child: Text('Last 7 Days')),
               const PopupMenuItem(value: '30days', child: Text('Last 30 Days')),
               const PopupMenuItem(value: '90days', child: Text('Last 3 Months')),
@@ -236,7 +236,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Average Rating',
                       style: TextStyle(
                         fontSize: 13,
@@ -256,7 +256,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                         const SizedBox(width: 8),
                         Text(
                           '($_totalReviews reviews)',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
                             color: AppColors.grey600,
                           ),
@@ -273,7 +273,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
+  Widget _buildSummaryCard(final String title, final String value, final IconData icon, final Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -301,7 +301,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
           const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.grey600,
             ),
@@ -336,11 +336,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.trending_up, color: AppColors.primaryGreen),
-              const SizedBox(width: 12),
-              const Expanded(
+              Icon(Icons.trending_up, color: AppColors.primaryGreen),
+              SizedBox(width: 12),
+              Expanded(
                 child: Text(
                   'Revenue Trend',
                   style: TextStyle(
@@ -358,11 +358,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                 ? const Center(child: Text('No sales data available'))
                 : LineChart(
                     LineChartData(
-                      gridData: FlGridData(show: false),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      gridData: const FlGridData(show: false),
+                      titlesData: const FlTitlesData(
+                        leftTitles: AxisTitles(sideTitles: SideTitles()),
+                        rightTitles: AxisTitles(sideTitles: SideTitles()),
+                        topTitles: AxisTitles(sideTitles: SideTitles()),
                       ),
                       borderData: FlBorderData(show: false),
                       lineBarsData: [
@@ -371,7 +371,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                           isCurved: true,
                           color: AppColors.primaryGreen,
                           barWidth: 3,
-                          dotData: FlDotData(show: true),
+                          dotData: const FlDotData(),
                           belowBarData: BarAreaData(
                             show: true,
                             color: AppColors.primaryGreen.withOpacity(0.1),
@@ -388,21 +388,21 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
 
   List<FlSpot> _getSalesSpots() {
     final values = _salesData.values
-        .map((value) => (value as num?)?.toDouble() ?? 0.0)
+        .map((final value) => (value as num?)?.toDouble() ?? 0.0)
         .toList();
 
     if (values.isEmpty) {
       return [FlSpot.zero];
     }
 
-    final maxValue = values.reduce((a, b) => a > b ? a : b);
+    final maxValue = values.reduce((final a, final b) => a > b ? a : b);
     if (maxValue <= 0) {
-      return List.generate(values.length, (index) => FlSpot(index.toDouble(), 0));
+      return List.generate(values.length, (final index) => FlSpot(index.toDouble(), 0));
     }
 
     return List.generate(
       values.length,
-      (index) => FlSpot(index.toDouble(), (values[index] / maxValue) * 10),
+      (final index) => FlSpot(index.toDouble(), (values[index] / maxValue) * 10),
     );
   }
 
@@ -423,11 +423,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.star, color: AppColors.warning),
-              const SizedBox(width: 12),
-              const Text(
+              Icon(Icons.star, color: AppColors.warning),
+              SizedBox(width: 12),
+              Text(
                 'Top Selling Products',
                 style: TextStyle(
                   fontSize: 18,
@@ -437,9 +437,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _topProducts.isEmpty
-              ? const Center(child: Text('No product data available'))
-              : Column(
+          if (_topProducts.isEmpty) const Center(child: Text('No product data available')) else Column(
                   children: _topProducts.take(5).map((product) {
                     return _buildProductTile(
                       (product['name'] as String?) ?? 'Product',
@@ -453,7 +451,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
     );
   }
 
-  Widget _buildProductTile(String name, int sold, double revenue) {
+  Widget _buildProductTile(final String name, final int sold, final double revenue) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -485,7 +483,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                 ),
                 Text(
                   '$sold sold',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.grey600,
                   ),
@@ -522,11 +520,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.receipt_long, color: AppColors.info),
-              const SizedBox(width: 12),
-              const Text(
+              Icon(Icons.receipt_long, color: AppColors.info),
+              SizedBox(width: 12),
+              Text(
                 'Recent Orders',
                 style: TextStyle(
                   fontSize: 18,
@@ -536,9 +534,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _recentOrders.isEmpty
-              ? const Center(child: Text('No recent orders'))
-              : Column(
+          if (_recentOrders.isEmpty) const Center(child: Text('No recent orders')) else Column(
                   children: _recentOrders.take(5).map((order) {
                     return _buildOrderTile(
                       (order['order_number'] as String?) ?? 'N/A',
@@ -553,8 +549,8 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
     );
   }
 
-  Widget _buildOrderTile(String orderNumber, String buyer, double total, String status) {
-    Color statusColor = AppColors.warning;
+  Widget _buildOrderTile(final String orderNumber, final String buyer, final double total, final String status) {
+    var statusColor = AppColors.warning;
     if (status == 'completed') statusColor = AppColors.success;
     if (status == 'cancelled') statusColor = AppColors.error;
 
@@ -589,7 +585,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                 ),
                 Text(
                   buyer,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.grey600,
                   ),
@@ -629,10 +625,10 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
     );
   }
 
-  String _formatNumber(int number) {
+  String _formatNumber(final int number) {
     return number.toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
+          (m) => '${m[1]},',
         );
   }
 }

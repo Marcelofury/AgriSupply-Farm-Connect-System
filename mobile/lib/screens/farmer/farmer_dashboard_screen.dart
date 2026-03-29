@@ -38,14 +38,14 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     }
   }
 
-  void _calculateSalesData(OrderProvider orderProvider) {
+  void _calculateSalesData(final OrderProvider orderProvider) {
     // Get orders from last 7 days
     final now = DateTime.now();
     final salesByDay = <String, double>{};
     final days = <String>[];
     
     // Initialize last 7 days with 0
-    for (int i = 6; i >= 0; i--) {
+    for (var i = 6; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
       final dayKey = '${date.month}/${date.day}';
       final dayLabel = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][date.weekday - 1];
@@ -68,11 +68,11 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
     
     // Convert to chart data
     final spots = <FlSpot>[];
-    final maxSale = salesByDay.values.isEmpty ? 100000.0 : salesByDay.values.reduce((a, b) => a > b ? a : b);
+    final maxSale = salesByDay.values.isEmpty ? 100000.0 : salesByDay.values.reduce((final a, final b) => a > b ? a : b);
     var index = 0;
     
     for (final entry in salesByDay.entries) {
-      final normalizedValue = maxSale > 0 ? ((entry.value / maxSale) * 6).toDouble() : 0.0;
+      final normalizedValue = maxSale > 0 ? ((entry.value / maxSale) * 6) : 0.0;
       spots.add(FlSpot(index.toDouble(), normalizedValue));
       index++;
     }
@@ -432,7 +432,6 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                     isCurved: true,
                     color: AppColors.primaryGreen,
                     barWidth: 3,
-                    dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
                       color: AppColors.primaryGreen.withOpacity(0.1),

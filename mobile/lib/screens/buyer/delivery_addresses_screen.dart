@@ -399,7 +399,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                 const SizedBox(height: 16),
                 // District selection (auto-detects region)
                 DropdownButtonFormField<String>(
-                  value: selectedDistrict,
+                  initialValue: selectedDistrict,
                   decoration: const InputDecoration(
                     labelText: 'District',
                     border: OutlineInputBorder(),
@@ -574,7 +574,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                 const SizedBox(height: 16),
                 // District selection (auto-detects region)
                 DropdownButtonFormField<String>(
-                  value: selectedDistrict,
+                  initialValue: selectedDistrict,
                   decoration: const InputDecoration(
                     labelText: 'District',
                     border: OutlineInputBorder(),
@@ -694,7 +694,7 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                   }
 
                   this.setState(() {
-                    final index = _addresses.indexWhere((a) => a.id == address.id);
+                    final index = _addresses.indexWhere((final a) => a.id == address.id);
                     if (index != -1) {
                       _addresses[index] = updatedAddress;
                     }
