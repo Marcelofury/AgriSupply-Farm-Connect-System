@@ -85,11 +85,11 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
         _totalReviews = (response['total_reviews'] as int?) ?? 0;
         _recentOrders = recentOrdersRaw
             .whereType<Map>()
-            .map((final item) => Map<String, dynamic>.from(item))
+            .map(Map<String, dynamic>.from)
             .toList();
         _topProducts = topProductsRaw
             .whereType<Map>()
-            .map((final item) => Map<String, dynamic>.from(item))
+            .map(Map<String, dynamic>.from)
             .toList();
         _salesData = Map<String, dynamic>.from(salesDataRaw);
         _isLoading = false;
@@ -360,9 +360,9 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                     LineChartData(
                       gridData: const FlGridData(show: false),
                       titlesData: const FlTitlesData(
-                        leftTitles: AxisTitles(sideTitles: SideTitles()),
-                        rightTitles: AxisTitles(sideTitles: SideTitles()),
-                        topTitles: AxisTitles(sideTitles: SideTitles()),
+                        leftTitles: AxisTitles(),
+                        rightTitles: AxisTitles(),
+                        topTitles: AxisTitles(),
                       ),
                       borderData: FlBorderData(show: false),
                       lineBarsData: [
@@ -371,7 +371,6 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
                           isCurved: true,
                           color: AppColors.primaryGreen,
                           barWidth: 3,
-                          dotData: const FlDotData(),
                           belowBarData: BarAreaData(
                             show: true,
                             color: AppColors.primaryGreen.withOpacity(0.1),
@@ -438,7 +437,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
           ),
           const SizedBox(height: 16),
           if (_topProducts.isEmpty) const Center(child: Text('No product data available')) else Column(
-                  children: _topProducts.take(5).map((product) {
+                  children: _topProducts.take(5).map((final product) {
                     return _buildProductTile(
                       (product['name'] as String?) ?? 'Product',
                       (product['sold'] as int?) ?? 0,
@@ -535,7 +534,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
           ),
           const SizedBox(height: 16),
           if (_recentOrders.isEmpty) const Center(child: Text('No recent orders')) else Column(
-                  children: _recentOrders.take(5).map((order) {
+                  children: _recentOrders.take(5).map((final order) {
                     return _buildOrderTile(
                       (order['order_number'] as String?) ?? 'N/A',
                       (order['buyer_name'] as String?) ?? 'Customer',
@@ -628,7 +627,7 @@ class _FarmerAnalyticsScreenState extends State<FarmerAnalyticsScreen> {
   String _formatNumber(final int number) {
     return number.toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]},',
+          (final m) => '${m[1]},',
         );
   }
 }
