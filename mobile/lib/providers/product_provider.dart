@@ -158,7 +158,6 @@ class ProductProvider extends ChangeNotifier {
     try {
       if (query.trim().isEmpty) {
         _searchResults = await _productService.getProducts(
-          page: 1,
           pageSize: _pageSize,
           category: _selectedCategory,
           region: _selectedRegion,
@@ -170,8 +169,6 @@ class ProductProvider extends ChangeNotifier {
       } else {
         _searchResults = await _productService.searchProducts(
           query,
-          page: 1,
-          pageSize: _pageSize,
           category: _selectedCategory,
           region: _selectedRegion,
           minPrice: _minPrice,
