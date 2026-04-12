@@ -1,4 +1,4 @@
-# 🌾 AgriSupply Farm Connect System
+# AgriSupply Farm Connect System
 
 <p align="center">
   <img src="assets/logo.png" alt="AgriSupply Logo" width="200"/>
@@ -33,7 +33,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 
 ##  Features
 
-### For Farmers 👨‍🌾
+### For Farmers 
 - **Easy Product Listing** - List products with photos, descriptions, and pricing
 - **Order Management** - Receive and manage orders from your phone
 - **Direct Payments** - Get paid directly via Mobile Money
@@ -41,7 +41,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 - **Market Insights** - Access price trends and demand forecasts
 - **Premium Features** - Boost listings and get verified badge
 
-### For Buyers 🛒
+### For Buyers 
 - **Browse Products** - Explore fresh produce from verified farmers
 - **Search & Filter** - Find exactly what you need by category, region, or price
 - **Secure Payments** - Pay via MTN/Airtel Mobile Money
@@ -50,7 +50,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 - **Reviews & Ratings** - Make informed decisions with community reviews
 - **Favorites** - Save products and follow favorite farmers
 
-### For Admins 👔
+### For Admins 
 - **Dashboard Analytics** - Real-time insights on platform performance
 - **User Management** - Verify farmers, manage suspensions
 - **Product Moderation** - Approve/reject product listings
@@ -58,15 +58,14 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 - **Financial Reports** - Track revenue, payments, and payouts
 - **System Configuration** - Manage platform settings
 
-### AI-Powered Features 🤖
+### AI-Powered Features 
 - **Farming Chatbot** - 24/7 agricultural advice in local context
 - **Crop Analysis** - Upload images for plant health assessment
 - **Pest Identification** - Identify pests and get treatment advice
-- **Disease Diagnosis** - Diagnose plant diseases from photos
 - **Market Predictions** - AI-powered price forecasting
 - **Weather Tips** - Weather-based farming recommendations
 
-## 📸 Screenshots
+##  Screenshots
 
 <p align="center">
   <img src="assets/screenshots/home.png" width="200" />
@@ -75,7 +74,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
   <img src="assets/screenshots/orders.png" width="200" />
 </p>
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 ### Mobile App (Flutter)
 - **Framework:** Flutter 3.16+
@@ -102,7 +101,7 @@ To empower Ugandan farmers with technology that increases their income, reduces 
 - **Monitoring:** Sentry
 - **Analytics:** Mixpanel
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Flutter SDK 3.16+
@@ -148,7 +147,7 @@ cp .env.example .env
 npm run dev
 ```
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 agrisupply/
@@ -182,7 +181,7 @@ agrisupply/
 └── README.md                     # This file
 ```
 
-## 📖 Documentation
+##  Documentation
 
 - [Mobile App Documentation](./docs/mobile.md)
 - [Backend API Documentation](./backend/README.md)
@@ -190,7 +189,7 @@ agrisupply/
 - [Deployment Guide](./docs/deployment.md)
 - [Contributing Guide](./CONTRIBUTING.md)
 
-## 🔐 Security
+##  Security
 
 - All API endpoints are protected with JWT authentication
 - Passwords are hashed using bcrypt
@@ -199,7 +198,7 @@ agrisupply/
 - Rate limiting on all endpoints
 - Input validation and sanitization
 
-## 🌐 API Endpoints
+##  API Endpoints
 
 | Category | Endpoints | Description |
 |----------|-----------|-------------|
@@ -212,7 +211,7 @@ agrisupply/
 | Admin | 22 | Dashboard, management, analytics |
 | Notifications | 11 | CRUD, preferences, devices |
 
-## 📊 Database Schema
+##  Database Schema
 
 ### Core Tables
 - `users` - User accounts and profiles
@@ -228,7 +227,7 @@ agrisupply/
 - `farmer_followers` - Social connections
 - `ai_chat_sessions` - AI conversation history
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -238,24 +237,24 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+##  Team
 
 - **Product Owner:** AgriSupply Team
 - **Lead Developer:** AgriSupply Engineering
 - **Design:** AgriSupply Design Team
 
-## 📞 Support
+##  Support
 
 - **Email:** 
 - **Phone:** 
 - **WhatsApp:** 
 - **Twitter:**
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Uganda Ministry of Agriculture
 - Local farmer cooperatives
