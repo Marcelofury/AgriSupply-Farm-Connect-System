@@ -73,6 +73,42 @@ router.post(
 );
 
 /**
+ * @route   POST /api/v1/auth/password-reset/send-otp
+ * @desc    Send password reset OTP to phone
+ * @access  Public
+ */
+router.post(
+  '/password-reset/send-otp',
+  authValidators.passwordResetSendOtp,
+  handleValidation,
+  authController.sendPasswordResetOtp
+);
+
+/**
+ * @route   POST /api/v1/auth/password-reset/verify-otp
+ * @desc    Verify password reset OTP
+ * @access  Public
+ */
+router.post(
+  '/password-reset/verify-otp',
+  authValidators.passwordResetVerifyOtp,
+  handleValidation,
+  authController.verifyPasswordResetOtp
+);
+
+/**
+ * @route   POST /api/v1/auth/password-reset/confirm
+ * @desc    Confirm password reset using verified reset token
+ * @access  Public
+ */
+router.post(
+  '/password-reset/confirm',
+  authValidators.passwordResetConfirm,
+  handleValidation,
+  authController.confirmPasswordResetWithOtp
+);
+
+/**
  * @route   POST /api/v1/auth/reset-password
  * @desc    Reset password with token
  * @access  Public

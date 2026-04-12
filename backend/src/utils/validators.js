@@ -95,6 +95,33 @@ const authValidators = {
       .normalizeEmail()
       .withMessage('Please provide a valid email'),
   ],
+
+  passwordResetSendOtp: [
+    body('phone')
+      .matches(/^(\+256|0)?[7][0-9]{8}$/)
+      .withMessage('Please provide a valid Ugandan phone number'),
+  ],
+
+  passwordResetVerifyOtp: [
+    body('phone')
+      .matches(/^(\+256|0)?[7][0-9]{8}$/)
+      .withMessage('Please provide a valid Ugandan phone number'),
+    body('otp')
+      .isLength({ min: 6, max: 6 })
+      .isNumeric()
+      .withMessage('OTP must be 6 digits'),
+  ],
+
+  passwordResetConfirm: [
+    body('phone')
+      .matches(/^(\+256|0)?[7][0-9]{8}$/)
+      .withMessage('Please provide a valid Ugandan phone number'),
+    body('resetToken')
+      .isString()
+      .isLength({ min: 16 })
+      .withMessage('A valid reset token is required'),
+    passwordRule('newPassword'),
+  ],
   
   updatePassword: [
     body('currentPassword')

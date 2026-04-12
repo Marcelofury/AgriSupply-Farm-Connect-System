@@ -2,6 +2,12 @@ const { supabase, supabaseAnon } = require('../config/supabase');
 const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { formatPhoneNumber, sanitizeUser } = require('../utils/helpers');
 const logger = require('../utils/logger');
+const { sendSms } = require('../services/smsProviderService');
+const {
+  issueOtp,
+  verifyOtp: verifyResetOtpCode,
+  consumeResetToken,
+} = require('../services/passwordResetOtpService');
 
 const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@agrisupply.ug';
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
@@ -319,6 +325,126 @@ const forgotPassword = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc    Send password reset OTP via SMS
+ * @route   POST /api/v1/auth/password-reset/send-otp
+ */
+const sendPasswordResetOtp = asyncHandler(async (req, res) => {
+  const { phone } = req.body;
+  const formattedPhone = formatPhoneNumber(phone);
+
+  if (!formattedPhone) {
+    throw new ApiError(400, 'Invalid phone number');
+  }
+
+  const { data: user } = await supabase
+    .from('users')
+    .select('id, phone')
+    .eq('phone', formattedPhone)
+    .eq('is_deleted', false)
+    .maybeSingle();
+
+  // Avoid account enumeration by always returning success-like response.
+  if (!user) {
+    return res.json({
+      success: true,
+      message: 'If this phone is registered, an OTP has been sent.',
+    });
+  }
+
+  const issued = issueOtp(formattedPhone, user.id);
+  if (!issued.ok) {
+    if (issued.reason === 'cooldown') {
+      throw new ApiError(429, `Please wait ${issued.retryAfterSeconds}s before requesting another OTP`);
+    }
+    throw new ApiError(400, 'Could not generate OTP');
+  }
+
+  const smsMessage = `AgriSupply password reset code: ${issued.otp}. Expires in 5 minutes.`;
+  const smsResult = await sendSms({
+    phone: formattedPhone,
+    message: smsMessage,
+  });
+
+  if (!smsResult.ok) {
+    logger.error('Failed to send password reset OTP:', smsResult);
+    throw new ApiError(500, 'Failed to send OTP. Please try again.');
+  }
+
+  const responseData = {};
+  if (process.env.NODE_ENV !== 'production') {
+    responseData.devOtp = issued.otp;
+  }
+
+  res.json({
+    success: true,
+    message: 'If this phone is registered, an OTP has been sent.',
+    data: responseData,
+  });
+});
+
+/**
+ * @desc    Verify password reset OTP
+ * @route   POST /api/v1/auth/password-reset/verify-otp
+ */
+const verifyPasswordResetOtp = asyncHandler(async (req, res) => {
+  const { phone, otp } = req.body;
+  const formattedPhone = formatPhoneNumber(phone);
+
+  if (!formattedPhone) {
+    throw new ApiError(400, 'Invalid phone number');
+  }
+
+  const verification = verifyResetOtpCode(formattedPhone, otp);
+  if (!verification.ok) {
+    throw new ApiError(400, 'Invalid or expired OTP');
+  }
+
+  res.json({
+    success: true,
+    message: 'OTP verified successfully',
+    data: {
+      resetToken: verification.resetToken,
+    },
+  });
+});
+
+/**
+ * @desc    Complete password reset using verified OTP token
+ * @route   POST /api/v1/auth/password-reset/confirm
+ */
+const confirmPasswordResetWithOtp = asyncHandler(async (req, res) => {
+  const { phone, resetToken, newPassword } = req.body;
+  const formattedPhone = formatPhoneNumber(phone);
+
+  if (!formattedPhone) {
+    throw new ApiError(400, 'Invalid phone number');
+  }
+
+  if (!resetToken || !newPassword) {
+    throw new ApiError(400, 'Phone, reset token, and new password are required');
+  }
+
+  const consumed = consumeResetToken(formattedPhone, resetToken);
+  if (!consumed.ok) {
+    throw new ApiError(400, 'Invalid or expired reset session');
+  }
+
+  const { error } = await supabase.auth.admin.updateUserById(consumed.userId, {
+    password: newPassword,
+  });
+
+  if (error) {
+    logger.error('Password reset by OTP failed:', error);
+    throw new ApiError(400, 'Failed to reset password');
+  }
+
+  res.json({
+    success: true,
+    message: 'Password reset successful. You can now log in with your new password.',
+  });
+});
+
+/**
  * @desc    Reset password
  * @route   POST /api/v1/auth/reset-password
  */
@@ -470,6 +596,9 @@ module.exports = {
   sendPhoneOTP,
   verifyPhoneOTP,
   forgotPassword,
+  sendPasswordResetOtp,
+  verifyPasswordResetOtp,
+  confirmPasswordResetWithOtp,
   resetPassword,
   refreshToken,
   logout,
