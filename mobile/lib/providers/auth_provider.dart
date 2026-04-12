@@ -330,6 +330,65 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<String?> sendPasswordResetOtp({required final String phone}) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final devOtp = await _authService.sendPasswordResetOtp(phone: phone);
+      _setLoading(false);
+      return devOtp;
+    } catch (e) {
+      _errorMessage = _parseError(e);
+      _setLoading(false);
+      return null;
+    }
+  }
+
+  Future<String?> verifyPasswordResetOtp({
+    required final String phone,
+    required final String otp,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      final resetToken = await _authService.verifyPasswordResetOtp(
+        phone: phone,
+        otp: otp,
+      );
+      _setLoading(false);
+      return resetToken;
+    } catch (e) {
+      _errorMessage = _parseError(e);
+      _setLoading(false);
+      return null;
+    }
+  }
+
+  Future<bool> confirmPasswordResetWithOtp({
+    required final String phone,
+    required final String resetToken,
+    required final String newPassword,
+  }) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      await _authService.confirmPasswordResetWithOtp(
+        phone: phone,
+        resetToken: resetToken,
+        newPassword: newPassword,
+      );
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _errorMessage = _parseError(e);
+      _setLoading(false);
+      return false;
+    }
+  }
+
   Future<bool> updatePassword({required final String newPassword}) async {
     _setLoading(true);
     _clearError();

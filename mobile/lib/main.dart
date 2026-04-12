@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:app_links/app_links.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
 
 import 'config/app_config.dart';
 import 'config/routes.dart';
@@ -35,8 +37,58 @@ void main() async {
   runApp(const AgriSupplyApp());
 }
 
-class AgriSupplyApp extends StatelessWidget {
+class AgriSupplyApp extends StatefulWidget {
   const AgriSupplyApp({super.key});
+
+  @override
+  State<AgriSupplyApp> createState() => _AgriSupplyAppState();
+}
+
+class _AgriSupplyAppState extends State<AgriSupplyApp> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final AppLinks _appLinks = AppLinks();
+  StreamSubscription<Uri>? _deepLinkSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDeepLinks();
+  }
+
+  Future<void> _initializeDeepLinks() async {
+    try {
+      final initialUri = await _appLinks.getInitialLink();
+      if (initialUri != null) {
+        _handleDeepLink(initialUri);
+      }
+    } catch (_) {}
+
+    _deepLinkSub = _appLinks.uriLinkStream.listen((final uri) {
+      _handleDeepLink(uri);
+    });
+  }
+
+  void _handleDeepLink(final Uri uri) {
+    final isResetRoute =
+        uri.path.contains('reset-password') || uri.host.contains('reset-password');
+    if (!isResetRoute) return;
+
+    final phone = uri.queryParameters['phone'];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigatorKey.currentState?.pushNamed(
+        AppRoutes.forgotPassword,
+        arguments: {
+          if (phone != null && phone.trim().isNotEmpty) 'phone': phone,
+        },
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _deepLinkSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(final BuildContext context) {
@@ -49,6 +101,7 @@ class AgriSupplyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: MaterialApp(
+        navigatorKey: _navigatorKey,
         title: 'AgriSupply Farm Connect',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,

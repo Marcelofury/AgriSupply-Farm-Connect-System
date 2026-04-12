@@ -3,12 +3,15 @@ import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/input_validators.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+  const ForgotPasswordScreen({super.key, this.initialPhone});
+
+  final String? initialPhone;
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -16,23 +19,128 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _otpController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  String? _resetToken;
+  String? _devOtp;
   bool _isLoading = false;
+  bool _otpSent = false;
+  bool _otpVerified = false;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPhone != null && widget.initialPhone!.trim().isNotEmpty) {
+      _phoneController.text = widget.initialPhone!.trim();
+    }
+  }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
+    _otpController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleResetRequest() async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _handleSendOtp() async {
+    if (InputValidators.ugandaPhone(_phoneController.text) != null) {
+      _showError(InputValidators.ugandaPhone(_phoneController.text)!);
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final ok = await authProvider.resetPassword(
-        email: _emailController.text.trim(),
+      final devOtp = await authProvider.sendPasswordResetOtp(
+        phone: _phoneController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _otpSent = true;
+        _devOtp = devOtp;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('OTP sent if this phone is registered.'),
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (_) {
+      _showError('Failed to send OTP. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleVerifyOtp() async {
+    if (_otpController.text.trim().length != 6) {
+      _showError('Enter a valid 6-digit OTP.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final resetToken = await authProvider.verifyPasswordResetOtp(
+        phone: _phoneController.text.trim(),
+        otp: _otpController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      if (resetToken != null && resetToken.isNotEmpty) {
+        setState(() {
+          _otpVerified = true;
+          _resetToken = resetToken;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('OTP verified. Set your new password.'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        _showError(authProvider.errorMessage ?? 'Invalid or expired OTP.');
+      }
+    } catch (_) {
+      _showError('An unexpected error occurred');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleResetPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_resetToken == null) {
+      _showError('Verify OTP first.');
+      return;
+    }
+
+    if (_newPasswordController.text != _confirmPasswordController.text) {
+      _showError('Passwords do not match.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final ok = await authProvider.confirmPasswordResetWithOtp(
+        phone: _phoneController.text.trim(),
+        resetToken: _resetToken!,
+        newPassword: _newPasswordController.text,
       );
 
       if (!mounted) return;
@@ -40,14 +148,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (ok) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('If this email exists, a reset link has been sent.'),
+            content: Text('Password reset successful. Please sign in.'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
         Navigator.pop(context);
       } else {
-        _showError(authProvider.errorMessage ?? 'Failed to send reset email');
+        _showError(authProvider.errorMessage ?? 'Failed to reset password');
       }
     } catch (_) {
       _showError('An unexpected error occurred');
@@ -112,7 +220,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Enter your account email. We will send a secure reset link.',
+                    'Reset with phone OTP. We send a 6-digit code via SMS.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: AppColors.grey600,
                         ),
@@ -120,27 +228,85 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   const SizedBox(height: 36),
                   CustomTextField(
-                    controller: _emailController,
-                    label: 'Email Address',
-                    hint: 'yourname@example.com',
-                    keyboardType: TextInputType.emailAddress,
-                    prefixIcon: Icons.email_outlined,
-                    validator: (final value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!RegExp(r'^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}
-?$').hasMatch(value.trim())) {
-                        return 'Enter a valid email address';
-                      }
-                      return null;
-                    },
+                    controller: _phoneController,
+                    label: 'Phone Number',
+                    hint: 'e.g. 0772123456',
+                    keyboardType: TextInputType.phone,
+                    prefixIcon: Icons.phone_outlined,
+                    validator: InputValidators.ugandaPhone,
                   ),
+                  if (_otpSent) ...[
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      controller: _otpController,
+                      label: 'OTP Code',
+                      hint: 'Enter 6-digit OTP',
+                      keyboardType: TextInputType.number,
+                      prefixIcon: Icons.verified_user_outlined,
+                      maxLength: 6,
+                    ),
+                    if (_devOtp != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Dev OTP: $_devOtp',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.grey600,
+                            ),
+                      ),
+                    ],
+                  ],
+                  if (_otpVerified) ...[
+                    const SizedBox(height: 16),
+                    CustomTextField(
+                      controller: _newPasswordController,
+                      label: 'New Password',
+                      hint: 'Enter new password',
+                      obscureText: _obscureNewPassword,
+                      prefixIcon: Icons.lock_outline,
+                      validator: InputValidators.password,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureNewPassword ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() => _obscureNewPassword = !_obscureNewPassword);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      controller: _confirmPasswordController,
+                      label: 'Confirm Password',
+                      hint: 'Re-enter new password',
+                      obscureText: _obscureConfirmPassword,
+                      prefixIcon: Icons.lock_reset_outlined,
+                      validator: InputValidators.password,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+                        },
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
-                  CustomButton(
-                    text: 'Send Reset Link',
-                    onPressed: _handleResetRequest,
-                  ),
+                  if (!_otpSent)
+                    CustomButton(
+                      text: 'Send OTP',
+                      onPressed: _handleSendOtp,
+                    )
+                  else if (!_otpVerified)
+                    CustomButton(
+                      text: 'Verify OTP',
+                      onPressed: _handleVerifyOtp,
+                    )
+                  else
+                    CustomButton(
+                      text: 'Reset Password',
+                      onPressed: _handleResetPassword,
+                    ),
                 ],
               ),
             ),

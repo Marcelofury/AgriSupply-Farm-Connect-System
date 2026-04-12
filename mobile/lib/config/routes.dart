@@ -83,7 +83,13 @@ class AppRoutes {
       case register:
         return _buildRoute(const RegisterScreen(), settings);
       case forgotPassword:
-        return _buildRoute(const ForgotPasswordScreen(), settings);
+        final args = settings.arguments as Map<String, dynamic>?;
+        return _buildRoute(
+          ForgotPasswordScreen(
+            initialPhone: args?['phone'] as String?,
+          ),
+          settings,
+        );
       case otpVerification:
         final args = settings.arguments as Map<String, dynamic>?;
         return _buildRoute(

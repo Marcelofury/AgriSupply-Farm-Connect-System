@@ -43,6 +43,7 @@ dependencies:
 
   # Navigation
   go_router: ^14.8.1
+  app_links: ^6.4.0
 
   # Notifications
   flutter_local_notifications: ^18.0.1

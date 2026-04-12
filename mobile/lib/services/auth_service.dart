@@ -470,6 +470,73 @@ class AuthService {
     }
   }
 
+  // Send password reset OTP to phone
+  Future<String?> sendPasswordResetOtp({required final String phone}) async {
+    try {
+      final response = await _apiService.post(
+        '/auth/password-reset/send-otp',
+        body: {'phone': phone},
+      );
+
+      final data = response['data'];
+      if (data is Map<String, dynamic>) {
+        final devOtp = data['devOtp'];
+        if (devOtp is String && devOtp.isNotEmpty) {
+          return devOtp;
+        }
+      }
+
+      return null;
+    } catch (e) {
+      throw Exception('Failed to send password reset OTP: $e');
+    }
+  }
+
+  // Verify password reset OTP and get reset token
+  Future<String> verifyPasswordResetOtp({
+    required final String phone,
+    required final String otp,
+  }) async {
+    try {
+      final response = await _apiService.post(
+        '/auth/password-reset/verify-otp',
+        body: {
+          'phone': phone,
+          'otp': otp,
+        },
+      );
+
+      final data = response['data'];
+      if (data is Map<String, dynamic> && data['resetToken'] is String) {
+        return data['resetToken'] as String;
+      }
+
+      throw Exception('Reset token was not returned by the server');
+    } catch (e) {
+      throw Exception('Failed to verify password reset OTP: $e');
+    }
+  }
+
+  // Confirm password reset with reset token
+  Future<void> confirmPasswordResetWithOtp({
+    required final String phone,
+    required final String resetToken,
+    required final String newPassword,
+  }) async {
+    try {
+      await _apiService.post(
+        '/auth/password-reset/confirm',
+        body: {
+          'phone': phone,
+          'resetToken': resetToken,
+          'newPassword': newPassword,
+        },
+      );
+    } catch (e) {
+      throw Exception('Failed to complete password reset: $e');
+    }
+  }
+
   // Update password
   Future<void> updatePassword({required final String newPassword}) async {
     try {
