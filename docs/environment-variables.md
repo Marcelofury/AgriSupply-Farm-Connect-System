@@ -82,6 +82,10 @@ Source scan coverage:
 | AFRICAS_TALKING_API_KEY | If SMS_SERVICE=africas_talking | none | Africa's Talking API key |
 | AFRICAS_TALKING_USERNAME | If SMS_SERVICE=africas_talking | none | Africa's Talking username |
 | AFRICAS_TALKING_SENDER_ID | No | none | SMS sender ID |
+| EGOSMS_API_URL | If SMS_SERVICE=egosms | none | EgoSMS API endpoint |
+| EGOSMS_USERNAME | If SMS_SERVICE=egosms | none | EgoSMS username |
+| EGOSMS_PASSWORD | If SMS_SERVICE=egosms | none | EgoSMS password |
+| EGOSMS_SENDER_ID | If SMS_SERVICE=egosms | none | EgoSMS sender name/ID |
 | FIREBASE_SERVER_KEY | Optional fallback | none | FCM legacy REST key fallback |
 
 ## 2) Current backend `.env` template
@@ -136,6 +140,13 @@ SMS_SERVICE=africas_talking
 AFRICAS_TALKING_API_KEY=your-africas-talking-api-key
 AFRICAS_TALKING_USERNAME=your-username
 AFRICAS_TALKING_SENDER_ID=AgriSupply
+
+# For EgoSMS-based OTP delivery
+# SMS_SERVICE=egosms
+# EGOSMS_API_URL=https://your-egosms-endpoint
+# EGOSMS_USERNAME=your-egosms-username
+# EGOSMS_PASSWORD=your-egosms-password
+# EGOSMS_SENDER_ID=AgriSupply
 
 FIREBASE_SERVER_KEY=your-firebase-server-key
 ```
