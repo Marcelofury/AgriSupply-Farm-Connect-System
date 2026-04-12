@@ -31,14 +31,10 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
   Future<void> _loadProducts() async {
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final buyerRegion = authProvider.currentUser?.region;
 
-    if (buyerRegion != null && buyerRegion.isNotEmpty) {
-      productProvider.setRegion(buyerRegion);
-    } else {
-      await productProvider.fetchProducts(refresh: true);
-    }
+    // Marketplace is global for buyers unless they explicitly choose a region filter.
+    productProvider.setRegion(null, refresh: false);
+    await productProvider.fetchProducts(refresh: true);
 
     await productProvider.fetchFeaturedProducts();
   }
