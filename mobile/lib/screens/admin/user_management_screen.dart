@@ -5,8 +5,6 @@ import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../services/admin_service.dart';
 import '../../widgets/loading_overlay.dart';
-
-// Use string-based user type checking for mock data
 class _UserType {
   static const String farmer = 'farmer';
   static const String buyer = 'buyer';
