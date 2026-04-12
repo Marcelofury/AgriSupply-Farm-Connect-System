@@ -1,4 +1,29 @@
 // Jest configuration for backend testing
+const reporters = ['default'];
+const watchPlugins = [];
+
+try {
+  require.resolve('jest-junit');
+  reporters.push([
+    'jest-junit',
+    {
+      outputDirectory: 'test-results',
+      outputName: 'junit.xml',
+    },
+  ]);
+} catch (error) {
+  // Keep default reporter when jest-junit is not available.
+}
+
+try {
+  require.resolve('jest-watch-typeahead/filename');
+  require.resolve('jest-watch-typeahead/testname');
+  watchPlugins.push('jest-watch-typeahead/filename');
+  watchPlugins.push('jest-watch-typeahead/testname');
+} catch (error) {
+  // Watch plugins are optional.
+}
+
 module.exports = {
   // Test environment
   testEnvironment: 'node',
@@ -80,20 +105,8 @@ module.exports = {
   },
 
   // Reporters
-  reporters: [
-    'default',
-    [
-      'jest-junit',
-      {
-        outputDirectory: 'test-results',
-        outputName: 'junit.xml',
-      },
-    ],
-  ],
+  reporters,
 
   // Watch plugins
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname',
-  ],
+  watchPlugins,
 };
