@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../config/theme.dart';
@@ -151,17 +152,17 @@ class AboutScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildSocialButton(
-                    Icons.facebook,
+                    FontAwesomeIcons.facebook,
                     'facebook',
                     () => _launchUrl('https://facebook.com/agrisupply'),
                   ),
                   _buildSocialButton(
-                    Icons.camera_alt,
+                    FontAwesomeIcons.instagram,
                     'instagram',
                     () => _launchUrl('https://instagram.com/agrisupply'),
                   ),
                   _buildSocialButton(
-                    Icons.tag,
+                    FontAwesomeIcons.xTwitter,
                     'twitter',
                     () => _launchUrl('https://twitter.com/agrisupply'),
                   ),
@@ -344,16 +345,36 @@ class AboutScreen extends StatelessWidget {
   }
 
   Widget _buildSocialButton(final IconData icon, final String platform, final VoidCallback onTap) {
+    final platformStyle = <String, Map<String, Color>>{
+      'facebook': {
+        'icon': const Color(0xFF1877F2),
+        'bg': const Color(0xFFE8F1FF),
+      },
+      'instagram': {
+        'icon': const Color(0xFFE4405F),
+        'bg': const Color(0xFFFFEEF2),
+      },
+      'twitter': {
+        'icon': const Color(0xFF111111),
+        'bg': const Color(0xFFF3F4F6),
+      },
+    };
+    final colors = platformStyle[platform] ??
+        {
+          'icon': AppColors.primaryGreen,
+          'bg': AppColors.primaryGreen.withOpacity(0.1),
+        };
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.primaryGreen.withOpacity(0.1),
+          color: colors['bg'],
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: AppColors.primaryGreen, size: 28),
+        child: Icon(icon, color: colors['icon'], size: 28),
       ),
     );
   }

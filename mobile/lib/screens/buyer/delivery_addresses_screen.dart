@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
@@ -152,6 +154,8 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
   }
 
   Widget _buildAddressCard(final DeliveryAddress address) {
+    final center = _districtCenter(address.district);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -275,11 +279,57 @@ class _DeliveryAddressesScreenState extends State<DeliveryAddressesScreen> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 140,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: FlutterMap(
+                      options: MapOptions(initialCenter: center, initialZoom: 12),
+                      children: [
+                        TileLayer(
+                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.agrisupply.mobile',
+                        ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: center,
+                              width: 44,
+                              height: 44,
+                              child: const Icon(
+                                Icons.location_on,
+                                color: AppColors.primaryGreen,
+                                size: 32,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ],
         ),
       ),
+
+      LatLng _districtCenter(final String district) {
+        const districtCenters = <String, LatLng>{
+          'Kampala': LatLng(0.3476, 32.5825),
+          'Wakiso': LatLng(0.4044, 32.4599),
+          'Mukono': LatLng(0.3533, 32.7553),
+          'Mbarara': LatLng(-0.6072, 30.6545),
+          'Gulu': LatLng(2.7746, 32.2989),
+          'Mbale': LatLng(1.0821, 34.1750),
+          'Jinja': LatLng(0.4479, 33.2026),
+          'Arua': LatLng(3.0201, 30.9111),
+          'Masaka': LatLng(-0.3338, 31.7341),
+        };
+
+        return districtCenters[district] ?? const LatLng(0.3476, 32.5825);
+      }
     );
   }
 

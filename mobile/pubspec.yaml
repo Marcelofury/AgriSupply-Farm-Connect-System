@@ -54,6 +54,9 @@ dependencies:
   # Location
   geolocator: ^13.0.2
   geocoding: ^3.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  font_awesome_flutter: ^10.7.0
 
   # Charts & Analytics
   fl_chart: ^0.70.2
