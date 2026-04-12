@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/notification_model.dart';
+import '../services/local_notification_service.dart';
 import '../services/notification_service.dart';
 
 class NotificationProvider extends ChangeNotifier {
@@ -145,6 +146,28 @@ class NotificationProvider extends ChangeNotifier {
   void addNotification(final NotificationModel notification) {
     _notifications.insert(0, notification);
     _hasNewNotifications = true;
+
+    final isCritical = {
+      'product',
+      'order',
+      'order_update',
+      'payment',
+      'payment_received',
+      'payment_failed',
+      'review',
+      'system',
+      'account',
+    }.contains(notification.type)
+        || notification.type.startsWith('order_')
+        || notification.type.startsWith('payment_');
+
+    if (isCritical) {
+      LocalNotificationService.showPopup(
+        title: notification.title,
+        body: notification.body,
+      );
+    }
+
     notifyListeners();
   }
 

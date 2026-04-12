@@ -4,6 +4,10 @@ const { paginate, paginationResponse, slugify } = require('../utils/helpers');
 const { processFiles } = require('../middleware/uploadMiddleware');
 const constants = require('../config/constants');
 const logger = require('../utils/logger');
+const {
+  createInAppNotification,
+  createBulkInAppNotifications,
+} = require('../utils/notificationHelper');
 
 /**
  * @desc    Get all products with filters
@@ -52,8 +56,7 @@ const getProducts = asyncHandler(async (req, res) => {
 
   normalizedSortOrder = normalizedSortOrder ?? 'desc';
 
-  const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
-  const effectiveRegion = region || buyerRegion;
+  const effectiveRegion = region || null;
   
   const { page: pageNum, limit: limitNum, offset } = paginate(page, limit);
 
@@ -155,8 +158,7 @@ const searchProducts = asyncHandler(async (req, res) => {
 
   normalizedSortOrder = normalizedSortOrder ?? 'desc';
 
-  const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
-  const effectiveRegion = region || buyerRegion;
+  const effectiveRegion = region || null;
   const { page: pageNum, limit: limitNum, offset } = paginate(page, limit);
 
   if (!q || q.length < 2) {
@@ -217,7 +219,6 @@ const searchProducts = asyncHandler(async (req, res) => {
  */
 const getFeaturedProducts = asyncHandler(async (req, res) => {
   const { limit = 10 } = req.query;
-  const buyerRegion = req.user?.role === 'buyer' ? req.user.region : null;
 
   let query = supabase
     .from('products')
@@ -228,10 +229,6 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
     .eq('status', 'active')
     .eq('is_featured', true)
     .order('rating', { ascending: false });
-
-  if (buyerRegion) {
-    query = query.eq('farmer.region', buyerRegion);
-  }
 
   const { data, error } = await query.limit(parseInt(limit));
 
@@ -437,6 +434,21 @@ const createProduct = asyncHandler(async (req, res) => {
     logger.error('Create product error:', error);
     throw new ApiError(400, 'Failed to create product');
   }
+
+  // Notify buyers about newly listed products.
+  const { data: buyers } = await supabase
+    .from('users')
+    .select('id')
+    .eq('role', 'buyer')
+    .eq('is_deleted', false);
+
+  await createBulkInAppNotifications({
+    userIds: buyers?.map((buyer) => buyer.id) || [],
+    type: 'product',
+    title: 'New Product Added',
+    message: `${data.name} is now available in the marketplace.`,
+    data: { productId: data.id, farmerId },
+  });
 
   res.status(201).json({
     success: true,
@@ -772,6 +784,14 @@ const addReview = asyncHandler(async (req, res) => {
     logger.error('Add review error:', error);
     throw new ApiError(400, 'Failed to add review');
   }
+
+  await createInAppNotification({
+    userId: product.farmer_id,
+    type: 'review',
+    title: 'New Product Review',
+    message: `Your product received a ${rating}-star review.`,
+    data: { productId: id, reviewId: data.id },
+  });
 
   // Update product rating
   const { data: reviews } = await supabase

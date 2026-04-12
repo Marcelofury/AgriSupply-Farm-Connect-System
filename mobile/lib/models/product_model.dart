@@ -6,6 +6,7 @@ class ProductModel {
     required this.farmerName,
     required this.name, required this.description, required this.category, required this.price, required this.unit, required this.quantity, required this.availableQuantity, required this.images, required this.harvestDate, required this.createdAt, required this.updatedAt, this.farmerImage,
     this.farmerRating = 0.0,
+    this.farmerVerified = false,
     this.region,
     this.district,
     this.isOrganic = false,
@@ -30,6 +31,7 @@ class ProductModel {
       farmerName: json['farmer_name'] as String? ?? farmerData?['full_name'] as String? ?? 'Unknown Farmer',
       farmerImage: json['farmer_image'] as String?,
       farmerRating: (json['farmer_rating'] as num?)?.toDouble() ?? 0.0,
+      farmerVerified: json['farmer_verified'] as bool? ?? farmerData?['is_verified'] as bool? ?? false,
       name: json['name'] as String,
       description: json['description'] as String,
       category: ProductCategory.fromId(json['category'] as String), // Convert from backend ID
@@ -83,6 +85,7 @@ class ProductModel {
   final String farmerName;
   final String? farmerImage;
   final double farmerRating;
+  final bool farmerVerified;
   final String name;
   final String description;
   final String category;
@@ -113,6 +116,7 @@ class ProductModel {
       'farmer_name': farmerName,
       'farmer_image': farmerImage,
       'farmer_rating': farmerRating,
+      'farmer_verified': farmerVerified,
       'name': name,
       'description': description,
       'category': ProductCategory.toId(category), // Convert to backend ID
@@ -147,6 +151,7 @@ class ProductModel {
     final String? farmerName,
     final String? farmerImage,
     final double? farmerRating,
+    final bool? farmerVerified,
     final String? name,
     final String? description,
     final String? category,
@@ -176,6 +181,7 @@ class ProductModel {
       farmerName: farmerName ?? this.farmerName,
       farmerImage: farmerImage ?? this.farmerImage,
       farmerRating: farmerRating ?? this.farmerRating,
+      farmerVerified: farmerVerified ?? this.farmerVerified,
       name: name ?? this.name,
       description: description ?? this.description,
       category: category ?? this.category,

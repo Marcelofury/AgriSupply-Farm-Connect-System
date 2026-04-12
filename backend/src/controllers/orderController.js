@@ -2,6 +2,10 @@ const { supabase } = require('../config/supabase');
 const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { paginate, paginationResponse, generateOrderNumber, generateTrackingNumber, calculateDeliveryFee } = require('../utils/helpers');
 const logger = require('../utils/logger');
+const {
+  createInAppNotification,
+  createBulkInAppNotifications,
+} = require('../utils/notificationHelper');
 
 /**
  * @desc    Get current user's orders (buyer)
@@ -282,16 +286,13 @@ const createOrder = asyncHandler(async (req, res) => {
 
   // Notify farmers
   const farmerIds = [...new Set(orderItems.map(item => item.farmer_id))];
-  for (const farmerId of farmerIds) {
-    await supabase.from('notifications').insert({
-      user_id: farmerId,
-      type: 'order_placed',
-      title: 'New Order Received',
-      message: `You have a new order #${orderNumber}`,
-      data: { orderId: order.id },
-      created_at: new Date().toISOString(),
-    });
-  }
+  await createBulkInAppNotifications({
+    userIds: farmerIds,
+    type: 'order_placed',
+    title: 'New Order Received',
+    message: `You have a new order #${orderNumber}`,
+    data: { orderId: order.id },
+  });
 
   res.status(201).json({
     success: true,
@@ -356,13 +357,12 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   });
 
   // Notify buyer
-  await supabase.from('notifications').insert({
-    user_id: order.buyer_id,
+  await createInAppNotification({
+    userId: order.buyer_id,
     type: `order_${status}`,
     title: 'Order Update',
     message: `Your order #${order.order_number} is now ${status}`,
     data: { orderId: id },
-    created_at: new Date().toISOString(),
   });
 
   res.json({

@@ -11,6 +11,7 @@ import 'providers/cart_provider.dart';
 import 'providers/notification_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/product_provider.dart';
+import 'services/local_notification_service.dart';
 import 'screens/splash_screen.dart';
 
 void main() async {
@@ -27,6 +28,9 @@ void main() async {
     url: AppConfig.supabaseUrl,
     anonKey: AppConfig.supabaseAnonKey,
   );
+
+  // Initialize local popup notifications
+  await LocalNotificationService.init();
 
   runApp(const AgriSupplyApp());
 }

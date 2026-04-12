@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../config/routes.dart';
 import '../config/theme.dart';
 import '../main.dart';
+import '../providers/notification_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -55,9 +57,15 @@ class _SplashScreenState extends State<SplashScreen>
             .eq('id', session.user.id)
             .single();
 
+        final notificationProvider =
+          Provider.of<NotificationProvider>(context, listen: false);
+        await notificationProvider.fetchNotifications(session.user.id);
+        notificationProvider.subscribeToNotifications(session.user.id);
+
         if (!mounted) return;
 
-        final userType = userData['user_type'] as String;
+        final userType =
+          (userData['user_type'] ?? userData['role'] ?? 'buyer') as String;
 
         switch (userType) {
           case 'farmer':

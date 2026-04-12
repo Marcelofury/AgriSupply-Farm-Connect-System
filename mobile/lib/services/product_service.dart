@@ -384,21 +384,14 @@ class ProductService {
   // Add product review
   Future<void> addReview(
     final String productId, {
-    required final String userId,
     required final double rating,
     final String? comment,
   }) async {
     try {
-      await _apiService.insert('product_reviews', {
-        'product_id': productId,
-        'user_id': userId,
+      await _apiService.post('/products/$productId/reviews', body: {
         'rating': rating,
         'comment': comment,
-        'created_at': DateTime.now().toIso8601String(),
       });
-
-      // Update product average rating
-      await _updateProductRating(productId);
     } catch (e) {
       throw Exception('Failed to add review: $e');
     }
@@ -432,15 +425,35 @@ class ProductService {
   // Get product reviews
   Future<List<Map<String, dynamic>>> getProductReviews(final String productId) async {
     try {
-      final reviews = await _apiService.query(
-        'product_reviews',
-        select: '*, users(full_name, photo_url)',
-        filters: {'product_id': productId},
-        orderBy: 'created_at',
-      );
-      return reviews;
+      final response = await _apiService.get('/products/$productId/reviews');
+      final reviews = (response['data'] ?? []) as List<dynamic>;
+      return reviews.cast<Map<String, dynamic>>();
     } catch (e) {
       throw Exception('Failed to fetch reviews: $e');
+    }
+  }
+
+  Future<void> updateReview(
+    final String productId,
+    final String reviewId, {
+    required final double rating,
+    final String? comment,
+  }) async {
+    try {
+      await _apiService.put('/products/$productId/reviews/$reviewId', body: {
+        'rating': rating,
+        'comment': comment,
+      });
+    } catch (e) {
+      throw Exception('Failed to update review: $e');
+    }
+  }
+
+  Future<void> deleteReview(final String productId, final String reviewId) async {
+    try {
+      await _apiService.delete('/products/$productId/reviews/$reviewId');
+    } catch (e) {
+      throw Exception('Failed to delete review: $e');
     }
   }
 }

@@ -4,6 +4,7 @@ const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { formatPhoneNumber, getMobileMoneyProvider, generateOrderNumber } = require('../utils/helpers');
 const logger = require('../utils/logger');
 const marzpayService = require('../services/marzpayService');
+const { createInAppNotification } = require('../utils/notificationHelper');
 
 // Payment provider configurations
 const MTN_API_URL = process.env.MTN_ENVIRONMENT === 'production'
@@ -395,15 +396,14 @@ const mtnCallback = asyncHandler(async (req, res) => {
       .single();
 
     if (order) {
-      await supabase.from('notifications').insert({
-        user_id: order.buyer_id,
+      await createInAppNotification({
+        userId: order.buyer_id,
         type: paymentStatus === 'completed' ? 'payment_received' : 'payment_failed',
         title: paymentStatus === 'completed' ? 'Payment Successful' : 'Payment Failed',
         message: paymentStatus === 'completed'
           ? `Payment for order #${order.order_number} was successful`
           : `Payment for order #${order.order_number} failed. Please try again.`,
         data: { orderId: payment.order_id },
-        created_at: new Date().toISOString(),
       });
     }
   }
@@ -501,15 +501,14 @@ const marzpayCallback = asyncHandler(async (req, res) => {
       .single();
 
     if (order) {
-      await supabase.from('notifications').insert({
-        user_id: order.buyer_id,
+      await createInAppNotification({
+        userId: order.buyer_id,
         type: paymentStatus === 'completed' ? 'payment_received' : 'payment_failed',
         title: paymentStatus === 'completed' ? 'Payment Successful' : 'Payment Failed',
         message: paymentStatus === 'completed'
           ? `Payment for order #${order.order_number} was successful via ${provider}`
           : `Payment for order #${order.order_number} failed. Please try again.`,
         data: { orderId: payment.order_id },
-        created_at: new Date().toISOString(),
       });
     }
   }
