@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../config/theme.dart';
+import '../../services/admin_service.dart';
 import '../../widgets/loading_overlay.dart';
 
 class AnalyticsScreen extends StatefulWidget {
@@ -13,9 +14,15 @@ class AnalyticsScreen extends StatefulWidget {
 }
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
+  final AdminService _adminService = AdminService();
   bool _isLoading = false;
   String _selectedPeriod = 'This Month';
   int _touchedIndex = -1;
+
+  Map<String, dynamic> _salesAnalytics = <String, dynamic>{};
+  Map<String, dynamic> _userAnalytics = <String, dynamic>{};
+  Map<String, dynamic> _productAnalytics = <String, dynamic>{};
+  Map<String, dynamic> _regionalAnalytics = <String, dynamic>{};
 
   final List<String> _periods = [
     'Today',
@@ -25,12 +32,69 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadAnalytics();
+  }
+
+  String _periodToApiValue() {
+    switch (_selectedPeriod) {
+      case 'Today':
+        return '7d';
+      case 'This Week':
+        return '7d';
+      case 'This Month':
+        return '30d';
+      case 'This Year':
+        return '1y';
+      default:
+        return '30d';
+    }
+  }
+
+  Future<void> _loadAnalytics() async {
+    setState(() => _isLoading = true);
+    try {
+      final period = _periodToApiValue();
+      final sales = await _adminService.getSalesAnalytics(period: period);
+      final users = await _adminService.getUserAnalytics(period: period);
+      final products = await _adminService.getProductAnalytics();
+      final regions = await _adminService.getRegionalAnalytics();
+
+      if (!mounted) return;
+      setState(() {
+        _salesAnalytics = sales;
+        _userAnalytics = users;
+        _productAnalytics = products;
+        _regionalAnalytics = regions;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load analytics: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
   Widget build(final BuildContext context) {
     final currencyFormat = NumberFormat.currency(
       locale: 'en_UG',
       symbol: 'UGX ',
       decimalDigits: 0,
     );
+    final totalRevenue = (_salesAnalytics['totalSales'] as num?)?.toDouble() ?? 0;
+    final totalOrders = (_salesAnalytics['totalOrders'] as num?)?.toInt() ?? 0;
+    final avgOrderValue = (_salesAnalytics['averageOrderValue'] as num?)?.toDouble() ?? 0;
+    final commission = totalRevenue * 0.05;
+    final newFarmers = (_userAnalytics['newFarmers'] as num?)?.toInt() ?? 0;
+    final newBuyers = (_userAnalytics['newBuyers'] as num?)?.toInt() ?? 0;
+    final totalNewUsers = (_userAnalytics['totalNewUsers'] as num?)?.toInt() ?? 0;
+    final totalProducts = (_productAnalytics['totalProducts'] as num?)?.toInt() ?? 0;
 
     return LoadingOverlay(
       isLoading: _isLoading,
@@ -58,18 +122,17 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   );
                 }).toList(),
                 onChanged: (final value) {
-                  if (value != null) setState(() => _selectedPeriod = value);
+                  if (value != null) {
+                    setState(() => _selectedPeriod = value);
+                    _loadAnalytics();
+                  }
                 },
               ),
             ),
           ],
         ),
         body: RefreshIndicator(
-          onRefresh: () async {
-            setState(() => _isLoading = true);
-            await Future<void>.delayed(const Duration(seconds: 1));
-            setState(() => _isLoading = false);
-          },
+          onRefresh: _loadAnalytics,
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -101,7 +164,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     Row(
                       children: [
                         Text(
-                          currencyFormat.format(45600000),
+                          currencyFormat.format(totalRevenue),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 28,
@@ -124,7 +187,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                   size: 14, color: Colors.white),
                               SizedBox(width: 4),
                               Text(
-                                '+15.3%',
+                                '+ live',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -141,8 +204,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildRevenueMetric('Orders', '1,234'),
-                        _buildRevenueMetric('Avg. Order', 'UGX 37K'),
-                        _buildRevenueMetric('Commission', 'UGX 2.3M'),
+                        _buildRevenueMetric('Orders', '$totalOrders'),
+                        _buildRevenueMetric('Avg. Order', currencyFormat.format(avgOrderValue)),
+                        _buildRevenueMetric('Commission', currencyFormat.format(commission)),
                       ],
                     ),
                   ],
@@ -264,8 +328,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Expanded(
                     child: _buildStatCard(
                       title: 'New Farmers',
-                      value: '156',
-                      change: '+12%',
+                      value: '$newFarmers',
+                      change: 'Live',
                       icon: Icons.agriculture,
                       color: AppColors.primaryGreen,
                     ),
@@ -274,8 +338,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Expanded(
                     child: _buildStatCard(
                       title: 'New Buyers',
-                      value: '423',
-                      change: '+18%',
+                      value: '$newBuyers',
+                      change: 'Live',
                       icon: Icons.shopping_cart,
                       color: AppColors.info,
                     ),
@@ -288,8 +352,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Expanded(
                     child: _buildStatCard(
                       title: 'Active Users',
-                      value: '1.2K',
-                      change: '+8%',
+                      value: '$totalNewUsers',
+                      change: 'Live',
                       icon: Icons.people,
                       color: AppColors.success,
                     ),
@@ -298,8 +362,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Expanded(
                     child: _buildStatCard(
                       title: 'New Users',
-                      value: '156',
-                      change: '+12%',
+                      value: '$totalProducts',
+                      change: 'Live',
                       icon: Icons.person_add,
                       color: AppColors.info,
                     ),
@@ -392,13 +456,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 ),
                 child: Column(
                   children: [
-                    _buildRegionBar('Central', 0.45, 456),
-                    const SizedBox(height: 12),
-                    _buildRegionBar('Eastern', 0.25, 253),
-                    const SizedBox(height: 12),
-                    _buildRegionBar('Western', 0.18, 182),
-                    const SizedBox(height: 12),
-                    _buildRegionBar('Northern', 0.12, 121),
+                    ..._buildRegionalBars(),
                   ],
                 ),
               ),
@@ -528,17 +586,34 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   String _getMonthName(final int index) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    return months[index];
+    final sortedKeys = (_salesAnalytics['salesByDate'] as Map<String, dynamic>? ?? <String, dynamic>{})
+        .keys
+        .toList()
+      ..sort();
+    if (sortedKeys.isEmpty || index >= sortedKeys.length) {
+      return '';
+    }
+    final date = DateTime.tryParse(sortedKeys[index]);
+    if (date == null) return '';
+    return DateFormat('MMM').format(date);
   }
 
   List<PieChartSectionData> _buildPieSections() {
+    final byCategory = (_productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final values = byCategory.values
+        .map((v) => (v as num?)?.toDouble() ?? 0)
+        .toList();
+    if (values.isEmpty || values.every((v) => v == 0)) {
+      values
+        ..clear()
+        ..addAll([1, 1, 1, 1, 1]);
+    }
     final data = [
-      (35.0, AppColors.primaryGreen),
-      (25.0, AppColors.secondaryOrange),
-      (20.0, AppColors.info),
-      (12.0, AppColors.warning),
-      (8.0, AppColors.grey500),
+      (values.length > 0 ? values[0] : 1, AppColors.primaryGreen),
+      (values.length > 1 ? values[1] : 1, AppColors.secondaryOrange),
+      (values.length > 2 ? values[2] : 1, AppColors.info),
+      (values.length > 3 ? values[3] : 1, AppColors.warning),
+      (values.length > 4 ? values[4] : 1, AppColors.grey500),
     ];
 
     return data.asMap().entries.map((final entry) {
@@ -586,17 +661,26 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   List<Widget> _buildTopProducts(final NumberFormat currencyFormat) {
-    final products = [
-      ('Fresh Tomatoes', '🍅', 234, 1560000),
-      ('Matooke', '🍌', 189, 1250000),
-      ('Fresh Milk', '🥛', 156, 980000),
-      ('Sweet Potatoes', '🍠', 143, 720000),
-      ('Beans', '🫘', 128, 640000),
-    ];
+    final products = (_productAnalytics['topByViews'] as List<dynamic>? ?? <dynamic>[])
+        .whereType<Map<String, dynamic>>()
+        .take(5)
+        .toList();
+
+    if (products.isEmpty) {
+      return [
+        const Padding(
+          padding: EdgeInsets.all(12),
+          child: Text('No product analytics available yet.'),
+        ),
+      ];
+    }
 
     return products.asMap().entries.map((final entry) {
       final index = entry.key;
       final product = entry.value;
+      final name = (product['name'] as String?) ?? 'Product';
+      final views = (product['views_count'] as num?)?.toInt() ?? 0;
+      final amount = ((product['price'] as num?)?.toDouble() ?? 0) * views;
 
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -623,7 +707,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               ),
               child: Center(
                 child: Text(
-                  product.$2,
+                    '📦',
                   style: const TextStyle(fontSize: 20),
                 ),
               ),
@@ -634,11 +718,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.$1,
+                    name,
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   Text(
-                    '${product.$3} orders',
+                    '$views views',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.grey600,
@@ -651,7 +735,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  currencyFormat.format(product.$4),
+                  currencyFormat.format(amount),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryGreen,
@@ -668,6 +752,34 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             ),
           ],
         ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildRegionalBars() {
+    final map = (_regionalAnalytics['ordersByRegion'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    if (map.isEmpty) {
+      return const [
+        Padding(
+          padding: EdgeInsets.all(12),
+          child: Text('No regional analytics available yet.'),
+        ),
+      ];
+    }
+
+    final entries = map.entries.toList();
+    final maxCount = entries.fold<int>(0, (prev, e) {
+      final count = ((e.value as Map<String, dynamic>)['count'] as num?)?.toInt() ?? 0;
+      return count > prev ? count : prev;
+    });
+
+    return entries.map((entry) {
+      final value = entry.value as Map<String, dynamic>;
+      final count = (value['count'] as num?)?.toInt() ?? 0;
+      final percentage = maxCount == 0 ? 0.0 : count / maxCount;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: _buildRegionBar(entry.key, percentage, count),
       );
     }).toList();
   }
