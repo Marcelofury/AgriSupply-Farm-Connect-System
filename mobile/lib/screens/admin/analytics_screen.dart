@@ -609,11 +609,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         ..addAll([1, 1, 1, 1, 1]);
     }
     final data = [
-      (values.length > 0 ? values[0] : 1, AppColors.primaryGreen),
-      (values.length > 1 ? values[1] : 1, AppColors.secondaryOrange),
-      (values.length > 2 ? values[2] : 1, AppColors.info),
-      (values.length > 3 ? values[3] : 1, AppColors.warning),
-      (values.length > 4 ? values[4] : 1, AppColors.grey500),
+      (values.length > 0 ? values[0] : 1.0, AppColors.primaryGreen),
+      (values.length > 1 ? values[1] : 1.0, AppColors.secondaryOrange),
+      (values.length > 2 ? values[2] : 1.0, AppColors.info),
+      (values.length > 3 ? values[3] : 1.0, AppColors.warning),
+      (values.length > 4 ? values[4] : 1.0, AppColors.grey500),
     ];
 
     return data.asMap().entries.map((final entry) {
