@@ -1,263 +1,304 @@
-# Sequence-Based Feature Presentation Guide
+# AgriSupply Deep File Walkthrough
 
-## Purpose
-Use this guide to present the code section feature-by-feature, aligned to the sequence diagrams already prepared.
+This walkthrough reflects the current implementation in this repository and follows real runtime flow.
 
-## How to Use During Presentation
-For each feature:
-1. State the business goal.
-2. Show frontend trigger screen.
-3. Trace provider/service call.
-4. Show backend controller logic.
-5. Mention database tables updated.
-6. Show success path and one failure path.
+## 1. Backend Runtime Entry
 
-## Backend Communication Architecture (Across All Sequences)
-This is the exact request path students should explain for every sequence:
-1. Flutter Screen (user action)
-2. Provider (state + trigger)
-3. Service (HTTP request)
-4. Route file (endpoint + middleware chain)
-5. Middleware (auth/role/validation)
-6. Controller (business logic)
-7. Service layer (external APIs where needed)
-8. Database operations (Supabase/PostgreSQL)
-9. JSON response to frontend
+## 1.1 backend/src/index.js
+Backend bootstrap and route mounting.
 
-### Core Backend Files to Show First
-- backend/src/index.js (API mounting and base paths)
-- backend/src/routes/authRoutes.js
-- backend/src/routes/productRoutes.js
-- backend/src/routes/orderRoutes.js
-- backend/src/routes/paymentRoutes.js
-- backend/src/routes/adminRoutes.js
-- backend/src/middleware/authMiddleware.js
-- backend/src/middleware/errorMiddleware.js
-- backend/src/controllers/authController.js
-- backend/src/controllers/productController.js
-- backend/src/controllers/orderController.js
-- backend/src/controllers/paymentController.js
-- backend/src/controllers/adminController.js
-- backend/src/services/marzpayService.js
+What it does:
+1. Loads environment variables and creates the Express app.
+2. Configures Helmet, CORS, compression, Morgan logging, body parsing, and global rate limiting.
+3. Mounts all route groups under /api/{version}/*.
+4. Exposes /health and / welcome endpoints.
+5. Applies catch-all 404 and global error middleware.
+6. Starts the HTTP listener and configures graceful shutdown handlers.
 
-### Sequence-to-Backend Communication Map
+## 1.2 backend/src/middleware/authMiddleware.js
+JWT/session middleware and role gates.
 
-#### Register Sequence
-- Frontend call: POST /api/v1/auth/register
-- Route chain: authRoutes -> authValidators.register -> handleValidation -> authController.register
-- Backend files: backend/src/routes/authRoutes.js, backend/src/controllers/authController.js
-- Data operations: users profile creation, optional notification_preferences setup
+What it does:
+1. Extracts Bearer token from Authorization header.
+2. Verifies token against Supabase auth via getUserFromToken.
+3. Loads the user profile from users and blocks suspended users.
+4. Attaches req.user and req.token.
+5. Restricts route access with requireAdmin, requireFarmer, requirePremium, and requireVerified.
 
-#### Login Sequence
-- Frontend call: POST /api/v1/auth/login
-- Route chain: authRoutes -> authValidators.login -> handleValidation -> authController.login
-- Backend files: backend/src/routes/authRoutes.js, backend/src/controllers/authController.js
-- Data operations: users lookup and last_login_at update
+## 1.3 backend/src/middleware/errorMiddleware.js
+Central error response middleware.
 
-#### Browse/Search Sequence
-- Frontend calls: GET /api/v1/products, GET /api/v1/products/search
-- Route chain: productRoutes -> optionalAuth -> productController.getProducts/searchProducts
-- Backend files: backend/src/routes/productRoutes.js, backend/src/controllers/productController.js
-- Data operations: products read with filters/pagination
+What it does:
+1. Defines ApiError for explicit HTTP failures.
+2. Normalizes Supabase, JWT, validation, and multer errors.
+3. Returns consistent JSON shape: { success: false, error: { message, ... } }.
+4. Exposes asyncHandler and handleValidation helpers used by route files.
 
-#### Checkout/Place Order Sequence
-- Frontend call: POST /api/v1/orders
-- Route chain: orderRoutes -> authenticate -> orderValidators.create -> handleValidation -> orderController.createOrder
-- Backend files: backend/src/routes/orderRoutes.js, backend/src/controllers/orderController.js
-- Data operations: orders insert, order_items insert, products quantity update, order_status_history insert, notifications insert
+## 2. Backend Configuration Layer
 
-#### Payment Sequence
-- Frontend call: POST /api/v1/payments/initiate
-- Callback: POST /api/v1/payments/marzpay/callback (also mtn/airtel/card callbacks)
-- Route chain: paymentRoutes -> authenticate -> paymentValidators.initiate -> handleValidation -> paymentController.initiatePayment
-- Backend files: backend/src/routes/paymentRoutes.js, backend/src/controllers/paymentController.js, backend/src/services/marzpayService.js
-- Data operations: payments insert/update, orders.payment_status update
+## 2.1 backend/src/config/supabase.js
+Supabase client initialization and helper wrappers.
 
-#### Tracking Sequence
-- Frontend calls: GET /api/v1/orders/:id, GET /api/v1/orders/:id/tracking, GET /api/v1/orders/:id/history
-- Route chain: orderRoutes -> authenticate -> id validation -> orderController methods
-- Backend files: backend/src/routes/orderRoutes.js, backend/src/controllers/orderController.js
-- Data operations: orders and order_status_history reads
+What it does:
+1. Creates service-role and anon clients.
+2. Exposes token-to-user lookup helpers.
+3. Exposes role checks (admin/farmer) and storage helpers.
 
-#### Review Sequence
-- Frontend call: POST /api/v1/products/:id/reviews
-- Route chain: productRoutes -> authenticate -> productValidators.review -> handleValidation -> productController.addReview
-- Backend files: backend/src/routes/productRoutes.js, backend/src/controllers/productController.js
-- Data operations: product_reviews insert, products rating aggregation update
+## 2.2 backend/src/config/constants.js
+Domain constants and AI model defaults.
 
-#### Farmer Product Management Sequence
-- Frontend calls: POST /api/v1/products, PUT /api/v1/products/:id
-- Route chain: productRoutes -> authenticate -> requireFarmer -> validation -> productController.createProduct/updateProduct
-- Backend files: backend/src/routes/productRoutes.js, backend/src/controllers/productController.js
-- Data operations: products create/update, optional image upload handling
+What it does:
+1. Holds product categories, validation constants, and cache/limit values.
+2. Holds Groq model defaults and system prompt configuration used by AI controller.
 
-#### Farmer Fulfillment Sequence
-- Frontend calls: PUT /api/v1/orders/:id/status, POST /api/v1/orders/:id/confirm, /ship, /deliver
-- Route chain: orderRoutes -> authenticate (+requireFarmer where applicable) -> validators -> orderController
-- Backend files: backend/src/routes/orderRoutes.js, backend/src/controllers/orderController.js
-- Data operations: order_items status update, orders status update, order_status_history insert, notifications insert
+## 2.3 backend/src/utils/validators.js
+Request validation definitions (express-validator).
 
-#### Admin Moderation Sequence
-- Frontend calls: /api/v1/admin/users, /products, /orders, /analytics/*
-- Route chain: adminRoutes (router.use(authenticate, requireAdmin)) -> validators -> adminController methods
-- Backend files: backend/src/routes/adminRoutes.js, backend/src/controllers/adminController.js, backend/src/middleware/authMiddleware.js
-- Data operations: users/products/orders/payments moderation and analytics queries
+What it does:
+1. Defines auth/product/order/payment/admin/notification validation rules.
+2. Works with handleValidation to reject invalid requests before controller execution.
 
----
+## 3. Auth and User Lifecycle
 
-## Feature 1: Register Account
-### Sequence
-Register sequence diagram.
+## 3.1 backend/src/routes/authRoutes.js
+Auth endpoint layer.
 
-### Business Goal
-Allow new users to create an account and profile.
+What it does:
+1. Exposes register/login/google/phone OTP/password/reset/refresh/logout/me/account endpoints.
+2. Applies validator chains and authenticate where needed.
 
-### What to Show
-- Frontend form submission flow
-- Auth service call
-- Backend registration and profile creation
+## 3.2 backend/src/controllers/authController.js
+Auth orchestration and profile bootstrap.
 
-### Files to Open
-- mobile/lib/screens/auth/register_screen.dart
-- mobile/lib/providers/auth_provider.dart
-- mobile/lib/services/auth_service.dart
-- backend/src/controllers/authController.js
+What it does:
+1. Creates users through Supabase auth admin APIs.
+2. Loads/creates users profile rows and notification_preferences.
+3. Handles login, token refresh, OTP verification, and password flows.
+4. Updates last_login_at and checks suspension status in runtime auth flow.
 
-### Data Impact
-- users
-- notification_preferences (if initialized on registration)
+## 3.3 backend/src/routes/userRoutes.js
+User profile and farmer relationship endpoints.
 
-### Demo Script
-1. User enters details and selects role.
-2. App validates input and sends register request.
-3. Backend creates auth user and profile.
-4. App receives token/profile and routes user accordingly.
+What it does:
+1. Exposes profile CRUD-like actions and profile photo upload.
+2. Exposes farmer discovery, follow/unfollow, and user statistics endpoints.
 
-### Likely Questions
-- Where is role assigned?
-- What happens if email already exists?
-- How is profile created after auth?
+## 4. Product and Catalog Lifecycle
 
----
+## 4.1 backend/src/routes/productRoutes.js
+Public and farmer product operations.
 
-## Feature 2: Login and Role Routing
-### Sequence
-Login sequence diagram.
+What it does:
+1. Serves listing/search/featured/category endpoints for buyers.
+2. Serves my-products and CRUD endpoints for farmers.
+3. Handles product image upload endpoints.
+4. Exposes reviews and favorites endpoints.
 
-### Business Goal
-Authenticate users and route them to Buyer, Farmer, or Admin dashboard.
+## 4.2 backend/src/controllers/productController.js
+Product business logic and filtering.
 
-### What to Show
-- Login screen action
-- Auth provider state update
-- Backend auth verification and profile lookup
+What it does:
+1. Builds filtered/paginated product queries.
+2. Handles farmer-owned product create/update/delete with ownership checks.
+3. Manages reviews and rating-related data updates.
 
-### Files to Open
-- mobile/lib/screens/auth/login_screen.dart
-- mobile/lib/providers/auth_provider.dart
-- mobile/lib/config/routes.dart
-- backend/src/controllers/authController.js
+## 5. Order Lifecycle
 
-### Data Impact
-- users.last_login_at
+## 5.1 backend/src/routes/orderRoutes.js
+Buyer/farmer/admin order endpoint layer.
 
-### Demo Script
-1. User logs in with credentials.
-2. Backend verifies credentials and returns profile.
-3. App checks role and navigates to role-specific dashboard.
+What it does:
+1. Exposes buyer order listing and per-order details.
+2. Exposes order creation endpoint.
+3. Exposes status transitions (confirm, ship, deliver, cancel, refund request).
+4. Exposes tracking/history/statistics reads.
 
-### Likely Questions
-- Where is route decision made?
-- How is suspended user blocked?
-- Where is token stored/used?
+## 5.2 backend/src/controllers/orderController.js
+Order orchestration.
 
----
+What it does:
+1. Normalizes mobile and web delivery address formats.
+2. Validates stock and computes subtotal plus delivery fee.
+3. Creates orders and order_items.
+4. Updates product quantities and appends order_status_history.
+5. Inserts notifications for farmers/buyers during status transitions.
 
-## Feature 3: Browse and Search Products
-### Sequence
-Browse/Search sequence diagram.
+## 6. Payment Lifecycle (MarzPay Primary)
 
-### Business Goal
-Help buyers discover products quickly.
+## 6.1 backend/src/routes/paymentRoutes.js
+Payment endpoint layer.
 
-### What to Show
-- Search input and result rendering
-- Product provider/service fetching product list
-- Backend filtering logic
+What it does:
+1. Exposes initiation/status/verify/retry/history endpoints.
+2. Exposes provider callback endpoints (MarzPay, MTN, Airtel, card).
+3. Exposes phone validation plus wallet/transaction reads.
 
-### Files to Open
-- mobile/lib/screens/buyer/search_screen.dart
-- mobile/lib/screens/buyer/buyer_home_screen.dart
-- mobile/lib/providers/product_provider.dart
-- mobile/lib/services/product_service.dart
-- backend/src/routes/productRoutes.js
-- backend/src/controllers/productController.js
+## 6.2 backend/src/controllers/paymentController.js
+Payment orchestration and callback transitions.
 
-### Data Impact
-- products (read)
+What it does:
+1. Validates payment requests and confirms order ownership.
+2. Routes initiation by method (marzpay, mtn_mobile, airtel_money, card, cash_on_delivery).
+3. Persists payments rows and updates orders.payment_status.
+4. Processes webhook callbacks and maps provider statuses to local statuses.
+5. Verifies pending transactions and supports refunds.
+6. Adds payment success/failure/refund notifications.
 
-### Demo Script
-1. Buyer searches by keyword/category.
-2. App fetches filtered products.
-3. Results display cards with price/category/rating info.
+## 6.3 backend/src/services/marzpayService.js
+MarzPay HTTP client wrapper.
 
-### Likely Questions
-- Is search server-side or client-side?
-- How do you filter by category/price?
+What it does:
+1. Builds Basic auth header from API key and secret.
+2. Sends collect-money/send-money requests.
+3. Provides transaction status, history, and wallet balance methods.
+4. Normalizes and validates Uganda MTN/Airtel numbers.
 
----
+## 7. Notifications Lifecycle
 
-## Feature 4: Add to Cart
-### Sequence
-Add-to-cart sequence diagram.
+## 7.1 backend/src/routes/notificationRoutes.js
+Authenticated notification read/update APIs.
 
-### Business Goal
-Allow buyers to stage products before checkout.
+What it does:
+1. Lists notifications with pagination and unread counts.
+2. Marks single/all notifications as read.
+3. Supports delete operations and preference/device registration endpoints.
 
-### What to Show
-- Product detail/cart action
-- Cart provider updates
-- Cart API/storage sync
+## 7.2 backend/src/controllers/notificationController.js
+Notification persistence and preference management.
 
-### Files to Open
-- mobile/lib/screens/buyer/product_detail_screen.dart
-- mobile/lib/screens/buyer/cart_screen.dart
-- mobile/lib/providers/cart_provider.dart
-- mobile/lib/services/order_service.dart or cart service logic
-- backend/src/routes/productRoutes.js
-- backend/src/controllers/productController.js
+What it does:
+1. Reads/writes notifications rows.
+2. Creates default notification_preferences when missing.
+3. Registers user_devices for push routing.
+4. Exposes helper functions for single/bulk notification inserts.
 
-### Data Impact
-- cart_items (if persisted)
-- local/provider cart state
+## 8. AI Assistant Lifecycle
 
-### Demo Script
-1. Buyer adds item from product detail.
-2. Cart state updates quantity and subtotal.
-3. Cart screen reflects live totals.
+## 8.1 backend/src/routes/aiRoutes.js
+AI endpoint layer.
 
-### Likely Questions
-- How are duplicate cart items handled?
-- Where are totals recalculated?
+What it does:
+1. Exposes chat, image analysis, crop analysis, market/weather insight endpoints.
+2. Exposes AI session CRUD and usage endpoints.
 
----
+## 8.2 backend/src/controllers/aiController.js
+Groq-powered AI orchestration.
 
-## Feature 5: Checkout and Place Order
-### Sequence
-Checkout and Place Order sequence diagrams.
+What it does:
+1. Initializes OpenAI-compatible Groq client.
+2. Stores/retrieves ai_chat_sessions.
+3. Sends text and multimodal prompts.
+4. Tracks ai_usage token consumption.
 
-### Business Goal
-Convert cart into an order with delivery details.
+## 9. Mobile App Runtime
 
-### What to Show
-- Checkout page confirmation
-- Order provider/service call
-- Backend stock validation and order creation
+## 9.1 mobile/lib/main.dart
+Flutter app entry and provider wiring.
 
-### Files to Open
-- mobile/lib/screens/buyer/checkout_screen.dart
-- mobile/lib/providers/order_provider.dart
-- mobile/lib/services/order_service.dart
+What it does:
+1. Initializes Flutter bindings and orientation lock.
+2. Initializes Supabase.
+3. Registers app providers and route generation.
+
+## 9.2 mobile/lib/services/api_service.dart
+Network and Supabase gateway used by mobile services.
+
+What it does:
+1. Uses production base URL from AppConfig.apiBaseUrl.
+2. Injects Authorization header from Supabase session token.
+3. Provides generic REST methods for backend endpoints.
+4. Also provides direct Supabase table/storage helpers used by several services.
+
+## 9.3 Mobile Service Layer
+
+Primary files:
+1. mobile/lib/services/auth_service.dart
+2. mobile/lib/services/product_service.dart
+3. mobile/lib/services/order_service.dart
+4. mobile/lib/services/payment_service.dart
+5. mobile/lib/services/notification_service.dart
+6. mobile/lib/services/ai_service.dart
+
+What services do:
+1. Wrap backend REST calls for major flows (auth/orders/payments/products).
+2. In several places, perform direct Supabase table calls.
+3. Normalize payloads and map response JSON into typed models.
+
+## 9.4 Provider Layer
+
+Current providers:
+1. mobile/lib/providers/auth_provider.dart
+2. mobile/lib/providers/product_provider.dart
+3. mobile/lib/providers/order_provider.dart
+4. mobile/lib/providers/cart_provider.dart
+5. mobile/lib/providers/notification_provider.dart
+6. mobile/lib/providers/user_provider.dart
+
+What providers do:
+1. Hold screen state (loading/error/data lists/selection).
+2. Invoke services and expose updates via notifyListeners().
+
+## 9.5 Screen Layer
+
+Main screen groups:
+1. mobile/lib/screens/auth/*
+2. mobile/lib/screens/buyer/*
+3. mobile/lib/screens/farmer/*
+4. mobile/lib/screens/admin/*
+5. mobile/lib/screens/common/*
+6. mobile/lib/screens/splash_screen.dart
+
+## 10. Database Files and Runtime Effects
+
+## 10.1 backend/database/schema.sql
+Core relational model and many triggers/policies.
+
+Runtime effect:
+1. Defines core tables (users, products, orders, order_items, payments, notifications, reviews, favorites, AI/session, cart, settings, payouts, refunds).
+2. Defines trigger-based profile creation from auth.users insert.
+3. Defines ratings/follower counters and RLS policy baselines.
+
+## 10.2 backend/database/manual_fix.sql
+Production support patch for profile trigger/policies.
+
+Runtime effect:
+1. Rebuilds handle_new_user trigger function and policy conditions.
+2. Intended to fix profile creation edge cases during signup.
+
+## 10.3 backend/database/setup_storage.sql
+Supabase Storage bucket and policy setup.
+
+Runtime effect:
+1. Creates media buckets used by profile/product/review/AI uploads.
+2. Defines storage access policies for public/authenticated access paths.
+
+## 10.4 backend/database/seed.sql
+Development data seed set.
+
+Runtime effect:
+1. Inserts sample admin/farmer/buyer users and sample catalog content.
+
+## 11. End-to-End Runtime Paths
+
+## 11.1 Common Buyer Journey
+1. Buyer signs in or registers via /api/v1/auth/*.
+2. Buyer browses products via /api/v1/products and /api/v1/products/search.
+3. Buyer places order via /api/v1/orders.
+4. Buyer initiates payment via /api/v1/payments/initiate.
+5. Callback/verification updates payment and order payment_status.
+6. Farmers process order state transitions; buyer receives notifications.
+
+## 11.2 Common Farmer Journey
+1. Farmer signs in and creates products via /api/v1/products.
+2. Farmer receives order notifications and opens /api/v1/orders/farmer.
+3. Farmer confirms/ships/delivers via order status endpoints.
+4. Buyer-facing notifications and history are updated throughout.
+
+## 12. Current Runtime Notes
+1. Backend is versioned under /api/v1.
+2. MarzPay is the primary mobile money rail; MTN/Airtel direct flows are still present as legacy paths.
+3. Mobile client uses a hybrid access model: backend REST plus direct Supabase table/storage operations.
+4. AI assistant is first-class, backed by Groq and persisted session history.
 - backend/src/routes/orderRoutes.js
 - backend/src/controllers/orderController.js
 

@@ -1,304 +1,161 @@
-# Environment Variables Reference
-# Complete list of all environment variables for AgriSupply
+# Environment Variables (Currently Used)
 
-# =============================================================================
-# APPLICATION SETTINGS
-# =============================================================================
+This document only lists variables currently referenced in code.
 
-# Application name
-APP_NAME=AgriSupply
+Source scan coverage:
+- `backend/src/**/*.js`
+- `backend/scripts/**/*.js`
+- `mobile/lib/config/app_config.dart`
 
-# Environment (development, staging, production)
+## 1) Backend variables
+
+### 1.1 Core app and API
+
+| Variable | Required | Default in code | Purpose |
+| --- | --- | --- | --- |
+| NODE_ENV | No | development-style behavior | Environment mode (logging and runtime mode checks) |
+| PORT | No | `3000` | HTTP server port |
+| API_VERSION | No | `v1` | API prefix in routes (`/api/v1/...`) |
+| API_URL | No | none | Used by admin/report/export paths (if configured) |
+| FRONTEND_URL | No | none | Used in auth/redirect/email flows |
+| ALLOWED_ORIGINS | No | `*` | CORS allow-list (comma-separated) |
+
+### 1.2 Supabase and authentication
+
+| Variable | Required | Default in code | Purpose |
+| --- | --- | --- | --- |
+| SUPABASE_URL | Yes | none | Supabase project URL |
+| SUPABASE_ANON_KEY | Yes | none | Supabase anon/public key |
+| SUPABASE_SERVICE_ROLE_KEY | Yes | none | Supabase server key for privileged DB operations |
+| JWT_SECRET | Yes | none | Access token signing secret |
+| JWT_EXPIRES_IN | No | `7d` | Access token duration |
+| JWT_REFRESH_SECRET | Yes | none | Refresh token signing secret |
+| JWT_REFRESH_EXPIRES_IN | No | `30d` | Refresh token duration |
+
+### 1.3 Rate limiting, upload, and logs
+
+| Variable | Required | Default in code | Purpose |
+| --- | --- | --- | --- |
+| RATE_LIMIT_WINDOW_MS | No | `900000` | Rate limit window in ms |
+| RATE_LIMIT_MAX_REQUESTS | No | `100` | Max requests per window |
+| MAX_FILE_SIZE | No | `5242880` | Upload size cap (bytes) |
+| ALLOWED_FILE_TYPES | No | `image/jpeg,image/png,image/webp` | Allowed upload MIME types |
+| LOG_LEVEL | No | `info` | App log level |
+
+### 1.4 AI (Groq)
+
+| Variable | Required | Default in code | Purpose |
+| --- | --- | --- | --- |
+| GROQ_API_KEY | Yes (for AI routes) | none | Groq API key |
+| GROQ_MODEL | No | `llama-3.3-70b-versatile` | Chat model |
+| GROQ_VISION_MODEL | No | `llama-3.2-90b-vision-preview` | Vision model |
+
+### 1.5 Payments
+
+| Variable | Required | Default in code | Purpose |
+| --- | --- | --- | --- |
+| MARZPAY_API_URL | No | `https://wallet.wearemarz.com/api/v1` | MarzPay API base URL |
+| MARZPAY_API_KEY | Yes (MarzPay flows) | none | MarzPay auth key |
+| MARZPAY_API_SECRET | Yes (MarzPay flows) | none | MarzPay auth secret |
+| MTN_API_KEY | Yes (MTN flows) | none | MTN API key |
+| MTN_API_SECRET | Yes (MTN flows) | none | MTN API secret |
+| MTN_SUBSCRIPTION_KEY | Yes (MTN flows) | none | MTN subscription key |
+| MTN_ENVIRONMENT | No | `sandbox` | MTN target env (`sandbox` or `production`) |
+| AIRTEL_API_KEY | Yes (Airtel flows) | none | Airtel API key |
+| AIRTEL_API_SECRET | Yes (Airtel flows) | none | Airtel API secret |
+| AIRTEL_ENVIRONMENT | No | `sandbox` | Airtel target env |
+| FLUTTERWAVE_SECRET_KEY | Yes (card verify/refund) | none | Flutterwave server key |
+
+### 1.6 Notification integrations
+
+| Variable | Required | Default in code | Purpose |
+| --- | --- | --- | --- |
+| EMAIL_SERVICE | No | none | Email provider selector (`sendgrid` or `mailgun`) |
+| SENDGRID_API_KEY | If EMAIL_SERVICE=sendgrid | none | SendGrid API key |
+| MAILGUN_API_KEY | If EMAIL_SERVICE=mailgun | none | Mailgun key |
+| MAILGUN_DOMAIN | If EMAIL_SERVICE=mailgun | none | Mailgun domain |
+| FROM_EMAIL | No | `noreply@agrisupply.com` | Sender identity |
+| SMS_SERVICE | No | none | SMS provider selector (`twilio` or `africas_talking`) |
+| TWILIO_ACCOUNT_SID | If SMS_SERVICE=twilio | none | Twilio account SID |
+| TWILIO_AUTH_TOKEN | If SMS_SERVICE=twilio | none | Twilio auth token |
+| TWILIO_PHONE_NUMBER | If SMS_SERVICE=twilio | none | Twilio sender number |
+| AFRICAS_TALKING_API_KEY | If SMS_SERVICE=africas_talking | none | Africa's Talking API key |
+| AFRICAS_TALKING_USERNAME | If SMS_SERVICE=africas_talking | none | Africa's Talking username |
+| AFRICAS_TALKING_SENDER_ID | No | none | SMS sender ID |
+| FIREBASE_SERVER_KEY | Optional fallback | none | FCM legacy REST key fallback |
+
+## 2) Current backend `.env` template
+
+Use this as a practical, current starting point:
+
+```env
 NODE_ENV=development
-
-# Server port
 PORT=3000
-
-# API version prefix
 API_VERSION=v1
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8080
 
-# Base URL for the API
-API_BASE_URL=http://localhost:3000/api/v1
-
-# Frontend URL (for CORS and email links)
-FRONTEND_URL=http://localhost:3000
-
-# =============================================================================
-# DATABASE - SUPABASE
-# =============================================================================
-
-# Supabase project URL
 SUPABASE_URL=https://your-project.supabase.co
-
-# Supabase anonymous/public key (safe for client-side)
 SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# Supabase service role key (server-side only - never expose!)
-SUPABASE_SERVICE_KEY=your-service-key
-
-# Direct database connection (optional, for migrations)
-DATABASE_URL=postgresql://postgres:[password]@db.your-project.supabase.co:5432/postgres
-
-# =============================================================================
-# AUTHENTICATION
-# =============================================================================
-
-# JWT secret for signing tokens (generate a strong random string)
-JWT_SECRET=your-super-secret-jwt-key-min-32-characters
-
-# JWT token expiration
+JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRES_IN=7d
-
-# Refresh token expiration
+JWT_REFRESH_SECRET=your-refresh-token-secret
 JWT_REFRESH_EXPIRES_IN=30d
 
-# Password hashing rounds
-BCRYPT_ROUNDS=12
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+MAX_FILE_SIZE=5242880
+ALLOWED_FILE_TYPES=image/jpeg,image/png,image/webp
+LOG_LEVEL=info
 
-# OTP expiration in minutes
-OTP_EXPIRES_IN=10
+GROQ_API_KEY=your-groq-api-key
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_VISION_MODEL=llama-3.2-90b-vision-preview
 
-# =============================================================================
-# PAYMENT PROVIDERS
-# =============================================================================
-
-# MarzPay Payment Gateway (Unified Mobile Money - MTN & Airtel Uganda)
+MARZPAY_API_URL=https://wallet.wearemarz.com/api/v1
 MARZPAY_API_KEY=your-marzpay-api-key
 MARZPAY_API_SECRET=your-marzpay-api-secret
-MARZPAY_API_URL=https://wallet.wearemarz.com/api/v1
-MARZPAY_CALLBACK_URL=https://api.agrisupply.ug/api/v1/payments/marzpay/callback
-APP_URL=https://api.agrisupply.ug
 
-# MTN Mobile Money Uganda (Legacy - prefer MarzPay for unified solution)
-MTN_API_URL=https://sandbox.momodeveloper.mtn.com
 MTN_API_KEY=your-mtn-api-key
 MTN_API_SECRET=your-mtn-api-secret
 MTN_SUBSCRIPTION_KEY=your-mtn-subscription-key
 MTN_ENVIRONMENT=sandbox
-MTN_CALLBACK_URL=https://api.agrisupply.ug/api/v1/payments/callback/mtn
 
-# Airtel Money Uganda (Legacy - prefer MarzPay for unified solution)
-AIRTEL_API_URL=https://openapiuat.airtel.africa
 AIRTEL_API_KEY=your-airtel-api-key
 AIRTEL_API_SECRET=your-airtel-api-secret
 AIRTEL_ENVIRONMENT=sandbox
-AIRTEL_CALLBACK_URL=https://api.agrisupply.ug/api/v1/payments/callback/airtel
 
-# Flutterwave (Card Payments)
-FLUTTERWAVE_PUBLIC_KEY=your-flutterwave-public-key
 FLUTTERWAVE_SECRET_KEY=your-flutterwave-secret-key
-FLUTTERWAVE_ENCRYPTION_KEY=your-flutterwave-encryption-key
-FLUTTERWAVE_WEBHOOK_SECRET=your-webhook-secret
-FLUTTERWAVE_REDIRECT_URL=https://app.agrisupply.ug/payment/callback
 
-# =============================================================================
-# AI SERVICES
-# =============================================================================
-
-# Groq API (Fast & Free Alternative to OpenAI)
-GROQ_API_KEY=your-groq-api-key
-GROQ_MODEL=llama-3.1-70b-versatile
-GROQ_VISION_MODEL=llama-3.2-90b-vision-preview
-
-# AI usage limits per user per day
-AI_DAILY_CHAT_LIMIT=50
-AI_DAILY_IMAGE_LIMIT=10
-
-# =============================================================================
-# FILE STORAGE
-# =============================================================================
-
-# Supabase Storage bucket names
-STORAGE_BUCKET_PRODUCTS=product-images
-STORAGE_BUCKET_AVATARS=user-avatars
-STORAGE_BUCKET_REVIEWS=review-images
-
-# Max file upload size in MB
-MAX_FILE_SIZE_MB=10
-
-# Allowed image types
-ALLOWED_IMAGE_TYPES=image/jpeg,image/png,image/webp
-
-# =============================================================================
-# EMAIL SERVICE
-# =============================================================================
-
-# Email provider (sendgrid, mailgun, smtp)
-EMAIL_PROVIDER=sendgrid
-
-# SendGrid
+EMAIL_SERVICE=sendgrid
 SENDGRID_API_KEY=your-sendgrid-api-key
-SENDGRID_FROM_EMAIL=noreply@agrisupply.ug
-SENDGRID_FROM_NAME=AgriSupply
+FROM_EMAIL=noreply@agrisupply.com
 
-# SMTP (alternative)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-SMTP_FROM_EMAIL=noreply@agrisupply.ug
+SMS_SERVICE=africas_talking
+AFRICAS_TALKING_API_KEY=your-africas-talking-api-key
+AFRICAS_TALKING_USERNAME=your-username
+AFRICAS_TALKING_SENDER_ID=AgriSupply
 
-# =============================================================================
-# PUSH NOTIFICATIONS
-# =============================================================================
+FIREBASE_SERVER_KEY=your-firebase-server-key
+```
 
-# Firebase Cloud Messaging
-FCM_PROJECT_ID=your-firebase-project-id
-FCM_PRIVATE_KEY=your-private-key
-FCM_CLIENT_EMAIL=your-service-account-email
-FCM_DATABASE_URL=https://your-project.firebaseio.com
+## 3) Mobile configuration variables
 
-# =============================================================================
-# SMS SERVICE
-# =============================================================================
+Current mobile app runtime values come from `mobile/lib/config/app_config.dart` constants, not from `.env` files.
 
-# SMS provider (africas_talking, twilio)
-SMS_PROVIDER=africas_talking
+### Hardcoded app config currently used
+- Supabase URL and anon key are read from `AppConfig.supabaseUrl` and `AppConfig.supabaseAnonKey`.
+- Backend API base URL is read from `AppConfig.apiBaseUrl`.
 
-# Africa's Talking
-AT_API_KEY=your-africas-talking-api-key
-AT_USERNAME=your-username
-AT_SENDER_ID=AgriSupply
+### Compile-time environment pattern (documented, not currently wired in `lib/`)
 
-# Twilio (alternative)
-TWILIO_ACCOUNT_SID=your-twilio-account-sid
-TWILIO_AUTH_TOKEN=your-twilio-auth-token
-TWILIO_PHONE_NUMBER=+1234567890
+```dart
+const String.fromEnvironment('API_URL', defaultValue: 'http://localhost:3000');
+const String.fromEnvironment('ENVIRONMENT', defaultValue: 'development');
+```
 
-# =============================================================================
-# CACHING - REDIS
-# =============================================================================
-
-# Redis connection
-REDIS_URL=redis://localhost:6379
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_PASSWORD=your-redis-password
-REDIS_DB=0
-
-# Cache TTL in seconds
-CACHE_TTL_DEFAULT=3600
-CACHE_TTL_PRODUCTS=1800
-CACHE_TTL_USER=900
-
-# =============================================================================
-# RATE LIMITING
-# =============================================================================
-
-# General API rate limit (requests per minute)
-RATE_LIMIT_WINDOW_MS=60000
-RATE_LIMIT_MAX_REQUESTS=100
-
-# Auth endpoints rate limit
-AUTH_RATE_LIMIT_MAX=10
-
-# AI endpoints rate limit (per hour)
-AI_RATE_LIMIT_MAX=20
-
-# =============================================================================
-# LOGGING
-# =============================================================================
-
-# Log level (error, warn, info, debug)
-LOG_LEVEL=info
-
-# Log format (json, pretty)
-LOG_FORMAT=json
-
-# Enable request logging
-ENABLE_REQUEST_LOGGING=true
-
-# External logging service
-LOGTAIL_SOURCE_TOKEN=your-logtail-token
-SENTRY_DSN=your-sentry-dsn
-
-# =============================================================================
-# MONITORING
-# =============================================================================
-
-# Health check endpoint
-HEALTH_CHECK_PATH=/health
-
-# Metrics endpoint
-METRICS_PATH=/metrics
-
-# Enable Prometheus metrics
-ENABLE_PROMETHEUS=true
-
-# =============================================================================
-# SECURITY
-# =============================================================================
-
-# CORS allowed origins (comma-separated)
-CORS_ORIGINS=http://localhost:3000,https://app.agrisupply.ug
-
-# Helmet security headers
-ENABLE_HELMET=true
-
-# Trust proxy (for reverse proxy setups)
-TRUST_PROXY=1
-
-# Session secret
-SESSION_SECRET=your-session-secret
-
-# =============================================================================
-# GEOGRAPHIC SETTINGS
-# =============================================================================
-
-# Default country code
-DEFAULT_COUNTRY_CODE=UG
-
-# Default currency
-DEFAULT_CURRENCY=UGX
-
-# Default timezone
-DEFAULT_TIMEZONE=Africa/Kampala
-
-# Supported regions
-SUPPORTED_REGIONS=Central,Eastern,Western,Northern
-
-# =============================================================================
-# FEATURE FLAGS
-# =============================================================================
-
-# Enable/disable features
-ENABLE_AI_CHAT=true
-ENABLE_AI_IMAGE_ANALYSIS=true
-ENABLE_MOBILE_MONEY=true
-ENABLE_CARD_PAYMENTS=true
-ENABLE_CASH_ON_DELIVERY=true
-ENABLE_NOTIFICATIONS=true
-ENABLE_REVIEWS=true
-ENABLE_FAVORITES=true
-
-# =============================================================================
-# DEVELOPMENT
-# =============================================================================
-
-# Enable debug mode
-DEBUG=false
-
-# Enable API documentation
-ENABLE_DOCS=true
-
-# Swagger UI path
-DOCS_PATH=/docs
-
-# Seed database on startup
-AUTO_SEED=false
-
-# =============================================================================
-# DEPLOYMENT
-# =============================================================================
-
-# Docker image tag
-IMAGE_TAG=latest
-
-# Kubernetes namespace
-K8S_NAMESPACE=agrisupply
-
-# Health check interval
-HEALTH_CHECK_INTERVAL=30s
-
-# Graceful shutdown timeout
-SHUTDOWN_TIMEOUT=30000
+## 4) Important notes
+- Use `SUPABASE_SERVICE_ROLE_KEY` (not `SUPABASE_SERVICE_KEY`) because that is what backend code reads.
+- Use `ALLOWED_ORIGINS` (not `CORS_ORIGINS`) for CORS in `backend/src/index.js`.
+- Keep secrets out of public repos and CI logs.
