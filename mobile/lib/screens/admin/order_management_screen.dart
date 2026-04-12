@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/order_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/order_service.dart';
+import '../../services/admin_service.dart';
 import '../../widgets/loading_overlay.dart';
 
 class OrderManagementScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _OrderManagementScreenState extends State<OrderManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
-  final _orderService = OrderService();
+  final _adminService = AdminService();
 
   bool _isLoading = false;
   String _searchQuery = '';
@@ -53,11 +53,7 @@ class _OrderManagementScreenState extends State<OrderManagementScreen>
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (!authProvider.isAuthenticated) return;
 
-      // Load all orders (would need admin endpoint)
-      final user = authProvider.user;
-      if (user == null) return;
-
-      final orders = await _orderService.getAllOrders();
+      final orders = await _adminService.getOrders(limit: 500);
 
       setState(() {
         _allOrders = orders;
@@ -150,8 +146,10 @@ class _OrderManagementScreenState extends State<OrderManagementScreen>
   Future<void> _updateOrderStatus(final OrderModel order, final String newStatus) async {
     setState(() => _isLoading = true);
     try {
-      // TODO: Call admin API to update order status
-      // await _adminService.updateOrderStatus(order.id, newStatus);
+      await _adminService.updateOrderStatus(
+        orderId: order.id,
+        status: newStatus,
+      );
 
       await _loadOrders();
 
