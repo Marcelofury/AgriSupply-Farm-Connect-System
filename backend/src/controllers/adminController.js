@@ -3,6 +3,27 @@ const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { paginate, paginationResponse } = require('../utils/helpers');
 const constants = require('../config/constants');
 const logger = require('../utils/logger');
+const { createInAppNotification } = require('../utils/notificationHelper');
+
+const FARMER_MIN_RATING = parseFloat(process.env.FARMER_VERIFICATION_MIN_RATING || '4.0');
+const FARMER_MIN_ORDERS = parseInt(process.env.FARMER_VERIFICATION_MIN_ORDERS || '10', 10);
+
+const evaluateFarmerVerificationCriteria = (user) => {
+  const kycComplete = Boolean(user.email_verified) && Boolean(user.phone_verified);
+  const rating = Number(user.rating || 0);
+  const completedOrders = Number(user.total_orders || 0);
+  const performanceQualified = rating >= FARMER_MIN_RATING && completedOrders >= FARMER_MIN_ORDERS;
+
+  return {
+    kycComplete,
+    performanceQualified,
+    rating,
+    completedOrders,
+    requiredRating: FARMER_MIN_RATING,
+    requiredOrders: FARMER_MIN_ORDERS,
+    isEligible: kycComplete && performanceQualified,
+  };
+};
 
 /**
  * @desc    Get admin dashboard statistics
@@ -222,6 +243,29 @@ const updateUser = asyncHandler(async (req, res) => {
  */
 const verifyUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const { override = false, overrideReason } = req.body || {};
+
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id, role, email_verified, phone_verified, rating, total_orders')
+    .eq('id', id)
+    .single();
+
+  if (userError || !user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  const criteria = user.role === 'farmer'
+    ? evaluateFarmerVerificationCriteria(user)
+    : null;
+
+  if (user.role === 'farmer' && !override && criteria && !criteria.isEligible) {
+    throw new ApiError(400, 'Farmer does not meet verification criteria');
+  }
+
+  if (user.role === 'farmer' && override && !overrideReason) {
+    throw new ApiError(400, 'Override reason is required when override is true');
+  }
 
   const { data, error } = await supabase
     .from('users')
@@ -240,19 +284,30 @@ const verifyUser = asyncHandler(async (req, res) => {
   }
 
   // Send notification to user
-  await supabase.from('notifications').insert({
-    user_id: id,
-    type: 'account',
+  await createInAppNotification({
+    userId: id,
+    type: 'system',
     title: 'Account Verified',
     message: 'Congratulations! Your account has been verified.',
-    is_read: false,
-    created_at: new Date().toISOString(),
+    data: {
+      role: user.role,
+      overrideUsed: Boolean(override),
+      overrideReason: override ? overrideReason : null,
+      criteria,
+    },
   });
 
   res.json({
     success: true,
     message: 'User verified successfully',
-    data,
+    data: {
+      ...data,
+      verification: {
+        criteria,
+        overrideUsed: Boolean(override),
+        overrideReason: override ? overrideReason : null,
+      },
+    },
   });
 });
 

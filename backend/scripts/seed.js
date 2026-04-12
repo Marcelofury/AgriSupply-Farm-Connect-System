@@ -16,6 +16,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
+
 // Sample data
 const users = [
   {
@@ -56,7 +58,7 @@ const users = [
   },
   {
     email: 'admin@agrisupply.ug',
-    password: 'AdminPass123!',
+    password: defaultAdminPassword,
     full_name: 'System Admin',
     phone: '+256700000000',
     role: 'admin',

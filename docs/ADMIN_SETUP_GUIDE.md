@@ -59,10 +59,13 @@ WHERE email = 'admin@agrisupply.com';
 #### Mobile App:
 1. Open the AgriSupply app
 2. Click **Login**
-3. Enter:
-   - Email: `admin@agrisupply.com`
-   - Password: (the password you set)
+3. Enter one of the following:
+  - Your manually created admin credentials, or
+  - Development default credentials from seed script:
+    - Email: `admin@agrisupply.ug`
+    - Password: `admin1234` (or `DEFAULT_ADMIN_PASSWORD` env override)
 4. You'll be redirected to the Admin Dashboard
+5. If you used the development default credentials, change the password immediately after first login
 
 ### 3. Admin Features Available
 
@@ -140,6 +143,7 @@ PUT    /api/v1/admin/orders/:id       - Update order
 
 1. **Never expose admin credentials** in code or public repositories
 2. **Use strong passwords** for admin accounts
+3. **Do not use `admin1234` in production**
 3. **Enable 2FA** if available
 4. **Limit admin accounts** - only create what's necessary
 5. **Monitor admin actions** via logs

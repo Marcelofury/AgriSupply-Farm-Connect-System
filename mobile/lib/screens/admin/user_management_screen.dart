@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../config/theme.dart';
 import '../../models/user_model.dart';
+import '../../services/admin_service.dart';
 import '../../widgets/loading_overlay.dart';
 
 // Use string-based user type checking for mock data
@@ -21,6 +22,7 @@ class UserManagementScreen extends StatefulWidget {
 
 class _UserManagementScreenState extends State<UserManagementScreen>
     with SingleTickerProviderStateMixin {
+  final AdminService _adminService = AdminService();
   late TabController _tabController;
   final _searchController = TextEditingController();
   bool _isLoading = false;
@@ -28,29 +30,38 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   String _sortBy = 'newest';
   String? _filterByRegion;
 
-  // Mock data for demonstration
-  final List<UserModel> _users = List.generate(
-    20,
-    (final index) => UserModel(
-      id: 'user_$index',
-      email: 'user$index@example.com',
-      fullName: index % 2 == 0 ? 'Farmer $index' : 'Buyer $index',
-      userType: index % 2 == 0 ? 'farmer' : 'buyer',
-      phone: '+256 7${index}0 000 00$index',
-      region: ['Central', 'Eastern', 'Northern', 'Western'][index % 4],
-      district: 'District $index',
-      isPremium: index % 3 == 0,
-      isVerified: index % 2 == 0,
-      createdAt: DateTime.now().subtract(Duration(days: index * 5)),
-      updatedAt: DateTime.now(),
-      rating: 3.5 + (index % 3) * 0.5,
-    ),
-  );
+  final List<UserModel> _users = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _loadUsers();
+  }
+
+  Future<void> _loadUsers() async {
+    setState(() => _isLoading = true);
+    try {
+      final users = await _adminService.getUsers(limit: 200);
+      if (!mounted) return;
+      setState(() {
+        _users
+          ..clear()
+          ..addAll(users);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load users: ${e.toString().replaceFirst('Exception: ', '')}'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -260,11 +271,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
               child: _filteredUsers.isEmpty
                   ? _buildEmptyState()
                   : RefreshIndicator(
-                      onRefresh: () async {
-                        setState(() => _isLoading = true);
-                        await Future<void>.delayed(const Duration(seconds: 1));
-                        setState(() => _isLoading = false);
-                      },
+                      onRefresh: _loadUsers,
                       child: ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: _filteredUsers.length,
@@ -483,7 +490,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       ],
                     ),
                   ),
-                  if (!user.isVerified)
+                  if (!user.isVerified && user.userType == _UserType.farmer)
                     const PopupMenuItem(
                       value: 'verify',
                       child: Row(
@@ -603,7 +610,11 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 const SizedBox(height: 24),
                 _buildDetailItem('Phone', user.phone ?? 'Not provided'),
                 _buildDetailItem('User Type',
-                    user.userType == _UserType.farmer ? 'Farmer' : 'Buyer'),
+                  user.userType == _UserType.farmer
+                    ? 'Farmer'
+                    : user.userType == _UserType.admin
+                      ? 'Admin'
+                      : 'Buyer'),
                 _buildDetailItem('Region', user.region ?? 'Not provided'),
                 _buildDetailItem('District', user.district ?? 'Not provided'),
                 _buildDetailItem(
@@ -759,20 +770,113 @@ class _UserManagementScreenState extends State<UserManagementScreen>
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${user.fullName} has been verified'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
+              await _runVerification(user);
             },
             child: const Text('Verify'),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _runVerification(
+    final UserModel user, {
+    final bool override = false,
+    final String? overrideReason,
+  }) async {
+    setState(() => _isLoading = true);
+    try {
+      final updated = await _adminService.verifyFarmer(
+        user.id,
+        override: override,
+        overrideReason: overrideReason,
+      );
+      final index = _users.indexWhere((final u) => u.id == user.id);
+      if (index >= 0) {
+        _users[index] = updated;
+      }
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${user.fullName} has been verified'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    } catch (e) {
+      final message = e.toString().replaceFirst('Exception: ', '');
+      if (!mounted) return;
+      if (!override && message.toLowerCase().contains('criteria')) {
+        await _showOverrideDialog(user, message);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _showOverrideDialog(final UserModel user, final String reason) async {
+    final reasonController = TextEditingController();
+    await showDialog<void>(
+      context: context,
+      builder: (final context) => AlertDialog(
+        title: const Text('Override Verification Criteria?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(reason),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                labelText: 'Override reason',
+                border: OutlineInputBorder(),
+              ),
+              minLines: 2,
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (reasonController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Override reason is required'),
+                    backgroundColor: AppColors.warning,
+                  ),
+                );
+                return;
+              }
+              Navigator.pop(context);
+              await _runVerification(
+                user,
+                override: true,
+                overrideReason: reasonController.text.trim(),
+              );
+            },
+            child: const Text('Verify with Override'),
+          ),
+        ],
+      ),
+    );
+    reasonController.dispose();
   }
 
   void _suspendUser(final UserModel user) {
@@ -787,14 +891,32 @@ class _UserManagementScreenState extends State<UserManagementScreen>
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${user.fullName} has been suspended'),
-                  backgroundColor: AppColors.warning,
-                ),
-              );
+              setState(() => _isLoading = true);
+              try {
+                await _adminService.suspendUser(
+                  user.id,
+                  reason: 'Suspended by admin',
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${user.fullName} has been suspended'),
+                    backgroundColor: AppColors.warning,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString().replaceFirst('Exception: ', '')),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              } finally {
+                if (mounted) {
+                  setState(() => _isLoading = false);
+                }
+              }
             },
             child: const Text('Suspend',
                 style: TextStyle(color: AppColors.warning)),
@@ -817,14 +939,31 @@ class _UserManagementScreenState extends State<UserManagementScreen>
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${user.fullName} has been deleted'),
-                  backgroundColor: AppColors.error,
-                ),
-              );
+              setState(() => _isLoading = true);
+              try {
+                await _adminService.deleteUser(user.id);
+                _users.removeWhere((final u) => u.id == user.id);
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${user.fullName} has been deleted'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString().replaceFirst('Exception: ', '')),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
+              } finally {
+                if (mounted) {
+                  setState(() => _isLoading = false);
+                }
+              }
             },
             child: const Text('Delete', style: TextStyle(color: AppColors.error)),
           ),

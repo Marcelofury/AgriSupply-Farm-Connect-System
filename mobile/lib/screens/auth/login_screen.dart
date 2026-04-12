@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/input_validators.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
@@ -46,6 +47,15 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result) {
         final userType = authProvider.currentUser?.userType ?? 'buyer';
 
+        if (userType == 'admin' &&
+            _emailController.text.trim().toLowerCase() == 'admin@agrisupply.ug' &&
+            _passwordController.text == 'admin1234') {
+          final changed = await _forceAdminPasswordChange(authProvider);
+          if (!changed) {
+            return;
+          }
+        }
+
         switch (userType) {
           case 'farmer':
             Navigator.pushReplacementNamed(context, AppRoutes.farmerDashboard);
@@ -64,6 +74,52 @@ class _LoginScreenState extends State<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<bool> _forceAdminPasswordChange(final AuthProvider authProvider) async {
+    final controller = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final changed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (final context) => AlertDialog(
+        title: const Text('Change Default Admin Password'),
+        content: Form(
+          key: formKey,
+          child: CustomTextField(
+            controller: controller,
+            label: 'New Password',
+            hint: 'Create a secure password',
+            obscureText: true,
+            validator: (final value) =>
+                InputValidators.password(value, label: 'a new password'),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (!formKey.currentState!.validate()) return;
+              final ok = await authProvider.updatePassword(
+                newPassword: controller.text.trim(),
+              );
+              if (!mounted) return;
+              if (ok) {
+                Navigator.pop(context, true);
+              } else {
+                _showError(authProvider.errorMessage ?? 'Failed to update password');
+              }
+            },
+            child: const Text('Update Password'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return changed ?? false;
   }
 
   void _showError(final String message) {
@@ -129,16 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     hint: 'Enter your email',
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
-                    validator: (final value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
+                    validator: InputValidators.email,
                   ),
                   const SizedBox(height: 16),
 
@@ -160,15 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
                     ),
-                    validator: (final value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
+                    validator: InputValidators.password,
                   ),
                   const SizedBox(height: 8),
 

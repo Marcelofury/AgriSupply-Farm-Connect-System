@@ -3,6 +3,9 @@ const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { formatPhoneNumber, sanitizeUser } = require('../utils/helpers');
 const logger = require('../utils/logger');
 
+const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@agrisupply.ug';
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
+
 /**
  * @desc    Register a new user
  * @route   POST /api/v1/auth/register
@@ -106,6 +109,11 @@ const login = asyncHandler(async (req, res) => {
     .update({ last_login_at: new Date().toISOString() })
     .eq('id', data.user.id);
 
+  const mustChangePassword =
+    profile.role === 'admin'
+    && email.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase()
+    && password === DEFAULT_ADMIN_PASSWORD;
+
   res.json({
     success: true,
     message: 'Login successful',
@@ -114,6 +122,7 @@ const login = asyncHandler(async (req, res) => {
       token: data.session.access_token,
       refreshToken: data.session.refresh_token,
       expiresAt: data.session.expires_at,
+      mustChangePassword,
     },
   });
 });
