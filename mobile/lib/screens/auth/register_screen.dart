@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../config/routes.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/input_validators.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/loading_overlay.dart';
@@ -246,16 +247,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: 'Enter your email',
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
-                    validator: (final value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
+                    validator: InputValidators.email,
                   ),
                   const SizedBox(height: 16),
 
@@ -266,12 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: 'e.g., +256 700 123 456',
                     keyboardType: TextInputType.phone,
                     prefixIcon: Icons.phone_outlined,
-                    validator: (final value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      }
-                      return null;
-                    },
+                    validator: InputValidators.ugandaPhone,
                   ),
                   const SizedBox(height: 16),
 
@@ -293,15 +280,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         setState(() => _obscurePassword = !_obscurePassword);
                       },
                     ),
-                    validator: (final value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
+                    validator: InputValidators.password,
                   ),
                   const SizedBox(height: 16),
 

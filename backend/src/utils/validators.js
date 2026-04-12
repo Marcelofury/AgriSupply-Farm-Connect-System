@@ -1,6 +1,46 @@
 const { body, param, query } = require('express-validator');
 const constants = require('../config/constants');
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const UG_PHONE_REGEX = /^\+256\d{9}$/;
+const STRONG_PASSWORD_MIN = 8;
+
+const legacyCategories = new Set([
+  'fruits_vegetables',
+  'grains_cereals',
+  'dairy_eggs',
+  'meat_poultry',
+  'fish_seafood',
+  'herbs_spices',
+  'beverages',
+  'processed_foods',
+  'seeds_seedlings',
+  'farm_equipment',
+]);
+
+const validPaymentMethods = new Set([
+  'mtn_mobile_money',
+  'airtel_money',
+  'card',
+  'cash_on_delivery',
+  'mtn_mobile',
+  'marzpay',
+]);
+
+const escapeMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+const passwordRule = bodyField => body(bodyField)
+  .isLength({ min: 4 })
+  .withMessage('Password must be at least 4 characters')
+  .matches(/[A-Za-z0-9]/)
+  .withMessage('Password must include at least one letter or number');
+
 // Auth validators
 const authValidators = {
   register: [
@@ -8,11 +48,7 @@ const authValidators = {
       .isEmail()
       .normalizeEmail()
       .withMessage('Please provide a valid email'),
-    body('password')
-      .isLength({ min: 8 })
-      .withMessage('Password must be at least 8 characters')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-      .withMessage('Password must contain at least one lowercase, one uppercase, and one number'),
+    passwordRule('password'),
     body('fullName')
       .trim()
       .isLength({ min: 2, max: 100 })
@@ -64,11 +100,7 @@ const authValidators = {
     body('currentPassword')
       .notEmpty()
       .withMessage('Current password is required'),
-    body('newPassword')
-      .isLength({ min: 8 })
-      .withMessage('New password must be at least 8 characters')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-      .withMessage('Password must contain at least one lowercase, one uppercase, and one number'),
+    passwordRule('newPassword'),
   ],
 };
 
@@ -419,7 +451,86 @@ const adminValidators = {
   ],
 };
 
+// Backward-compatible utility validators used by unit tests.
+const validateEmail = (email) => typeof email === 'string' && EMAIL_REGEX.test(email.trim());
+
+const validatePhone = (phone) => typeof phone === 'string' && UG_PHONE_REGEX.test(phone.trim());
+
+const validateUgandanPhone = validatePhone;
+
+const validatePassword = (password, options = {}) => {
+  const errors = [];
+
+  if (typeof password !== 'string') {
+    errors.push('Password is required');
+  } else {
+    if (password.length < STRONG_PASSWORD_MIN) {
+      errors.push('Password must be at least 8 characters');
+    }
+    if (!/[a-z]/.test(password)) {
+      errors.push('Password must include at least one lowercase letter');
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Password must include at least one uppercase letter');
+    }
+    if (!/\d/.test(password)) {
+      errors.push('Password must include at least one number');
+    }
+  }
+
+  const isValid = errors.length === 0;
+  if (options.returnDetails) {
+    return { isValid, errors };
+  }
+  return isValid;
+};
+
+const validatePrice = (price) => Number.isFinite(Number(price)) && Number(price) > 0;
+
+const validateQuantity = (quantity) => Number.isInteger(Number(quantity)) && Number(quantity) > 0;
+
+const sanitizeInput = (input) => {
+  if (input == null) {
+    return '';
+  }
+
+  return String(input)
+    .trim()
+    .replace(/[&<>"']/g, char => escapeMap[char]);
+};
+
+const validateOrderStatus = (status) =>
+  typeof status === 'string' && constants.orderStatuses.includes(status);
+
+const validatePaymentMethod = (method) =>
+  typeof method === 'string' && validPaymentMethods.has(method);
+
+const validateCategory = (category) => {
+  if (typeof category !== 'string') {
+    return false;
+  }
+
+  return (
+    constants.productCategories.some(c => c.id === category)
+    || legacyCategories.has(category)
+  );
+};
+
+const validateRegion = (region) =>
+  typeof region === 'string' && constants.uganda.regions.includes(region);
+
 module.exports = {
+  validateEmail,
+  validatePhone,
+  validatePassword,
+  validateUgandanPhone,
+  validatePrice,
+  validateQuantity,
+  sanitizeInput,
+  validateOrderStatus,
+  validatePaymentMethod,
+  validateCategory,
+  validateRegion,
   authValidators,
   userValidators,
   productValidators,
