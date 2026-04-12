@@ -175,7 +175,7 @@ class NotificationService {
    */
   async sendSMSNotification(phone, message) {
     try {
-      const smsService = process.env.SMS_SERVICE; // 'twilio' or 'africas_talking'
+      const smsService = process.env.SMS_SERVICE; // 'twilio' or 'egosms'
 
       if (smsService === 'twilio') {
         // Twilio implementation
@@ -192,22 +192,6 @@ class NotificationService {
         });
 
         logger.info('SMS sent successfully via Twilio');
-        return true;
-      } else if (smsService === 'africas_talking') {
-        // Africa's Talking implementation (popular in Uganda)
-        const AfricasTalking = require('africastalking')({
-          apiKey: process.env.AFRICAS_TALKING_API_KEY,
-          username: process.env.AFRICAS_TALKING_USERNAME,
-        });
-
-        const sms = AfricasTalking.SMS;
-        const result = await sms.send({
-          to: [phone],
-          message: message,
-          from: process.env.AFRICAS_TALKING_SENDER_ID,
-        });
-
-        logger.info('SMS sent successfully via Africa\'s Talking:', result);
         return true;
       } else {
         logger.warn('No SMS service configured');

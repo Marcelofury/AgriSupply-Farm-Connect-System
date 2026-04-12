@@ -3,7 +3,7 @@ const logger = require('../utils/logger');
 
 /**
  * Send SMS using configured provider.
- * Supports egosms (preferred), twilio, africas_talking.
+ * Supports egosms (preferred) and twilio.
  */
 async function sendSms({ phone, message }) {
   const provider = (process.env.SMS_SERVICE || '').toLowerCase();
@@ -19,10 +19,6 @@ async function sendSms({ phone, message }) {
 
   if (provider === 'twilio') {
     return sendViaTwilio({ phone, message });
-  }
-
-  if (provider === 'africas_talking') {
-    return sendViaAfricasTalking({ phone, message });
   }
 
   logger.warn(`Unsupported SMS_SERVICE provider: ${provider}`);
@@ -88,26 +84,6 @@ async function sendViaTwilio({ phone, message }) {
   } catch (error) {
     logger.error('Twilio send failed:', error.message || error);
     return { ok: false, reason: 'twilio_request_failed' };
-  }
-}
-
-async function sendViaAfricasTalking({ phone, message }) {
-  try {
-    const AfricasTalking = require('africastalking')({
-      apiKey: process.env.AFRICAS_TALKING_API_KEY,
-      username: process.env.AFRICAS_TALKING_USERNAME,
-    });
-
-    await AfricasTalking.SMS.send({
-      to: [phone],
-      message,
-      from: process.env.AFRICAS_TALKING_SENDER_ID,
-    });
-
-    return { ok: true };
-  } catch (error) {
-    logger.error("Africa's Talking send failed:", error.message || error);
-    return { ok: false, reason: 'africas_talking_request_failed' };
   }
 }
 

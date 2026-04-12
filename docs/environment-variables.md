@@ -75,13 +75,10 @@ Source scan coverage:
 | MAILGUN_API_KEY | If EMAIL_SERVICE=mailgun | none | Mailgun key |
 | MAILGUN_DOMAIN | If EMAIL_SERVICE=mailgun | none | Mailgun domain |
 | FROM_EMAIL | No | `noreply@agrisupply.com` | Sender identity |
-| SMS_SERVICE | No | none | SMS provider selector (`twilio` or `africas_talking`) |
+| SMS_SERVICE | No | none | SMS provider selector (`egosms` or `twilio`) |
 | TWILIO_ACCOUNT_SID | If SMS_SERVICE=twilio | none | Twilio account SID |
 | TWILIO_AUTH_TOKEN | If SMS_SERVICE=twilio | none | Twilio auth token |
 | TWILIO_PHONE_NUMBER | If SMS_SERVICE=twilio | none | Twilio sender number |
-| AFRICAS_TALKING_API_KEY | If SMS_SERVICE=africas_talking | none | Africa's Talking API key |
-| AFRICAS_TALKING_USERNAME | If SMS_SERVICE=africas_talking | none | Africa's Talking username |
-| AFRICAS_TALKING_SENDER_ID | No | none | SMS sender ID |
 | EGOSMS_API_URL | If SMS_SERVICE=egosms | none | EgoSMS API endpoint |
 | EGOSMS_USERNAME | If SMS_SERVICE=egosms | none | EgoSMS username |
 | EGOSMS_PASSWORD | If SMS_SERVICE=egosms | none | EgoSMS password |
@@ -136,17 +133,11 @@ EMAIL_SERVICE=sendgrid
 SENDGRID_API_KEY=your-sendgrid-api-key
 FROM_EMAIL=noreply@agrisupply.com
 
-SMS_SERVICE=africas_talking
-AFRICAS_TALKING_API_KEY=your-africas-talking-api-key
-AFRICAS_TALKING_USERNAME=your-username
-AFRICAS_TALKING_SENDER_ID=AgriSupply
-
-# For EgoSMS-based OTP delivery
-# SMS_SERVICE=egosms
-# EGOSMS_API_URL=https://your-egosms-endpoint
-# EGOSMS_USERNAME=your-egosms-username
-# EGOSMS_PASSWORD=your-egosms-password
-# EGOSMS_SENDER_ID=AgriSupply
+SMS_SERVICE=egosms
+EGOSMS_API_URL=https://your-egosms-endpoint
+EGOSMS_USERNAME=your-egosms-username
+EGOSMS_PASSWORD=your-egosms-password
+EGOSMS_SENDER_ID=AgriSupply
 
 FIREBASE_SERVER_KEY=your-firebase-server-key
 ```

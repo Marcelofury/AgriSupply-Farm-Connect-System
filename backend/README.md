@@ -171,10 +171,12 @@ FIREBASE_PROJECT_ID=your-firebase-project-id
 FIREBASE_PRIVATE_KEY=your-firebase-private-key
 FIREBASE_CLIENT_EMAIL=your-firebase-client-email
 
-# SMS (Africa's Talking)
-AFRICASTALKING_API_KEY=your-africas-talking-key
-AFRICASTALKING_USERNAME=your-username
-AFRICASTALKING_SENDER_ID=AgriSupply
+# SMS (EgoSMS)
+SMS_SERVICE=egosms
+EGOSMS_API_URL=https://your-egosms-endpoint
+EGOSMS_USERNAME=your-username
+EGOSMS_PASSWORD=your-password
+EGOSMS_SENDER_ID=AgriSupply
 ```
 
 ## 📚 API Documentation
