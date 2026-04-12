@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/product_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../services/product_service.dart';
+import '../../services/admin_service.dart';
 import '../../widgets/loading_overlay.dart';
 
 class ProductManagementScreen extends StatefulWidget {
@@ -21,7 +21,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
-  final _productService = ProductService();
+  final _adminService = AdminService();
 
   bool _isLoading = false;
   String _searchQuery = '';
@@ -54,8 +54,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       if (!authProvider.isAuthenticated) return;
 
-      // Load all products (admin endpoint would be needed)
-      final products = await _productService.searchProducts('');
+      final products = await _adminService.getProducts(limit: 500);
       
       setState(() {
         _allProducts = products;
@@ -147,8 +146,10 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
   ) async {
     setState(() => _isLoading = true);
     try {
-      // TODO: Call admin API to update product status
-      // await _adminService.updateProductStatus(product.id, newStatus);
+      await _adminService.updateProduct(
+        productId: product.id,
+        status: newStatus,
+      );
       
       await _loadProducts(); // Reload products
       
@@ -195,8 +196,7 @@ class _ProductManagementScreenState extends State<ProductManagementScreen>
 
     setState(() => _isLoading = true);
     try {
-      // TODO: Call admin API to delete product
-      // await _adminService.deleteProduct(product.id);
+      await _adminService.deleteProduct(product.id);
       
       await _loadProducts();
       
