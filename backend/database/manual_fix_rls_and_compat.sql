@@ -74,7 +74,8 @@ CREATE POLICY "Service role can manage order items"
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
--- 6) Notifications + Payments: reset policies to remove hidden restrictive leftovers
+-- 6) Notifications + Payments + Notification Preferences:
+--    reset policies to remove hidden restrictive leftovers
 DO $$
 DECLARE
   p RECORD;
@@ -83,7 +84,7 @@ BEGIN
     SELECT schemaname, tablename, policyname
     FROM pg_policies
     WHERE schemaname = 'public'
-      AND tablename IN ('notifications', 'payments')
+      AND tablename IN ('notifications', 'payments', 'notification_preferences')
   LOOP
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I', p.policyname, p.schemaname, p.tablename);
   END LOOP;
@@ -120,13 +121,24 @@ CREATE POLICY "Users can view own payments"
     OR auth.role() = 'service_role'
   );
 
+-- Recreate notification_preferences policies
+CREATE POLICY "Service role can manage notification preferences"
+  ON public.notification_preferences FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+CREATE POLICY "Users can manage own notification preferences"
+  ON public.notification_preferences FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
 COMMIT;
 
 -- Verification checks
 SELECT policyname, tablename
 FROM pg_policies
 WHERE schemaname = 'public'
-  AND tablename IN ('orders', 'order_items', 'notifications', 'payments')
+  AND tablename IN ('orders', 'order_items', 'notifications', 'payments', 'notification_preferences')
 ORDER BY tablename, policyname;
 
 SELECT column_name
@@ -148,7 +160,7 @@ SELECT
 FROM pg_class c
 JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public'
-  AND c.relname IN ('payments', 'notifications', 'orders', 'order_items')
+  AND c.relname IN ('payments', 'notifications', 'notification_preferences', 'orders', 'order_items')
 ORDER BY c.relname;
 
 -- B) Show effective policies and expressions for payments/notifications
@@ -163,7 +175,7 @@ SELECT
   with_check
 FROM pg_policies
 WHERE schemaname = 'public'
-  AND tablename IN ('payments', 'notifications')
+  AND tablename IN ('payments', 'notifications', 'notification_preferences')
 ORDER BY tablename, policyname;
 
 -- C) Quick role visibility check (helps confirm execution context in SQL editor)
