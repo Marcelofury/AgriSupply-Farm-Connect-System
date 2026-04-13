@@ -89,7 +89,7 @@ class OrderModel {
   final String
   status; // pending, confirmed, processing, shipped, delivered, cancelled
   final String paymentStatus; // pending, paid, failed, refunded
-  final String paymentMethod; // mobile_money, cash_on_delivery
+  final String paymentMethod; // marzpay, cash_on_delivery
   final String? paymentReference;
   final String? deliveryAddress;
   final String? deliveryRegion;
@@ -244,12 +244,12 @@ class OrderItem {
     final quantityRaw = json['quantity'] ?? 0;
 
     return OrderItem(
-      id: json['id'] as String,
-      orderId: json['order_id'] as String,
-      productId: json['product_id'] as String,
+      id: (json['id'] as String?) ?? (json['product_id'] as String?) ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      orderId: (json['order_id'] as String?) ?? '',
+      productId: (json['product_id'] as String?) ?? product?['id'] as String? ?? '',
       productName: json['product_name'] as String? ?? product?['name'] as String? ?? 'Product',
       productImage: json['product_image'] as String?,
-      farmerId: json['farmer_id'] as String,
+      farmerId: (json['farmer_id'] as String?) ?? farmer?['id'] as String? ?? '',
       farmerName: json['farmer_name'] as String? ?? farmer?['full_name'] as String? ?? 'Farmer',
       price: (priceRaw as num).toDouble(),
       unit: json['unit'] as String? ?? product?['unit'] as String? ?? 'unit',

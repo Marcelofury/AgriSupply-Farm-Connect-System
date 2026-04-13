@@ -497,10 +497,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ],
             ),
           ),
-          TextButton(
-            onPressed: () {},
-            child: const Text('View Profile'),
-          ),
+          const SizedBox.shrink(),
         ],
       ),
     );

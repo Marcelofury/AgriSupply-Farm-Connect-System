@@ -183,11 +183,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.trending_up,
-                                  size: 14, color: Colors.white),
+                              Icon(Icons.trending_up, size: 14, color: Colors.white),
                               SizedBox(width: 4),
                               Text(
-                                '+ live',
+                                'Live',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -203,7 +202,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildRevenueMetric('Orders', '1,234'),
                         _buildRevenueMetric('Orders', '$totalOrders'),
                         _buildRevenueMetric('Avg. Order', currencyFormat.format(avgOrderValue)),
                         _buildRevenueMetric('Commission', currencyFormat.format(commission)),
@@ -234,7 +232,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 child: BarChart(
                   BarChartData(
                     alignment: BarChartAlignment.spaceAround,
-                    maxY: 10,
+                    maxY: _maxSalesY,
                     barTouchData: BarTouchData(
                       enabled: true,
                       touchTooltipData: BarTouchTooltipData(
@@ -249,7 +247,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             ),
                             children: [
                               TextSpan(
-                                text: 'UGX ${(rod.toY * 5).toInt()}M',
+                                text: 'UGX ${rod.toY.toStringAsFixed(0)}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
@@ -283,7 +281,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           showTitles: true,
                           getTitlesWidget: (final value, final meta) {
                             return Text(
-                              '${(value * 5).toInt()}M',
+                              NumberFormat.compact().format(value),
                               style: const TextStyle(
                                 color: AppColors.grey500,
                                 fontSize: 10,
@@ -307,14 +305,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       ),
                     ),
                     borderData: FlBorderData(show: false),
-                    barGroups: [
-                      _makeBarGroup(0, 6),
-                      _makeBarGroup(1, 7),
-                      _makeBarGroup(2, 5),
-                      _makeBarGroup(3, 8),
-                      _makeBarGroup(4, 7.5),
-                      _makeBarGroup(5, 9),
-                    ],
+                    barGroups: _salesBarGroups,
                   ),
                 ),
               ),
@@ -419,13 +410,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLegendItem('Vegetables', AppColors.primaryGreen, '35%'),
-                        _buildLegendItem('Fruits', AppColors.secondaryOrange, '25%'),
-                        _buildLegendItem('Grains', AppColors.info, '20%'),
-                        _buildLegendItem('Dairy', AppColors.warning, '12%'),
-                        _buildLegendItem('Others', AppColors.grey500, '8%'),
-                      ],
+                      children: _buildCategoryLegends(),
                     ),
                   ],
                 ),
@@ -598,6 +583,42 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return DateFormat('MMM').format(date);
   }
 
+  List<MapEntry<String, double>> get _salesEntries {
+    final map = (_salesAnalytics['salesByDate'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final entries = map.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+
+    return entries
+        .map((entry) {
+          final value = entry.value as Map<String, dynamic>?;
+          final amount = (value?['amount'] as num?)?.toDouble() ?? 0;
+          return MapEntry(entry.key, amount);
+        })
+        .toList();
+  }
+
+  List<BarChartGroupData> get _salesBarGroups {
+    final entries = _salesEntries;
+    if (entries.isEmpty) {
+      return [_makeBarGroup(0, 0)];
+    }
+
+    return entries.asMap().entries
+        .map((entry) => _makeBarGroup(entry.key, entry.value.value))
+        .toList();
+  }
+
+  double get _maxSalesY {
+    final entries = _salesEntries;
+    if (entries.isEmpty) return 10;
+
+    final maxValue = entries
+        .map((e) => e.value)
+        .fold<double>(0, (prev, value) => value > prev ? value : prev);
+
+    if (maxValue <= 0) return 10;
+    return maxValue * 1.2;
+  }
+
   List<PieChartSectionData> _buildPieSections() {
     final byCategory = (_productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{});
     final values = byCategory.values
@@ -625,6 +646,34 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         value: entry.value.$1,
         title: '',
         radius: radius,
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildCategoryLegends() {
+    final byCategory = (_productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final entries = byCategory.entries.toList();
+    final total = entries.fold<num>(0, (sum, e) => sum + ((e.value as num?) ?? 0));
+
+    if (entries.isEmpty || total == 0) {
+      return [_buildLegendItem('No data', AppColors.grey500, '0%')];
+    }
+
+    final colors = [
+      AppColors.primaryGreen,
+      AppColors.secondaryOrange,
+      AppColors.info,
+      AppColors.warning,
+      AppColors.grey500,
+    ];
+
+    return entries.asMap().entries.take(5).map((entry) {
+      final value = (entry.value.value as num?) ?? 0;
+      final percent = ((value / total) * 100).toStringAsFixed(0);
+      return _buildLegendItem(
+        entry.value.key,
+        colors[entry.key % colors.length],
+        '$percent%',
       );
     }).toList();
   }

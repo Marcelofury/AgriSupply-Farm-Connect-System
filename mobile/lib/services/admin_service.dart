@@ -6,6 +6,21 @@ import 'api_service.dart';
 class AdminService {
   final ApiService _apiService = ApiService();
 
+  List<dynamic> _extractList(final dynamic response) {
+    if (response is List) return response;
+    if (response is Map<String, dynamic>) {
+      final data = response['data'];
+      if (data is List) return data;
+      if (data is Map<String, dynamic>) {
+        final items = data['items'];
+        if (items is List) return items;
+      }
+      final items = response['items'];
+      if (items is List) return items;
+    }
+    return const [];
+  }
+
   Future<Map<String, dynamic>> getDashboard() async {
     final response = await _apiService.get('/admin/dashboard');
     return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
@@ -26,11 +41,31 @@ class AdminService {
     }
 
     final response = await _apiService.get('/admin/users', queryParams: params);
-    final users = (response['data'] ?? []) as List<dynamic>;
+    final users = _extractList(response);
     return users
         .whereType<Map<String, dynamic>>()
         .map(UserModel.fromJson)
         .toList();
+  }
+
+  Future<UserModel> updateUser({
+    required final String userId,
+    final String? role,
+    final bool? isVerified,
+    final bool? isPremium,
+    final bool? isSuspended,
+  }) async {
+    final response = await _apiService.put(
+      '/admin/users/$userId',
+      body: {
+        if (role != null) 'role': role,
+        if (isVerified != null) 'is_verified': isVerified,
+        if (isPremium != null) 'is_premium': isPremium,
+        if (isSuspended != null) 'is_suspended': isSuspended,
+      },
+    );
+
+    return UserModel.fromJson(response['data'] as Map<String, dynamic>);
   }
 
   Future<UserModel> verifyFarmer(
@@ -57,6 +92,10 @@ class AdminService {
     );
   }
 
+  Future<void> unsuspendUser(final String userId) async {
+    await _apiService.post('/admin/users/$userId/unsuspend');
+  }
+
   Future<void> deleteUser(final String userId) async {
     await _apiService.delete('/admin/users/$userId');
   }
@@ -77,7 +116,7 @@ class AdminService {
     };
 
     final response = await _apiService.get('/admin/products', queryParams: params);
-    final data = (response['data'] as List<dynamic>? ?? <dynamic>[])
+    final data = _extractList(response)
         .whereType<Map<String, dynamic>>()
         .map(_normalizeProduct)
         .map(ProductModel.fromJson)
@@ -123,7 +162,7 @@ class AdminService {
     };
 
     final response = await _apiService.get('/admin/orders', queryParams: params);
-    final data = (response['data'] as List<dynamic>? ?? <dynamic>[])
+    final data = _extractList(response)
         .whereType<Map<String, dynamic>>()
         .map(_normalizeOrder)
         .map(OrderModel.fromJson)

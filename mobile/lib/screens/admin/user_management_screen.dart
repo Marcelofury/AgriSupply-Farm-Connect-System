@@ -143,10 +143,6 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 child: const Icon(Icons.filter_list),
               ),
             ),
-            IconButton(
-              onPressed: _showAddUserDialog,
-              icon: const Icon(Icons.person_add),
-            ),
           ],
         ),
         body: Column(
@@ -505,7 +501,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                       children: [
                         Icon(Icons.block, size: 18, color: AppColors.warning),
                         SizedBox(width: 12),
-                        Text('Suspend'),
+                        Text('Suspend / Unsuspend'),
                       ],
                     ),
                   ),
@@ -632,7 +628,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                           foregroundColor: AppColors.warning,
                           side: const BorderSide(color: AppColors.warning),
                         ),
-                        child: const Text('Suspend'),
+                        child: Text(user.isSuspended ? 'Unsuspend' : 'Suspend'),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -744,15 +740,104 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     );
   }
 
-  void _showAddUserDialog() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add User dialog coming soon')),
-    );
-  }
+  Future<void> _showEditUserDialog(final UserModel user) async {
+    String selectedRole = user.userType;
+    bool isVerified = user.isVerified;
+    bool isPremium = user.isPremium;
+    bool isSuspended = user.isSuspended;
 
-  void _showEditUserDialog(final UserModel user) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Edit ${user.fullName} dialog coming soon')),
+    await showDialog<void>(
+      context: context,
+      builder: (final context) => StatefulBuilder(
+        builder: (final context, final setModalState) => AlertDialog(
+          title: Text('Edit ${user.fullName}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedRole,
+                decoration: const InputDecoration(labelText: 'Role'),
+                items: const [
+                  DropdownMenuItem(value: 'buyer', child: Text('Buyer')),
+                  DropdownMenuItem(value: 'farmer', child: Text('Farmer')),
+                  DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setModalState(() => selectedRole = value);
+                  }
+                },
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Verified'),
+                value: isVerified,
+                onChanged: (value) => setModalState(() => isVerified = value),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Premium'),
+                value: isPremium,
+                onChanged: (value) => setModalState(() => isPremium = value),
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Suspended'),
+                value: isSuspended,
+                onChanged: (value) => setModalState(() => isSuspended = value),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                setState(() => _isLoading = true);
+                try {
+                  final updated = await _adminService.updateUser(
+                    userId: user.id,
+                    role: selectedRole,
+                    isVerified: isVerified,
+                    isPremium: isPremium,
+                    isSuspended: isSuspended,
+                  );
+
+                  final index = _users.indexWhere((u) => u.id == user.id);
+                  if (index >= 0) {
+                    _users[index] = updated;
+                  }
+
+                  if (!mounted) return;
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('User updated successfully'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                } catch (e) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString().replaceFirst('Exception: ', '')),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                } finally {
+                  if (mounted) {
+                    setState(() => _isLoading = false);
+                  }
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -881,8 +966,12 @@ class _UserManagementScreenState extends State<UserManagementScreen>
     showDialog<void>(
       context: context,
       builder: (final context) => AlertDialog(
-        title: const Text('Suspend User'),
-        content: Text('Are you sure you want to suspend ${user.fullName}?'),
+        title: Text(user.isSuspended ? 'Unsuspend User' : 'Suspend User'),
+        content: Text(
+          user.isSuspended
+              ? 'Are you sure you want to unsuspend ${user.fullName}?'
+              : 'Are you sure you want to suspend ${user.fullName}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -893,14 +982,24 @@ class _UserManagementScreenState extends State<UserManagementScreen>
               Navigator.pop(context);
               setState(() => _isLoading = true);
               try {
-                await _adminService.suspendUser(
-                  user.id,
-                  reason: 'Suspended by admin',
-                );
+                if (user.isSuspended) {
+                  await _adminService.unsuspendUser(user.id);
+                } else {
+                  await _adminService.suspendUser(
+                    user.id,
+                    reason: 'Suspended by admin',
+                  );
+                }
+                await _loadUsers();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${user.fullName} has been suspended'),
-                    backgroundColor: AppColors.warning,
+                    content: Text(
+                      user.isSuspended
+                          ? '${user.fullName} has been unsuspended'
+                          : '${user.fullName} has been suspended',
+                    ),
+                    backgroundColor:
+                        user.isSuspended ? AppColors.success : AppColors.warning,
                   ),
                 );
               } catch (e) {
@@ -916,8 +1015,10 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 }
               }
             },
-            child: const Text('Suspend',
-                style: TextStyle(color: AppColors.warning)),
+            child: Text(
+              user.isSuspended ? 'Unsuspend' : 'Suspend',
+              style: const TextStyle(color: AppColors.warning),
+            ),
           ),
         ],
       ),
