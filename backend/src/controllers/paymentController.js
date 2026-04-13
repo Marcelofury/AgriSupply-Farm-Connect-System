@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { randomUUID } = require('crypto');
 const { supabase } = require('../config/supabase');
 const { ApiError, asyncHandler } = require('../middleware/errorMiddleware');
 const { formatPhoneNumber, getMobileMoneyProvider, generateOrderNumber } = require('../utils/helpers');
@@ -119,13 +120,15 @@ const initiateMarzPayPayment = async (order, phone, transactionRef) => {
   }
 
   try {
+    const marzpayReference = randomUUID();
+
     // Optional: Validate phone number before payment
     const validation = await marzpayService.validateMobileNumber(formattedPhone);
     logger.info(`Phone validation result for ${formattedPhone}:`, validation);
 
     // Request payment
     const result = await marzpayService.collectMoney({
-      reference: transactionRef,
+      reference: marzpayReference,
       phoneNumber: formattedPhone,
       country: 'UG',
       amount: order.total,
