@@ -24,6 +24,9 @@ class ProductModel {
     final quantityValue = json['quantity'] ?? json['quantity_available'] ?? json['available_quantity'] ?? 0;
     final availableQuantityValue = json['quantity_available'] ?? json['available_quantity'] ?? json['quantity'] ?? 0;
     final farmerData = json['farmer'] as Map<String, dynamic>?;
+    final harvestDateRaw = json['harvest_date'] as String?;
+    final createdAtRaw = json['created_at'] as String?;
+    final fallbackDate = createdAtRaw ?? DateTime.now().toIso8601String();
 
     return ProductModel(
       id: json['id'] as String,
@@ -45,7 +48,7 @@ class ProductModel {
       isOrganic: json['is_organic'] as bool? ?? false,
       isFeatured: json['is_featured'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
-      harvestDate: DateTime.parse(json['harvest_date'] as String),
+      harvestDate: DateTime.parse(harvestDateRaw ?? fallbackDate),
       expiryDate:
           json['expiry_date'] != null
               ? DateTime.parse(json['expiry_date'] as String)
