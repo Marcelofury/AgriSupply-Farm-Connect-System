@@ -34,9 +34,10 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
 
     // Marketplace is global for buyers unless they explicitly choose a region filter.
     productProvider.setRegion(null, refresh: false);
-    await productProvider.fetchProducts(refresh: true);
-
-    await productProvider.fetchFeaturedProducts();
+    await Future.wait([
+      productProvider.fetchProducts(refresh: true),
+      productProvider.fetchFeaturedProducts(),
+    ]);
   }
 
   @override
@@ -256,7 +257,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
   Widget _buildFeaturedProducts() {
     return Consumer<ProductProvider>(
       builder: (final context, final productProvider, final child) {
-        if (productProvider.isLoading) {
+        if (productProvider.isLoading && productProvider.featuredProducts.isEmpty) {
           return const SliverToBoxAdapter(
             child: Center(child: CircularProgressIndicator()),
           );
@@ -303,7 +304,7 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
   Widget _buildProductGrid() {
     return Consumer<ProductProvider>(
       builder: (final context, final productProvider, final child) {
-        if (productProvider.isLoading) {
+        if (productProvider.isLoading && productProvider.products.isEmpty) {
           return const SliverToBoxAdapter(
             child: Center(child: CircularProgressIndicator()),
           );
@@ -339,14 +340,15 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.75,
+              childAspectRatio: 0.64,
               crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+              mainAxisSpacing: 20,
             ),
             delegate: SliverChildBuilderDelegate(
               (final context, final index) {
                 return ProductCard(
                   product: products[index],
+                  isCompact: true,
                   onTap: () => Navigator.pushNamed(
                     context,
                     AppRoutes.productDetail,

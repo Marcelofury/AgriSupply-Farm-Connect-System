@@ -8,6 +8,25 @@ import 'api_service.dart';
 class ProductService {
   final ApiService _apiService = ApiService();
 
+  List<dynamic> _extractListResponse(final dynamic response) {
+    if (response is List) return response;
+
+    if (response is Map<String, dynamic>) {
+      final data = response['data'];
+      if (data is List) return data;
+
+      if (data is Map<String, dynamic>) {
+        final items = data['items'];
+        if (items is List) return items;
+      }
+
+      final items = response['items'];
+      if (items is List) return items;
+    }
+
+    return const [];
+  }
+
   Map<String, String> _mapSortParams(final String sortBy) {
     switch (sortBy) {
       case 'price_low':
@@ -51,7 +70,7 @@ class ProductService {
       params.addAll(_mapSortParams(sortBy));
 
       final response = await _apiService.get('/products', queryParams: params);
-      final data = (response['data'] ?? response) as List;
+      final data = _extractListResponse(response);
 
       return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
@@ -63,7 +82,7 @@ class ProductService {
   Future<List<ProductModel>> getFeaturedProducts() async {
     try {
       final response = await _apiService.get('/products/featured');
-      final data = (response['data'] ?? response) as List;
+      final data = _extractListResponse(response);
 
       return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
@@ -129,7 +148,7 @@ class ProductService {
         '/products/search',
         queryParams: params,
       );
-      final data = (response['data'] ?? response) as List;
+      final data = _extractListResponse(response);
 
       return data.map((final json) => ProductModel.fromJson(json as Map<String, dynamic>)).toList();
     } catch (e) {
@@ -370,7 +389,7 @@ class ProductService {
           ..._mapSortParams('rating'),
         },
       );
-      final data = (response['data'] ?? response) as List;
+      final data = _extractListResponse(response);
 
       return data
           .map((final json) => ProductModel.fromJson(json as Map<String, dynamic>))
