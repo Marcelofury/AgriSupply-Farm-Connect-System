@@ -163,15 +163,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     cartProvider.addItem(_product!, _quantity);
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar(reason: SnackBarClosedReason.remove);
+    messenger.clearSnackBars();
+
+    messenger.showSnackBar(
       SnackBar(
         content: Text('${_product!.name} added to cart'),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
         action: SnackBarAction(
           label: 'View Cart',
           textColor: Colors.white,
-          onPressed: () => Navigator.pushNamed(context, AppRoutes.cart),
+          onPressed: () {
+            messenger.hideCurrentSnackBar(reason: SnackBarClosedReason.action);
+            Navigator.pushNamed(context, AppRoutes.cart);
+          },
         ),
       ),
     );
