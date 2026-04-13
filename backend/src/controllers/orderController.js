@@ -232,7 +232,11 @@ const createOrder = asyncHandler(async (req, res) => {
     payment_method: paymentMethod,
     subtotal,
     delivery_fee: deliveryFee,
+    total_amount: total,
     total,
+    delivery_address: typeof normalizedAddress.address === 'string'
+      ? normalizedAddress.address
+      : (typeof deliveryAddress === 'string' ? deliveryAddress : JSON.stringify(normalizedAddress)),
     shipping_address: normalizedAddress,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
