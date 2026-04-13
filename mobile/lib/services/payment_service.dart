@@ -96,35 +96,24 @@ class PaymentService {
     final String phoneNumber,
   ) async {
     try {
-      final response = await _apiService.post('/payments/mtn', body: {
-        'order_id': orderId,
-        'amount': amount,
-        'phone_number': phoneNumber,
-        'currency': 'UGX',
-        'payer_message': 'Payment for AgriSupply order #$orderId',
-        'payee_note': 'AgriSupply order payment',
+      final response = await _apiService.post('/payments/initiate', body: {
+        'orderId': orderId,
+        'method': 'mtn_mobile',
+        'phone': phoneNumber,
       });
 
-      if (response['status'] == 'pending' || response['status'] == 'success') {
-        // Record payment initiation
-        await _recordPayment(
-          orderId: orderId,
-          amount: amount,
-          provider: 'mtn_mobile',
-          transactionId: response['transaction_id'] as String?,
-          status: 'pending',
-        );
+      if (response['success'] == true) {
+        final data = response['data'];
 
         return PaymentResult(
           success: true,
-          transactionId: response['transaction_id'] as String?,
-          message: 'Please confirm payment on your phone',
+          transactionId: data['transactionRef'] as String?,
+          message: response['message'] as String? ?? 'Please confirm payment on your phone',
         );
       } else {
         return PaymentResult(
           success: false,
           message: (response['message'] as String?) ?? 'Payment failed',
-          errorCode: response['error_code'] as String?,
         );
       }
     } catch (e) {
@@ -142,33 +131,24 @@ class PaymentService {
     final String phoneNumber,
   ) async {
     try {
-      final response = await _apiService.post('/payments/airtel', body: {
-        'order_id': orderId,
-        'amount': amount,
-        'phone_number': phoneNumber,
-        'currency': 'UGX',
-        'reference': 'AGR-$orderId',
+      final response = await _apiService.post('/payments/initiate', body: {
+        'orderId': orderId,
+        'method': 'airtel_money',
+        'phone': phoneNumber,
       });
 
-      if (response['status'] == 'pending' || response['status'] == 'success') {
-        await _recordPayment(
-          orderId: orderId,
-          amount: amount,
-          provider: 'airtel_money',
-          transactionId: response['transaction_id'] as String?,
-          status: 'pending',
-        );
+      if (response['success'] == true) {
+        final data = response['data'];
 
         return PaymentResult(
           success: true,
-          transactionId: response['transaction_id'] as String?,
-          message: 'Please confirm payment on your phone',
+          transactionId: data['transactionRef'] as String?,
+          message: response['message'] as String? ?? 'Please confirm payment on your phone',
         );
       } else {
         return PaymentResult(
           success: false,
           message: (response['message'] as String?) ?? 'Payment failed',
-          errorCode: response['error_code'] as String?,
         );
       }
     } catch (e) {
@@ -185,26 +165,18 @@ class PaymentService {
     final double amount,
   ) async {
     try {
-      final response = await _apiService.post('/payments/card', body: {
-        'order_id': orderId,
-        'amount': amount,
-        'currency': 'UGX',
-        'redirect_url': 'agrisupply://payment/callback',
+      final response = await _apiService.post('/payments/initiate', body: {
+        'orderId': orderId,
+        'method': 'card',
       });
 
-      if (response['payment_url'] != null) {
-        await _recordPayment(
-          orderId: orderId,
-          amount: amount,
-          provider: 'card',
-          transactionId: response['reference'] as String?,
-          status: 'pending',
-        );
+      if (response['success'] == true) {
+        final data = response['data'];
 
         return PaymentResult(
           success: true,
-          transactionId: response['reference'] as String?,
-          message: response['payment_url'] as String?, // Return URL for webview
+          transactionId: data['transactionRef'] as String?,
+          message: data['paymentUrl'] as String? ?? 'Card payment initialized',
         );
       } else {
         return PaymentResult(
@@ -278,7 +250,7 @@ class PaymentService {
   // Verify payment callback
   Future<bool> verifyPayment(final String transactionId) async {
     try {
-      final response = await _apiService.post('/payments/$transactionId/verify');
+      final response = await _apiService.get('/payments/verify/$transactionId');
       
       if (response['verified'] == true) {
         // Update payment record
@@ -311,8 +283,7 @@ class PaymentService {
     final String? reason,
   }) async {
     try {
-      final response = await _apiService.post('/payments/refund', body: {
-        'transaction_id': transactionId,
+      final response = await _apiService.post('/payments/$orderId/refund', body: {
         'amount': amount,
         'reason': reason,
       });

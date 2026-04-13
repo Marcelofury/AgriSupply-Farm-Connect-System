@@ -312,7 +312,7 @@ class PaymentStatus {
 }
 
 class PaymentMethod {
-  static const String mobileMoney = 'mobile_money';
+  static const String mobileMoney = 'marzpay';
   static const String cashOnDelivery = 'cash_on_delivery';
 
   static List<String> get all => [mobileMoney, cashOnDelivery];
@@ -320,6 +320,8 @@ class PaymentMethod {
   static String getDisplay(final String method) {
     switch (method) {
       case mobileMoney:
+        return 'Mobile Money';
+      case 'mobile_money':
         return 'Mobile Money';
       case cashOnDelivery:
         return 'Cash on Delivery';
