@@ -80,6 +80,7 @@ const initiatePayment = asyncHandler(async (req, res) => {
 
   if (paymentError) {
     logger.error('Create payment record error:', paymentError);
+    throw new ApiError(500, 'Payment initiation failed while saving transaction record. Please try again.');
   }
 
   // Update order payment status
@@ -99,6 +100,8 @@ const initiatePayment = asyncHandler(async (req, res) => {
       transactionRef,
       status: paymentResult.status,
       providerRef: paymentResult.providerRef,
+      providerStatus: paymentResult.providerStatus,
+      verification: paymentResult.verification,
       paymentUrl: paymentResult.paymentUrl,
     },
   });
@@ -135,11 +138,40 @@ const initiateMarzPayPayment = async (order, phone, transactionRef) => {
       description: `AgriSupply Order #${order.order_number}`,
     });
 
+    let verification = {
+      checked: false,
+      message: 'Initial provider status check not attempted',
+    };
+
+    // Non-blocking verification to surface provider status immediately to clients.
+    if (result.uuid) {
+      try {
+        const statusResult = await marzpayService.checkTransactionStatus(result.uuid);
+        verification = {
+          checked: true,
+          status: statusResult?.status || result.status || 'pending',
+          providerReference: statusResult?.providerReference || result.providerReference || null,
+          uuid: statusResult?.uuid || result.uuid,
+          updatedAt: statusResult?.updatedAt || null,
+        };
+      } catch (verifyError) {
+        logger.warn('MarzPay immediate status check failed:', verifyError.message);
+        verification = {
+          checked: true,
+          status: result.status || 'pending',
+          uuid: result.uuid,
+          message: 'Initiated, but immediate provider status check failed',
+        };
+      }
+    }
+
     return {
-      status: 'pending',
+      status: verification.status === 'success' || verification.status === 'completed' ? 'completed' : 'pending',
       message: result.message || 'Payment request sent. Please approve on your phone.',
       providerRef: result.reference,
       provider: provider,
+      providerStatus: verification.status || result.status || 'pending',
+      verification,
     };
   } catch (error) {
     logger.error('MarzPay payment error:', error.message);
@@ -643,7 +675,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
       const statusData = await marzpayService.checkTransactionStatus(payment.provider_reference || transactionId);
 
       let paymentStatus = 'pending';
-      if (statusData.status === 'success') {
+      if (['success', 'successful', 'completed'].includes(statusData.status)) {
         paymentStatus = 'completed';
       } else if (statusData.status === 'failed') {
         paymentStatus = 'failed';
@@ -654,7 +686,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
           .from('payments')
           .update({ 
             status: paymentStatus, 
-            provider_reference: statusData.providerTransactionId,
+            provider_reference: statusData.providerReference || payment.provider_reference,
             updated_at: new Date().toISOString() 
           })
           .eq('id', payment.id);

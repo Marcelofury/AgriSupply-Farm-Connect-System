@@ -27,6 +27,8 @@ const axios = require('axios');
 const API_BASE_URL = process.env.API_BASE_URL || 'https://agrisupply-farm-connect-system.onrender.com/api/v1';
 const BUYER_PAYMENT_PHONE = process.env.BUYER_PHONE || '0783858472';
 const BUYER_ACCOUNT_PHONE = process.env.BUYER_ACCOUNT_PHONE || `0776${String(Date.now()).slice(-6)}`;
+const VERIFY_ATTEMPTS = Number(process.env.VERIFY_ATTEMPTS || 4);
+const VERIFY_INTERVAL_MS = Number(process.env.VERIFY_INTERVAL_MS || 5000);
 
 const BUYER_EMAIL = process.env.BUYER_EMAIL || `buyer.${Date.now()}@agrisupply.test`;
 const BUYER_PASSWORD = process.env.BUYER_PASSWORD || 'Buyer1234';
@@ -106,6 +108,45 @@ function withAuth(token) {
       Authorization: `Bearer ${token}`,
     },
   };
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function verifyPaymentWithRetries({ token, transactionRef }) {
+  let lastResponse = null;
+
+  for (let attempt = 1; attempt <= VERIFY_ATTEMPTS; attempt += 1) {
+    const verifyRes = await client.get(`/payments/verify/${transactionRef}`, withAuth(token));
+    const paymentData = verifyRes.data?.data;
+    const paymentStatus = paymentData?.status || 'unknown';
+
+    lastResponse = {
+      attempt,
+      status: paymentStatus,
+      providerReference: paymentData?.provider_reference,
+      method: paymentData?.method,
+      amount: paymentData?.amount,
+      raw: paymentData,
+    };
+
+    logStep(`Payment verify attempt ${attempt}/${VERIFY_ATTEMPTS}`, {
+      status: paymentStatus,
+      providerReference: paymentData?.provider_reference || null,
+      transactionRef,
+    });
+
+    if (['completed', 'failed', 'cancelled', 'refunded'].includes(paymentStatus)) {
+      return lastResponse;
+    }
+
+    if (attempt < VERIFY_ATTEMPTS) {
+      await sleep(VERIFY_INTERVAL_MS);
+    }
+  }
+
+  return lastResponse;
 }
 
 async function run() {
@@ -219,6 +260,24 @@ async function run() {
   if (!ok) {
     throw new Error('Payment initiation did not return success=true');
   }
+
+  const transactionRef = payRes.data?.data?.transactionRef;
+  if (!transactionRef) {
+    throw new Error('Payment initiation succeeded but transactionRef missing in response');
+  }
+
+  const verification = await verifyPaymentWithRetries({
+    token: buyerAuth.token,
+    transactionRef,
+  });
+
+  logStep('Final payment verification summary', {
+    attempts: VERIFY_ATTEMPTS,
+    intervalMs: VERIFY_INTERVAL_MS,
+    status: verification?.status || 'unknown',
+    transactionRef,
+    providerReference: verification?.providerReference || null,
+  });
 
   console.log('\nSUCCESS: Flow completed. If MarzPay is configured correctly, approve prompt should appear on phone:', BUYER_PAYMENT_PHONE);
 }
