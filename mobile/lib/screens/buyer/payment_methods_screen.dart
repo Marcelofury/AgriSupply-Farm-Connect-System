@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../config/theme.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/custom_text_field.dart';
 
 class PaymentMethodItem {
@@ -20,6 +23,12 @@ class PaymentMethodItem {
     switch (type) {
       case 'marzpay':
         return 'Mobile Money (MTN & Airtel)';
+      case 'mtn':
+        return 'MTN Mobile Money';
+      case 'airtel':
+        return 'Airtel Money';
+      case 'card':
+        return 'Card';
       case 'cash':
         return 'Cash on Delivery';
       default:
@@ -30,6 +39,11 @@ class PaymentMethodItem {
   String get displayDetails {
     if (type == 'marzpay') {
       return details['phone'] ?? 'Mobile Money Payment';
+    } else if (type == 'mtn' || type == 'airtel') {
+      return details['phone'] ?? 'Mobile Money Payment';
+    } else if (type == 'card') {
+      final last4 = details['last4'];
+      return last4 != null ? '•••• •••• •••• $last4' : 'Card Payment';
     } else if (type == 'cash') {
       return 'Pay when you receive your order';
     }
@@ -51,6 +65,12 @@ class PaymentMethodItem {
     switch (type) {
       case 'marzpay':
         return const Color(0xFF4CAF50);
+      case 'mtn':
+        return const Color(0xFFFFCC00);
+      case 'airtel':
+        return const Color(0xFFED1C24);
+      case 'card':
+        return AppColors.info;
       case 'cash':
         return AppColors.warning;
       default:
@@ -68,17 +88,72 @@ class PaymentMethodsScreen extends StatefulWidget {
 
 class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   final List<PaymentMethodItem> _paymentMethods = [];
+  String? _storageKey;
 
   @override
   void initState() {
     super.initState();
-    _loadPaymentMethods();
+    _initializeAndLoad();
   }
 
-  void _loadPaymentMethods() {
-    // TODO: Load saved payment methods from backend
-    // For now, show empty state
-    setState(() {});
+  Future<void> _initializeAndLoad() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.currentUser?.id;
+    _storageKey = 'payment_methods_${userId ?? 'anonymous'}';
+    await _loadPaymentMethods();
+  }
+
+  Future<void> _loadPaymentMethods() async {
+    final key = _storageKey;
+    if (key == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final rows = prefs.getStringList(key) ?? <String>[];
+
+    final parsed = rows.map((row) {
+      final parts = row.split('|');
+      final id = parts.isNotEmpty ? parts[0] : DateTime.now().millisecondsSinceEpoch.toString();
+      final type = parts.length > 1 ? parts[1] : 'marzpay';
+      final isDefault = parts.length > 2 ? parts[2] == '1' : false;
+      final detailsRaw = parts.length > 3 ? parts[3] : '';
+
+      final details = <String, String>{};
+      if (detailsRaw.isNotEmpty) {
+        for (final entry in detailsRaw.split(';')) {
+          final idx = entry.indexOf('=');
+          if (idx > 0) {
+            details[entry.substring(0, idx)] = entry.substring(idx + 1);
+          }
+        }
+      }
+
+      return PaymentMethodItem(
+        id: id,
+        type: type,
+        details: details,
+        isDefault: isDefault,
+      );
+    }).toList();
+
+    if (!mounted) return;
+    setState(() {
+      _paymentMethods
+        ..clear()
+        ..addAll(parsed);
+    });
+  }
+
+  Future<void> _savePaymentMethods() async {
+    final key = _storageKey;
+    if (key == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final rows = _paymentMethods.map((m) {
+      final details = m.details.entries.map((e) => '${e.key}=${e.value}').join(';');
+      return '${m.id}|${m.type}|${m.isDefault ? '1' : '0'}|$details';
+    }).toList();
+
+    await prefs.setStringList(key, rows);
   }
 
   @override
@@ -418,6 +493,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 );
 
                 setState(() => _paymentMethods.add(newMethod));
+                _savePaymentMethods();
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -516,6 +592,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 );
 
                 setState(() => _paymentMethods.add(newMethod));
+                _savePaymentMethods();
                 Navigator.pop(context);
 
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -544,6 +621,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
         );
       }
     });
+    _savePaymentMethods();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -568,6 +646,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ElevatedButton(
             onPressed: () {
               setState(() => _paymentMethods.remove(method));
+              _savePaymentMethods();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
