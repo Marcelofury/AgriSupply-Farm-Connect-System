@@ -10,6 +10,34 @@ if (missingEnvVars.length > 0) {
   throw new Error(message);
 }
 
+const decodeJwtPayload = (token) => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const pad = base64.length % 4;
+    const padded = base64 + (pad ? '='.repeat(4 - pad) : '');
+    const payload = Buffer.from(padded, 'base64').toString('utf8');
+    return JSON.parse(payload);
+  } catch (error) {
+    return null;
+  }
+};
+
+const serviceKeyPayload = decodeJwtPayload(process.env.SUPABASE_SERVICE_ROLE_KEY);
+if (!serviceKeyPayload || serviceKeyPayload.role !== 'service_role') {
+  const message = 'SUPABASE_SERVICE_ROLE_KEY is invalid or does not have role=service_role';
+  logger.error(message);
+  throw new Error(message);
+}
+
+const anonKeyPayload = decodeJwtPayload(process.env.SUPABASE_ANON_KEY);
+if (!anonKeyPayload || anonKeyPayload.role !== 'anon') {
+  const message = 'SUPABASE_ANON_KEY is invalid or does not have role=anon';
+  logger.error(message);
+  throw new Error(message);
+}
+
 // Create Supabase client with service role key for backend operations
 const supabase = createClient(
   process.env.SUPABASE_URL,
