@@ -204,7 +204,11 @@ const createOrder = asyncHandler(async (req, res) => {
     orderItems.push({
       product_id: product.id,
       farmer_id: product.farmer_id,
+      product_name: product.name,
+      product_image: Array.isArray(product.images) ? (product.images[0] || null) : null,
+      unit_price: product.price,
       quantity: item.quantity,
+      subtotal: itemTotal,
       price: product.price,
       total: itemTotal,
       status: 'pending',
@@ -288,9 +292,38 @@ const createOrder = asyncHandler(async (req, res) => {
     created_at: new Date().toISOString(),
   }));
 
-  const { error: itemsError } = await supabase
-    .from('order_items')
-    .insert(itemsWithOrderId);
+  let itemsError;
+  let sanitizedItemsPayload = itemsWithOrderId.map(item => ({ ...item }));
+
+  // Handle order_items schema drift similarly to orders by pruning unknown columns and retrying.
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const insertItemsResult = await supabase
+      .from('order_items')
+      .insert(sanitizedItemsPayload);
+
+    itemsError = insertItemsResult.error;
+
+    if (!itemsError) {
+      break;
+    }
+
+    const missingColumnMatch = /Could not find the '([^']+)' column/i.exec(itemsError.message || '');
+    if (!missingColumnMatch) {
+      break;
+    }
+
+    const missingColumn = missingColumnMatch[1];
+    sanitizedItemsPayload = sanitizedItemsPayload.map((row) => {
+      if (missingColumn in row) {
+        const next = { ...row };
+        delete next[missingColumn];
+        return next;
+      }
+      return row;
+    });
+
+    logger.warn(`Order items schema mismatch detected. Retrying without column: ${missingColumn}`);
+  }
 
   if (itemsError) {
     // Rollback order
