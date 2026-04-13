@@ -372,7 +372,7 @@ const paymentValidators = {
       .isUUID()
       .withMessage('Invalid order ID'),
     body('method')
-      .isIn(['mtn_mobile', 'airtel_money', 'card', 'cash_on_delivery'])
+      .isIn(['mtn_mobile', 'airtel_money', 'card', 'cash_on_delivery', 'marzpay'])
       .withMessage('Invalid payment method'),
     body('phone')
       .optional()
