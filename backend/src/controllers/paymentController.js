@@ -66,11 +66,13 @@ const initiatePayment = asyncHandler(async (req, res) => {
   }
 
   // Create payment record
+  const paymentMethod = method || order.payment_method || 'marzpay';
   const { error: paymentError } = await supabase.from('payments').insert({
     order_id: orderId,
     user_id: userId,
-    amount: order.total,
-    method,
+    amount: order.total ?? order.total_amount ?? 0,
+    payment_method: paymentMethod,
+    method: paymentMethod,
     transaction_ref: transactionRef,
     status: paymentResult.status,
     provider_reference: paymentResult.providerRef,
