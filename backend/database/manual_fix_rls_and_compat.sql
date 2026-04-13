@@ -102,3 +102,50 @@ FROM information_schema.columns
 WHERE table_schema = 'public'
   AND table_name = 'payments'
   AND column_name IN ('provider', 'transaction_id', 'method', 'transaction_ref', 'payment_method');
+
+-- ============================================
+-- Extra Diagnostics (safe read-only checks)
+-- ============================================
+
+-- A) Confirm RLS is enabled on target tables
+SELECT
+  n.nspname AS schema_name,
+  c.relname AS table_name,
+  c.relrowsecurity AS rls_enabled,
+  c.relforcerowsecurity AS force_rls
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+  AND c.relname IN ('payments', 'notifications', 'orders', 'order_items')
+ORDER BY c.relname;
+
+-- B) Show effective policies and expressions for payments/notifications
+SELECT
+  schemaname,
+  tablename,
+  policyname,
+  permissive,
+  roles,
+  cmd,
+  qual,
+  with_check
+FROM pg_policies
+WHERE schemaname = 'public'
+  AND tablename IN ('payments', 'notifications')
+ORDER BY tablename, policyname;
+
+-- C) Quick role visibility check (helps confirm execution context in SQL editor)
+SELECT current_user AS sql_user, session_user AS sql_session_user;
+
+-- D) Confirm payments table write privileges exist for common app roles
+SELECT
+  role_name,
+  has_table_privilege(role_name, 'public.payments', 'INSERT') AS can_insert_payments,
+  has_table_privilege(role_name, 'public.payments', 'UPDATE') AS can_update_payments
+FROM (
+  SELECT 'service_role'::text AS role_name
+  UNION ALL
+  SELECT 'authenticated'::text
+  UNION ALL
+  SELECT 'anon'::text
+) r;
