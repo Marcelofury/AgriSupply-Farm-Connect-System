@@ -74,19 +74,51 @@ CREATE POLICY "Service role can manage order items"
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
--- 6) Notifications policies: allow backend to create user notifications
-DROP POLICY IF EXISTS "Service role can manage notifications" ON public.notifications;
+-- 6) Notifications + Payments: reset policies to remove hidden restrictive leftovers
+DO $$
+DECLARE
+  p RECORD;
+BEGIN
+  FOR p IN
+    SELECT schemaname, tablename, policyname
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename IN ('notifications', 'payments')
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I', p.policyname, p.schemaname, p.tablename);
+  END LOOP;
+END $$;
+
+-- Recreate notifications policies
 CREATE POLICY "Service role can manage notifications"
   ON public.notifications FOR ALL
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
--- 7) Payments policies: allow backend to create/update payment records
-DROP POLICY IF EXISTS "Service role can manage payments" ON public.payments;
+CREATE POLICY "Users can manage own notifications"
+  ON public.notifications FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- Recreate payments policies
 CREATE POLICY "Service role can manage payments"
   ON public.payments FOR ALL
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
+
+CREATE POLICY "Users can create own payments"
+  ON public.payments FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    OR auth.role() = 'service_role'
+  );
+
+CREATE POLICY "Users can view own payments"
+  ON public.payments FOR SELECT
+  USING (
+    auth.uid() = user_id
+    OR auth.role() = 'service_role'
+  );
 
 COMMIT;
 
