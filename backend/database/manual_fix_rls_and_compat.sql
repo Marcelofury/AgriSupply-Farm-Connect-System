@@ -81,13 +81,20 @@ CREATE POLICY "Service role can manage notifications"
   USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
+-- 7) Payments policies: allow backend to create/update payment records
+DROP POLICY IF EXISTS "Service role can manage payments" ON public.payments;
+CREATE POLICY "Service role can manage payments"
+  ON public.payments FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
 COMMIT;
 
 -- Verification checks
 SELECT policyname, tablename
 FROM pg_policies
 WHERE schemaname = 'public'
-  AND tablename IN ('orders', 'order_items', 'notifications')
+  AND tablename IN ('orders', 'order_items', 'notifications', 'payments')
 ORDER BY tablename, policyname;
 
 SELECT column_name
