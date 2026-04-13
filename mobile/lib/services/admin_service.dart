@@ -6,6 +6,17 @@ import 'api_service.dart';
 class AdminService {
   final ApiService _apiService = ApiService();
 
+  Map<String, dynamic> _extractMap(final dynamic response) {
+    if (response is Map<String, dynamic>) {
+      final data = response['data'];
+      if (data is Map<String, dynamic>) {
+        return data;
+      }
+      return response;
+    }
+    return <String, dynamic>{};
+  }
+
   List<dynamic> _extractList(final dynamic response) {
     if (response is List) return response;
     if (response is Map<String, dynamic>) {
@@ -14,16 +25,24 @@ class AdminService {
       if (data is Map<String, dynamic>) {
         final items = data['items'];
         if (items is List) return items;
+        for (final key in const ['users', 'products', 'orders', 'results', 'rows']) {
+          final value = data[key];
+          if (value is List) return value;
+        }
       }
       final items = response['items'];
       if (items is List) return items;
+      for (final key in const ['users', 'products', 'orders', 'results', 'rows']) {
+        final value = response[key];
+        if (value is List) return value;
+      }
     }
     return const [];
   }
 
   Future<Map<String, dynamic>> getDashboard() async {
     final response = await _apiService.get('/admin/dashboard');
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<List<UserModel>> getUsers({
@@ -65,7 +84,7 @@ class AdminService {
       },
     );
 
-    return UserModel.fromJson(response['data'] as Map<String, dynamic>);
+    return UserModel.fromJson(_extractMap(response));
   }
 
   Future<UserModel> verifyFarmer(
@@ -189,7 +208,7 @@ class AdminService {
       '/admin/analytics/sales',
       queryParams: {'period': period},
     );
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<Map<String, dynamic>> getUserAnalytics({final String period = '30d'}) async {
@@ -197,27 +216,27 @@ class AdminService {
       '/admin/analytics/users',
       queryParams: {'period': period},
     );
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<Map<String, dynamic>> getProductAnalytics() async {
     final response = await _apiService.get('/admin/analytics/products');
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<Map<String, dynamic>> getRegionalAnalytics() async {
     final response = await _apiService.get('/admin/analytics/regions');
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<Map<String, dynamic>> getSettings() async {
     final response = await _apiService.get('/admin/settings');
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<Map<String, dynamic>> updateSettings(final Map<String, dynamic> settings) async {
     final response = await _apiService.put('/admin/settings', body: settings);
-    return (response['data'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    return _extractMap(response);
   }
 
   Future<void> sendBroadcast({

@@ -95,6 +95,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     final newBuyers = (_userAnalytics['newBuyers'] as num?)?.toInt() ?? 0;
     final totalNewUsers = (_userAnalytics['totalNewUsers'] as num?)?.toInt() ?? 0;
     final totalProducts = (_productAnalytics['totalProducts'] as num?)?.toInt() ?? 0;
+    final activeProducts = (_productAnalytics['activeProducts'] as num?)?.toInt() ?? 0;
+    final farmerShare = totalNewUsers > 0 ? ((newFarmers / totalNewUsers) * 100).toStringAsFixed(0) : '0';
+    final buyerShare = totalNewUsers > 0 ? ((newBuyers / totalNewUsers) * 100).toStringAsFixed(0) : '0';
 
     return LoadingOverlay(
       isLoading: _isLoading,
@@ -181,13 +184,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.trending_up, size: 14, color: Colors.white),
-                              SizedBox(width: 4),
+                              const Icon(Icons.trending_up, size: 14, color: Colors.white),
+                              const SizedBox(width: 4),
                               Text(
-                                'Live',
-                                style: TextStyle(
+                                _selectedPeriod,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -320,7 +323,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     child: _buildStatCard(
                       title: 'New Farmers',
                       value: '$newFarmers',
-                      change: 'Live',
+                      change: '$farmerShare%',
                       icon: Icons.agriculture,
                       color: AppColors.primaryGreen,
                     ),
@@ -330,7 +333,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     child: _buildStatCard(
                       title: 'New Buyers',
                       value: '$newBuyers',
-                      change: 'Live',
+                      change: '$buyerShare%',
                       icon: Icons.shopping_cart,
                       color: AppColors.info,
                     ),
@@ -342,10 +345,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      title: 'Active Users',
-                      value: '$totalNewUsers',
-                      change: 'Live',
-                      icon: Icons.people,
+                      title: 'Total Products',
+                      value: '$totalProducts',
+                      change: '$activeProducts active',
+                      icon: Icons.inventory_2,
                       color: AppColors.success,
                     ),
                   ),
@@ -353,8 +356,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   Expanded(
                     child: _buildStatCard(
                       title: 'New Users',
-                      value: '$totalProducts',
-                      change: 'Live',
+                      value: '$totalNewUsers',
+                      change: _selectedPeriod,
                       icon: Icons.person_add,
                       color: AppColors.info,
                     ),
@@ -420,7 +423,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               // Top Products
               _buildSectionHeader('Top Products'),
               const SizedBox(height: 12),
-              ..._buildTopProducts(currencyFormat),
+              ..._buildTopProducts(),
               const SizedBox(height: 24),
 
               // Regional Distribution
@@ -625,9 +628,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         .map((v) => (v as num?)?.toDouble() ?? 0)
         .toList();
     if (values.isEmpty || values.every((v) => v == 0)) {
-      values
-        ..clear()
-        ..addAll([1, 1, 1, 1, 1]);
+      return [
+        PieChartSectionData(
+          color: AppColors.grey200,
+          value: 1,
+          title: '',
+          radius: 50,
+        ),
+      ];
     }
     final data = [
       (values.length > 0 ? values[0] : 1.0, AppColors.primaryGreen),
@@ -709,7 +717,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  List<Widget> _buildTopProducts(final NumberFormat currencyFormat) {
+  List<Widget> _buildTopProducts() {
     final products = (_productAnalytics['topByViews'] as List<dynamic>? ?? <dynamic>[])
         .whereType<Map<String, dynamic>>()
         .take(5)
@@ -729,7 +737,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       final product = entry.value;
       final name = (product['name'] as String?) ?? 'Product';
       final views = (product['views_count'] as num?)?.toInt() ?? 0;
-      final amount = ((product['price'] as num?)?.toDouble() ?? 0) * views;
 
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -784,14 +791,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  currencyFormat.format(amount),
+                  '$views views',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.primaryGreen,
                   ),
                 ),
                 Text(
-                  '#${index + 1}',
+                  'Rank #${index + 1}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.grey500,

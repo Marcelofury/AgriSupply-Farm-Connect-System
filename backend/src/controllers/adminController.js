@@ -142,8 +142,8 @@ const getUsers = asyncHandler(async (req, res) => {
     query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
   }
 
-  const { from, to } = paginate(parseInt(page), parseInt(limit));
-  query = query.range(from, to).order('created_at', { ascending: false });
+  const { offset, limit: pageSize } = paginate(parseInt(page), parseInt(limit));
+  query = query.range(offset, offset + pageSize - 1).order('created_at', { ascending: false });
 
   const { data, error, count } = await query;
 
@@ -155,7 +155,7 @@ const getUsers = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data,
-    pagination: paginationResponse(count, parseInt(page), parseInt(limit)),
+    pagination: paginationResponse(data, count || 0, parseInt(page, 10) || 1, pageSize),
   });
 });
 
@@ -439,8 +439,8 @@ const getProducts = asyncHandler(async (req, res) => {
     query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
   }
 
-  const { from, to } = paginate(parseInt(page), parseInt(limit));
-  query = query.range(from, to).order('created_at', { ascending: false });
+  const { offset, limit: pageSize } = paginate(parseInt(page), parseInt(limit));
+  query = query.range(offset, offset + pageSize - 1).order('created_at', { ascending: false });
 
   const { data, error, count } = await query;
 
@@ -452,7 +452,7 @@ const getProducts = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data,
-    pagination: paginationResponse(count, parseInt(page), parseInt(limit)),
+    pagination: paginationResponse(data, count || 0, parseInt(page, 10) || 1, pageSize),
   });
 });
 
@@ -564,8 +564,8 @@ const getOrders = asyncHandler(async (req, res) => {
   if (date_from) query = query.gte('created_at', date_from);
   if (date_to) query = query.lte('created_at', date_to);
 
-  const { from, to } = paginate(parseInt(page), parseInt(limit));
-  query = query.range(from, to).order('created_at', { ascending: false });
+  const { offset, limit: pageSize } = paginate(parseInt(page), parseInt(limit));
+  query = query.range(offset, offset + pageSize - 1).order('created_at', { ascending: false });
 
   const { data, error, count } = await query;
 
@@ -577,7 +577,7 @@ const getOrders = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data,
-    pagination: paginationResponse(count, parseInt(page), parseInt(limit)),
+    pagination: paginationResponse(data, count || 0, parseInt(page, 10) || 1, pageSize),
   });
 });
 
@@ -650,8 +650,8 @@ const getPayments = asyncHandler(async (req, res) => {
   if (date_from) query = query.gte('created_at', date_from);
   if (date_to) query = query.lte('created_at', date_to);
 
-  const { from, to } = paginate(parseInt(page), parseInt(limit));
-  query = query.range(from, to).order('created_at', { ascending: false });
+  const { offset, limit: pageSize } = paginate(parseInt(page), parseInt(limit));
+  query = query.range(offset, offset + pageSize - 1).order('created_at', { ascending: false });
 
   const { data, error, count } = await query;
 
@@ -663,7 +663,7 @@ const getPayments = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     data,
-    pagination: paginationResponse(count, parseInt(page), parseInt(limit)),
+    pagination: paginationResponse(data, count || 0, parseInt(page, 10) || 1, pageSize),
   });
 });
 
@@ -842,7 +842,9 @@ const getProductAnalytics = asyncHandler(async (req, res) => {
   // Group by category
   const byCategory = {};
   constants.productCategories.forEach(cat => {
-    byCategory[cat] = 0;
+    if (cat && cat.id) {
+      byCategory[cat.id] = 0;
+    }
   });
   
   products?.forEach(product => {
