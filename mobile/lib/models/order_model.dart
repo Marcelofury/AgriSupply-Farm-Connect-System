@@ -22,12 +22,17 @@ class OrderModel {
   });
 
   factory OrderModel.fromJson(final Map<String, dynamic> json) {
+    final buyer = json['buyer'] as Map<String, dynamic>?;
+    final totalAmountRaw = json['total_amount'] ?? json['total'] ?? 0;
+    final paymentMethodRaw = json['payment_method'] ?? json['paymentMethod'] ?? PaymentMethod.mobileMoney;
+    final deliveryAddressRaw = json['delivery_address'];
+
     return OrderModel(
       id: json['id'] as String,
       orderNumber: json['order_number'] as String?,
       buyerId: json['buyer_id'] as String,
-      buyerName: json['buyer_name'] as String,
-      buyerPhone: json['buyer_phone'] as String?,
+      buyerName: json['buyer_name'] as String? ?? buyer?['full_name'] as String? ?? 'Buyer',
+      buyerPhone: json['buyer_phone'] as String? ?? buyer?['phone'] as String?,
       buyerAddress: json['buyer_address'] as String?,
       items:
           (json['items'] as List<dynamic>?)
@@ -36,12 +41,16 @@ class OrderModel {
           [],
       subtotal: (json['subtotal'] as num).toDouble(),
       deliveryFee: (json['delivery_fee'] as num).toDouble(),
-      totalAmount: (json['total_amount'] as num).toDouble(),
+      totalAmount: (totalAmountRaw as num).toDouble(),
       status: json['status'] as String? ?? 'pending',
       paymentStatus: json['payment_status'] as String? ?? 'pending',
-      paymentMethod: json['payment_method'] as String,
+      paymentMethod: paymentMethodRaw as String,
       paymentReference: json['payment_reference'] as String?,
-      deliveryAddress: json['delivery_address'] as String?,
+      deliveryAddress: deliveryAddressRaw is String
+        ? deliveryAddressRaw
+        : (deliveryAddressRaw is Map<String, dynamic>
+          ? deliveryAddressRaw['address'] as String?
+          : null),
       deliveryRegion: json['delivery_region'] as String?,
       deliveryDistrict: json['delivery_district'] as String?,
       deliveryLatitude:
@@ -227,18 +236,25 @@ class OrderItem {
   });
 
   factory OrderItem.fromJson(final Map<String, dynamic> json) {
+    final product = json['product'] as Map<String, dynamic>?;
+    final farmer = json['farmer'] as Map<String, dynamic>?;
+
+    final priceRaw = json['price'] ?? json['unit_price'] ?? 0;
+    final totalRaw = json['total_price'] ?? json['total'] ?? json['subtotal'] ?? 0;
+    final quantityRaw = json['quantity'] ?? 0;
+
     return OrderItem(
       id: json['id'] as String,
       orderId: json['order_id'] as String,
       productId: json['product_id'] as String,
-      productName: json['product_name'] as String,
+      productName: json['product_name'] as String? ?? product?['name'] as String? ?? 'Product',
       productImage: json['product_image'] as String?,
       farmerId: json['farmer_id'] as String,
-      farmerName: json['farmer_name'] as String,
-      price: (json['price'] as num).toDouble(),
-      unit: json['unit'] as String,
-      quantity: (json['quantity'] as num).toDouble(),
-      totalPrice: (json['total_price'] as num).toDouble(),
+      farmerName: json['farmer_name'] as String? ?? farmer?['full_name'] as String? ?? 'Farmer',
+      price: (priceRaw as num).toDouble(),
+      unit: json['unit'] as String? ?? product?['unit'] as String? ?? 'unit',
+      quantity: (quantityRaw as num).toDouble(),
+      totalPrice: (totalRaw as num).toDouble(),
       status: json['status'] as String? ?? 'pending',
       farmerNotes: json['farmer_notes'] as String?,
     );
