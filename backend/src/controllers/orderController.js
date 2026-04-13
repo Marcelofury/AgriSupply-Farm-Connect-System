@@ -238,17 +238,40 @@ const createOrder = asyncHandler(async (req, res) => {
     updated_at: new Date().toISOString(),
   };
 
-  if (typeof notes === 'string' && notes.trim().length > 0) {
-    orderInsertPayload.notes = notes.trim();
+  let order;
+  let orderError;
+  const sanitizedInsertPayload = { ...orderInsertPayload };
+
+  // Handle schema drift gracefully by removing unknown columns and retrying.
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const insertResult = await supabase
+      .from('orders')
+      .insert(sanitizedInsertPayload)
+      .select()
+      .single();
+
+    order = insertResult.data;
+    orderError = insertResult.error;
+
+    if (!orderError) {
+      break;
+    }
+
+    const missingColumnMatch = /Could not find the '([^']+)' column/i.exec(orderError.message || '');
+    if (!missingColumnMatch) {
+      break;
+    }
+
+    const missingColumn = missingColumnMatch[1];
+    if (!(missingColumn in sanitizedInsertPayload)) {
+      break;
+    }
+
+    delete sanitizedInsertPayload[missingColumn];
+    logger.warn(`Order schema mismatch detected. Retrying without column: ${missingColumn}`);
   }
 
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .insert(orderInsertPayload)
-    .select()
-    .single();
-
-  if (orderError) {
+  if (orderError || !order) {
     logger.error('Create order error:', orderError);
     throw new ApiError(400, `Failed to create order: ${orderError.message || JSON.stringify(orderError)}`);
   }
