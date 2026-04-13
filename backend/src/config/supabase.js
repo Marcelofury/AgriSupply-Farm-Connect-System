@@ -1,6 +1,15 @@
 const { createClient } = require('@supabase/supabase-js');
 const logger = require('../utils/logger');
 
+const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_ANON_KEY'];
+const missingEnvVars = requiredEnvVars.filter((name) => !process.env[name]);
+
+if (missingEnvVars.length > 0) {
+  const message = `Missing required Supabase environment variables: ${missingEnvVars.join(', ')}`;
+  logger.error(message);
+  throw new Error(message);
+}
+
 // Create Supabase client with service role key for backend operations
 const supabase = createClient(
   process.env.SUPABASE_URL,
