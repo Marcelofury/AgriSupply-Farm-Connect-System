@@ -224,22 +224,27 @@ const createOrder = asyncHandler(async (req, res) => {
   // Create order
   const orderNumber = generateOrderNumber();
   
+  const orderInsertPayload = {
+    buyer_id: buyerId,
+    order_number: orderNumber,
+    status: 'pending',
+    payment_status: 'pending',
+    payment_method: paymentMethod,
+    subtotal,
+    delivery_fee: deliveryFee,
+    total,
+    shipping_address: normalizedAddress,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  if (typeof notes === 'string' && notes.trim().length > 0) {
+    orderInsertPayload.notes = notes.trim();
+  }
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert({
-      buyer_id: buyerId,
-      order_number: orderNumber,
-      status: 'pending',
-      payment_status: 'pending',
-      payment_method: paymentMethod,
-      subtotal,
-      delivery_fee: deliveryFee,
-      total,
-      shipping_address: normalizedAddress,
-      notes,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
+    .insert(orderInsertPayload)
     .select()
     .single();
 
