@@ -228,7 +228,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
   if (error) {
     logger.error('Update user error:', error);
-    throw new ApiError(400, 'Failed to update user');
+      throw new ApiError(400, `Failed to update user: ${error.message || 'Unknown database error'}`);
   }
 
   res.json({
@@ -478,7 +478,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   if (error) {
     logger.error('Update product error:', error);
-    throw new ApiError(400, 'Failed to update product');
+      throw new ApiError(400, `Failed to update product: ${error.message || 'Unknown database error'}`);
   }
 
   // Notify farmer
@@ -837,7 +837,7 @@ const getUserAnalytics = asyncHandler(async (req, res) => {
 const getProductAnalytics = asyncHandler(async (req, res) => {
   const { data: products } = await supabase
     .from('products')
-    .select('id, category, status, views_count, rating');
+    .select('id, name, price, category, status, views_count, rating, thumbnail_url, images');
 
   // Group by category
   const byCategory = {};
