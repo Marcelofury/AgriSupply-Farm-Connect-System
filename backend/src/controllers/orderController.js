@@ -308,7 +308,7 @@ const createOrder = asyncHandler(async (req, res) => {
   await supabase.from('order_status_history').insert({
     order_id: order.id,
     status: 'pending',
-    note: 'Order placed',
+    notes: 'Order placed',
     created_at: new Date().toISOString(),
   });
 
@@ -379,7 +379,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   await supabase.from('order_status_history').insert({
     order_id: id,
     status,
-    note,
+    notes: note,
     changed_by: userId,
     created_at: new Date().toISOString(),
   });
@@ -438,7 +438,7 @@ const confirmOrder = asyncHandler(async (req, res) => {
     await supabase.from('order_status_history').insert({
       order_id: id,
       status: 'confirmed',
-      note: 'Order confirmed by all farmers',
+      notes: 'Order confirmed by all farmers',
       changed_by: farmerId,
       created_at: new Date().toISOString(),
     });
@@ -519,7 +519,7 @@ const shipOrder = asyncHandler(async (req, res) => {
     await supabase.from('order_status_history').insert({
       order_id: id,
       status: 'shipped',
-      note: `Tracking: ${tracking}`,
+      notes: `Tracking: ${tracking}`,
       changed_by: farmerId,
       created_at: new Date().toISOString(),
     });
@@ -594,7 +594,7 @@ const deliverOrder = asyncHandler(async (req, res) => {
   await supabase.from('order_status_history').insert({
     order_id: id,
     status: 'delivered',
-    note: 'Order delivered successfully',
+    notes: 'Order delivered successfully',
     changed_by: userId,
     created_at: new Date().toISOString(),
   });
@@ -691,7 +691,7 @@ const cancelOrder = asyncHandler(async (req, res) => {
   await supabase.from('order_status_history').insert({
     order_id: id,
     status: 'cancelled',
-    note: reason || 'Order cancelled',
+    notes: reason || 'Order cancelled',
     changed_by: userId,
     created_at: new Date().toISOString(),
   });
