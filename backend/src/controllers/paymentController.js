@@ -80,7 +80,8 @@ const initiatePayment = asyncHandler(async (req, res) => {
     method: paymentMethod,
     transaction_ref: transactionRef,
     status: paymentResult.status,
-    provider_reference: paymentResult.providerRef,
+    provider_reference: paymentResult.providerTxnId || paymentResult.providerRef,
+    transaction_id: paymentResult.providerTxnId || paymentResult.providerRef,
     phone: formatPhoneNumber(phone),
     created_at: new Date().toISOString(),
   });
@@ -176,6 +177,7 @@ const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount)
       status: verification.status === 'success' || verification.status === 'completed' ? 'completed' : 'pending',
       message: result.message || 'Payment request sent. Please approve on your phone.',
       providerRef: result.reference,
+      providerTxnId: result.uuid,
       provider: provider,
       providerStatus: verification.status || result.status || 'pending',
       verification,
@@ -389,6 +391,51 @@ const getPaymentStatus = asyncHandler(async (req, res) => {
 
   if (!payment) {
     throw new ApiError(404, 'Payment not found');
+  }
+
+  const paymentMethod = (payment.payment_method || payment.method || '').toLowerCase();
+
+  // When webhook delivery is delayed/missed, proactively resolve MarzPay pending payments.
+  if (paymentMethod === 'marzpay' && payment.status === 'pending') {
+    const marzpayTxnId = payment.transaction_id || payment.provider_reference;
+    if (marzpayTxnId) {
+      try {
+        const statusData = await marzpayService.checkTransactionStatus(marzpayTxnId);
+        const providerStatus = (statusData.status || '').toLowerCase();
+
+        let resolvedStatus = 'pending';
+        if (['success', 'successful', 'completed'].includes(providerStatus)) {
+          resolvedStatus = 'completed';
+        } else if (['failed', 'error', 'cancelled', 'canceled'].includes(providerStatus)) {
+          resolvedStatus = 'failed';
+        }
+
+        if (resolvedStatus !== 'pending') {
+          await supabase
+            .from('payments')
+            .update({
+              status: resolvedStatus,
+              provider_reference: statusData.providerReference || payment.provider_reference,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', payment.id);
+
+          await supabase
+            .from('orders')
+            .update({
+              payment_status: resolvedStatus,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', payment.order_id);
+
+          payment.status = resolvedStatus;
+          payment.provider_reference = statusData.providerReference || payment.provider_reference;
+          payment.updated_at = new Date().toISOString();
+        }
+      } catch (statusError) {
+        logger.warn('MarzPay status refresh in getPaymentStatus failed:', statusError.message);
+      }
+    }
   }
 
   res.json({
