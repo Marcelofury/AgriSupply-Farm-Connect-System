@@ -141,7 +141,7 @@ class OrderModel {
   bool get isShipped => status == 'shipped';
   bool get isDelivered => status == 'delivered';
   bool get isCancelled => status == 'cancelled';
-  bool get isPaid => paymentStatus == 'paid';
+  bool get isPaid => paymentStatus == 'paid' || paymentStatus == 'completed';
 
   double get total => totalAmount;
 
@@ -213,6 +213,9 @@ class OrderModel {
         return 'Processing';
       case 'shipped':
         return 'On the way';
+      case 'out_for_delivery':
+      case 'in_transit':
+        return 'Out for delivery';
       case 'delivered':
         return 'Delivered';
       case 'cancelled':

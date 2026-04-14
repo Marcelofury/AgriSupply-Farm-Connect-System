@@ -69,7 +69,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
           : TabBarView(
               controller: _tabController,
               children: [
-                _buildOrdersList(['pending', 'confirmed', 'processing', 'shipped']),
+                _buildOrdersList(['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery', 'in_transit']),
                 _buildOrdersList(['delivered']),
                 _buildOrdersList(['cancelled']),
               ],

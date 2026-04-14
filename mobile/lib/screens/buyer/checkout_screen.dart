@@ -128,7 +128,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  void _showPaymentDialog(final String orderId) {
+  Future<void> _showPaymentDialog(
+    final String orderId,
+    final String paymentMessage,
+  ) async {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -143,8 +146,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               color: AppColors.primaryGreen,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'A payment request has been sent to your phone.',
+            Text(
+              paymentMessage,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
@@ -154,37 +157,65 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Please enter your PIN to complete the payment.',
+              'If no PIN prompt appears, dial *165# and check pending approvals, then tap Check Status.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.grey600),
-            ),
-            const SizedBox(height: 16),
-            const CircularProgressIndicator(),
-            const SizedBox(height: 8),
-            const Text(
-              'Verifying payment...',
-              style: TextStyle(fontSize: 12, color: AppColors.grey600),
             ),
           ],
         ),
         actions: [
           TextButton(
+            onPressed: () async {
+              final status = await _checkPaymentStatus(orderId);
+              if (!mounted) return;
+              if (status == PaymentStatus.completed) {
+                Navigator.pop(context);
+                _showSuccessDialog(orderId);
+                return;
+              }
+
+              if (status == PaymentStatus.failed) {
+                Navigator.pop(context);
+                _showError('Payment failed. Please retry.');
+                return;
+              }
+
+              ScaffoldMessenger.of(this.context).showSnackBar(
+                const SnackBar(
+                  content: Text('Payment is still pending. Please complete it on your phone.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Text('Check Status'),
+          ),
+          TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _showSuccessDialog(orderId);
+              Navigator.pushNamedAndRemoveUntil(
+                this.context,
+                AppRoutes.buyerHome,
+                (final route) => false,
+              );
             },
-            child: const Text('Done'),
+            child: const Text('Pay Later'),
           ),
         ],
       ),
     );
   }
 
+  Future<String> _checkPaymentStatus(final String orderId) async {
+    try {
+      final paymentService = PaymentService();
+      return await paymentService.checkPaymentStatus(orderId);
+    } catch (_) {
+      return PaymentStatus.pending;
+    }
+  }
+
   Future<void> _initiatePayment(final String orderId, final double amount) async {
     try {
-      // Show payment dialog
-      _showPaymentDialog(orderId);
-
       final paymentService = PaymentService();
       final result = await paymentService.initiatePayment(
         orderId: orderId,
@@ -196,15 +227,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (!mounted) return;
 
       if (result.success) {
-        // Keep dialog open, user will click "Done" after approving
-        // In production, you'd poll for payment status
+        await _showPaymentDialog(
+          orderId,
+          result.message ?? 'A payment request has been sent to your phone.',
+        );
       } else {
-        Navigator.pop(context); // Close dialog
         _showError(result.message ?? 'Payment initiation failed');
       }
     } catch (e) {
       if (!mounted) return;
-      Navigator.pop(context);
       _showError('Payment failed: $e');
     }
   }

@@ -224,14 +224,17 @@ class PaymentService {
     }
   }
 
-  // Check payment status
-  Future<String> checkPaymentStatus(final String transactionId) async {
+  // Check payment status by order ID
+  Future<String> checkPaymentStatus(final String orderId) async {
     try {
-      final response = await _apiService.get('/payments/$transactionId/status');
-      
-      switch (response['status']) {
+      final response = await _apiService.get('/payments/$orderId/status');
+      final data = response['data'] as Map<String, dynamic>? ?? <String, dynamic>{};
+      final status = (data['status'] as String?)?.toLowerCase() ?? 'pending';
+
+      switch (status) {
         case 'completed':
         case 'successful':
+        case 'paid':
           return PaymentStatus.completed;
         case 'pending':
           return PaymentStatus.pending;
