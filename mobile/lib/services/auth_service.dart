@@ -174,146 +174,34 @@ class AuthService {
     final String? district,
   }) async {
     try {
-      print('[AuthService] Starting signup for email: $email');
-      
-      // Check if user already exists - if so, try to sign in instead
-      try {
-        final existingSession = await _supabase.auth.signInWithPassword(
-          email: email,
-          password: password,
-        );
-        
-        if (existingSession.user != null) {
-          print('[AuthService] User already exists, attempting to fetch/create profile...');
-          
-          // Try to get existing profile
-          var profile = await getUserProfile(existingSession.user!.id);
-          
-          // If no profile, create one
-          if (profile == null) {
-            print('[AuthService] No profile found, creating one...');
-            try {
-              final profileData = await _supabase.from('users').insert({
-                'id': existingSession.user!.id,
-                'email': email,
-                'full_name': fullName,
-                'phone': phone,
-                'role': role,
-                'farm_name': farmName,
-                'region': region,
-                'district': district,
-              }).select().single();
-              
-              profile = UserModel.fromJson(profileData);
-              print('[AuthService] Profile created for existing user');
-            } catch (profileError) {
-              print('[AuthService] ERROR creating profile for existing user: $profileError');
-              
-              // Check if it's a duplicate phone error
-              if (profileError.toString().contains('users_phone_key') || 
-                  profileError.toString().contains('duplicate key')) {
-                throw Exception('This phone number is already registered. Please use a different phone number.');
-              }
-              
-              throw Exception('Failed to create profile: $profileError');
-            }
-          }
-          
-          return profile;
-        }
-      } catch (signInError) {
-        print('[AuthService] User does not exist or wrong password, proceeding with signup...');
-      }
-      
-      // Create auth user - the database trigger will automatically create the profile
-      final authResponse = await _supabase.auth.signUp(
-        email: email,
-        password: password,
-        data: {
-          'full_name': fullName,
+      final response = await _apiService.post(
+        '/auth/register',
+        body: {
+          'email': email,
+          'password': password,
+          'fullName': fullName,
           'phone': phone,
           'role': role,
-          'farm_name': farmName,
-          'region': region,
-          'district': district,
         },
       );
 
-      print('[AuthService] Auth response: ${authResponse.user?.id}');
+      final data = response is Map<String, dynamic>
+          ? (response['data'] as Map<String, dynamic>?)
+          : null;
 
-      if (authResponse.user == null) {
-        print('[AuthService] ERROR: No user in auth response');
-        throw Exception('Failed to create account - No user returned');
+      // Registration payload is not guaranteed to include a usable session.
+      final refreshToken = data?['refreshToken'] as String?;
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await _supabase.auth.setSession(refreshToken);
       }
 
-      // Wait a moment for the trigger to create the profile
-      print('[AuthService] Waiting for trigger to create profile...');
-      await Future<void>.delayed(const Duration(milliseconds: 1500));
-
-      // Try to get the profile - if it fails, the trigger didn't work
-      print('[AuthService] Attempting to fetch user profile...');
-      var profile = await getUserProfile(authResponse.user!.id);
-      
-      // If profile is null, create it manually
+      // Follow backend auth as source-of-truth and establish session/profile via login.
+      final profile = await signIn(email: email, password: password);
       if (profile == null) {
-        print('[AuthService] Profile is null, attempting manual profile creation...');
-        try {
-          final manualProfile = await _supabase.from('users').insert({
-            'id': authResponse.user!.id,
-            'email': email,
-            'full_name': fullName,
-            'phone': phone,
-            'role': role,
-            'farm_name': farmName,
-            'region': region,
-            'district': district,
-          }).select().single();
-          
-          profile = UserModel.fromJson(manualProfile);
-          print('[AuthService] Manual profile creation successful');
-        } catch (manualError) {
-          print('[AuthService] ERROR in manual profile creation: $manualError');
-          
-          // Check if it's a duplicate phone error
-          if (manualError.toString().contains('users_phone_key') || 
-              manualError.toString().contains('duplicate key')) {
-            throw Exception('This phone number is already registered. Please use a different phone number or sign in.');
-          }
-          
-          throw Exception('Failed to create user profile. Error: $manualError');
-        }
-      } else {
-        print('[AuthService] Profile fetched successfully: ${profile.id}');
+        throw Exception('Failed to create account');
       }
-
-      // Update additional profile fields if provided
-      if (farmName != null || region != null || district != null) {
-        final updateData = <String, dynamic>{};
-        if (farmName != null) updateData['farm_name'] = farmName;
-        if (region != null) updateData['region'] = region;
-        if (district != null) updateData['district'] = district;
-        
-        if (updateData.isNotEmpty) {
-          try {
-            await _apiService.update('users', authResponse.user!.id, updateData);
-          } catch (updateError) {
-            print('[AuthService] Warning: Failed to update profile fields: $updateError');
-          }
-        }
-      }
-
       return profile;
-    } on AuthException catch (e) {
-      print('[AuthService] AuthException: ${e.message}');
-      
-      // If user already exists, show helpful message
-      if (e.message.contains('already registered')) {
-        throw Exception('An account with this email already exists. Please try logging in instead.');
-      }
-      
-      throw Exception(e.message);
     } catch (e) {
-      print('[AuthService] General Exception: $e');
       throw Exception('Failed to sign up: $e');
     }
   }
@@ -324,25 +212,35 @@ class AuthService {
     required final String password,
   }) async {
     try {
-      final authResponse = await _supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
+      final response = await _apiService.post(
+        '/auth/login',
+        body: {
+          'email': email,
+          'password': password,
+        },
       );
 
-      if (authResponse.user == null) {
+      final data = response is Map<String, dynamic>
+          ? (response['data'] as Map<String, dynamic>?)
+          : null;
+      final userData = data?['user'] as Map<String, dynamic>?;
+      final refreshToken = data?['refreshToken'] as String?;
+
+      if (userData == null) {
         throw Exception('Invalid credentials');
       }
 
-      var profile = await getUserProfile(authResponse.user!.id);
-
-      // Self-heal missing profile rows for users that exist in auth but not users table.
-      if (profile == null) {
-        profile = await _createProfileFromAuthUser(authResponse.user!);
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await _supabase.auth.setSession(refreshToken);
+      } else {
+        // Fallback to direct auth sign-in when refresh token is unavailable.
+        await _supabase.auth.signInWithPassword(
+          email: email,
+          password: password,
+        );
       }
 
-      return profile;
-    } on AuthException catch (e) {
-      throw Exception(e.message);
+      return UserModel.fromJson(userData);
     } catch (e) {
       throw Exception('Failed to sign in: $e');
     }
