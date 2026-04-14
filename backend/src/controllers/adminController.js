@@ -589,6 +589,43 @@ const updateOrder = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status, notes } = req.body;
 
+  if (!status || !constants.orderStatuses.includes(status)) {
+    throw new ApiError(400, 'Invalid order status');
+  }
+
+  const { data: currentOrder, error: currentOrderError } = await supabase
+    .from('orders')
+    .select('status')
+    .eq('id', id)
+    .single();
+
+  if (currentOrderError || !currentOrder) {
+    throw new ApiError(404, 'Order not found');
+  }
+
+  const currentStatus = currentOrder.status;
+  if (['delivered', 'cancelled', 'refunded'].includes(currentStatus) && currentStatus !== status) {
+    throw new ApiError(400, `Cannot change order status from ${currentStatus}`);
+  }
+
+  const allowedTransitions = {
+    pending: ['confirmed', 'processing', 'cancelled'],
+    confirmed: ['processing', 'shipped', 'cancelled'],
+    processing: ['shipped', 'out_for_delivery', 'cancelled'],
+    shipped: ['out_for_delivery', 'delivered'],
+    out_for_delivery: ['delivered'],
+    delivered: [],
+    cancelled: [],
+    refunded: [],
+  };
+
+  if (currentStatus !== status) {
+    const allowed = allowedTransitions[currentStatus] || [];
+    if (!allowed.includes(status)) {
+      throw new ApiError(400, `Invalid order transition: ${currentStatus} -> ${status}`);
+    }
+  }
+
   const { data, error } = await supabase
     .from('orders')
     .update({ 

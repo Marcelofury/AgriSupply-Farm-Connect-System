@@ -42,21 +42,26 @@ const initiatePayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Order already paid');
   }
 
+  const orderAmount = Number(order.total ?? order.total_amount ?? 0);
+  if (!Number.isFinite(orderAmount) || orderAmount <= 0) {
+    throw new ApiError(400, 'Invalid order amount for payment');
+  }
+
   let paymentResult;
   const transactionRef = `TXN-${generateOrderNumber()}`;
 
   switch (method) {
     case 'marzpay': // Unified mobile money via MarzPay
-      paymentResult = await initiateMarzPayPayment(order, phone, transactionRef);
+      paymentResult = await initiateMarzPayPayment(order, phone, transactionRef, orderAmount);
       break;
     case 'mtn_mobile':
-      paymentResult = await initiateMTNPayment(order, phone, transactionRef);
+      paymentResult = await initiateMTNPayment(order, phone, transactionRef, orderAmount);
       break;
     case 'airtel_money':
-      paymentResult = await initiateAirtelPayment(order, phone, transactionRef);
+      paymentResult = await initiateAirtelPayment(order, phone, transactionRef, orderAmount);
       break;
     case 'card':
-      paymentResult = await initiateCardPayment(order, transactionRef, req.user.email);
+      paymentResult = await initiateCardPayment(order, transactionRef, req.user.email, orderAmount);
       break;
     case 'cash_on_delivery':
       paymentResult = await initiateCODPayment(order, transactionRef);
@@ -90,7 +95,7 @@ const initiatePayment = asyncHandler(async (req, res) => {
     .from('orders')
     .update({
       payment_status: paymentResult.status === 'completed' ? 'completed' : 'processing',
-      payment_method: method,
+      payment_method: paymentMethod,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId);
@@ -112,7 +117,7 @@ const initiatePayment = asyncHandler(async (req, res) => {
 /**
  * Initiate MarzPay Mobile Money payment (MTN & Airtel Uganda)
  */
-const initiateMarzPayPayment = async (order, phone, transactionRef) => {
+const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount) => {
   const formattedPhone = marzpayService.formatPhoneNumber(phone);
   
   if (!formattedPhone) {
@@ -136,7 +141,7 @@ const initiateMarzPayPayment = async (order, phone, transactionRef) => {
       reference: marzpayReference,
       phoneNumber: formattedPhone,
       country: 'UG',
-      amount: order.total,
+      amount: orderAmount,
       description: `AgriSupply Order #${order.order_number}`,
     });
 
@@ -184,7 +189,7 @@ const initiateMarzPayPayment = async (order, phone, transactionRef) => {
 /**
  * Initiate MTN Mobile Money payment
  */
-const initiateMTNPayment = async (order, phone, transactionRef) => {
+const initiateMTNPayment = async (order, phone, transactionRef, orderAmount) => {
   const formattedPhone = formatPhoneNumber(phone);
   
   if (!formattedPhone || getMobileMoneyProvider(phone) !== 'mtn') {
@@ -210,7 +215,7 @@ const initiateMTNPayment = async (order, phone, transactionRef) => {
     const paymentResponse = await axios.post(
       `${MTN_API_URL}/collection/v1_0/requesttopay`,
       {
-        amount: order.total.toString(),
+        amount: orderAmount.toString(),
         currency: 'UGX',
         externalId: transactionRef,
         payer: {
@@ -245,7 +250,7 @@ const initiateMTNPayment = async (order, phone, transactionRef) => {
 /**
  * Initiate Airtel Money payment
  */
-const initiateAirtelPayment = async (order, phone, transactionRef) => {
+const initiateAirtelPayment = async (order, phone, transactionRef, orderAmount) => {
   const formattedPhone = formatPhoneNumber(phone);
   
   if (!formattedPhone || getMobileMoneyProvider(phone) !== 'airtel') {
@@ -279,7 +284,7 @@ const initiateAirtelPayment = async (order, phone, transactionRef) => {
           msisdn: formattedPhone.replace('+256', ''),
         },
         transaction: {
-          amount: order.total,
+          amount: orderAmount,
           country: 'UG',
           currency: 'UGX',
           id: transactionRef,
@@ -309,13 +314,13 @@ const initiateAirtelPayment = async (order, phone, transactionRef) => {
 /**
  * Initiate card payment via Flutterwave
  */
-const initiateCardPayment = async (order, transactionRef, email) => {
+const initiateCardPayment = async (order, transactionRef, email, orderAmount) => {
   try {
     const response = await axios.post(
       `${FLUTTERWAVE_API_URL}/payments`,
       {
         tx_ref: transactionRef,
-        amount: order.total,
+        amount: orderAmount,
         currency: 'UGX',
         redirect_url: `${process.env.FRONTEND_URL}/payment/callback`,
         payment_options: 'card',

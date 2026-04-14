@@ -69,7 +69,7 @@ const supabaseAnon = createClient(
  */
 const getUserFromToken = async (accessToken) => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+    const { data: { user }, error } = await supabaseAnon.auth.getUser(accessToken);
     
     if (error) {
       logger.error('Error getting user from token:', error);

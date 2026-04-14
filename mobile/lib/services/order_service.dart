@@ -4,17 +4,27 @@ import 'api_service.dart';
 class OrderService {
   final ApiService _apiService = ApiService();
 
+  Map<String, dynamic> _normalizeOrderPayload(final Map<String, dynamic> raw) {
+    return {
+      ...raw,
+      'items': raw['items'] ?? raw['order_items'] ?? <dynamic>[],
+    };
+  }
+
   // Get orders by buyer
   Future<List<OrderModel>> getOrdersByBuyer(final String buyerId) async {
     try {
-      final data = await _apiService.query(
-        'orders',
-        select: '*, order_items(*, products(*))',
-        filters: {'buyer_id': buyerId},
-        orderBy: 'created_at',
-      );
+      final response = await _apiService.get('/orders', queryParams: {
+        'page': '1',
+        'limit': '100',
+      });
+      final list = (response['data'] as List<dynamic>? ?? <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map(_normalizeOrderPayload)
+          .map(OrderModel.fromJson)
+          .toList();
 
-      return data.map(OrderModel.fromJson).toList();
+      return list;
     } catch (e) {
       throw Exception('Failed to fetch buyer orders: $e');
     }
@@ -54,11 +64,12 @@ class OrderService {
   // Get order by ID
   Future<OrderModel> getOrderById(final String orderId) async {
     try {
-      final data = await _apiService.getById('orders', orderId);
+      final response = await _apiService.get('/orders/$orderId');
+      final data = response['data'] as Map<String, dynamic>?;
       if (data == null) {
         throw Exception('Order not found');
       }
-      return OrderModel.fromJson(data);
+      return OrderModel.fromJson(_normalizeOrderPayload(data));
     } catch (e) {
       throw Exception('Failed to fetch order: $e');
     }
