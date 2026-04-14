@@ -92,14 +92,35 @@ const initiatePayment = asyncHandler(async (req, res) => {
   }
 
   // Update order payment status
+  const normalizedOrderPaymentStatus =
+    paymentResult.status === 'completed'
+      ? 'completed'
+      : paymentResult.status === 'failed'
+        ? 'failed'
+        : 'processing';
+
   await supabase
     .from('orders')
     .update({
-      payment_status: paymentResult.status === 'completed' ? 'completed' : 'processing',
+      payment_status: normalizedOrderPaymentStatus,
       payment_method: paymentMethod,
       updated_at: new Date().toISOString(),
     })
     .eq('id', orderId);
+
+  if (paymentResult.status === 'failed') {
+    return res.status(200).json({
+      success: false,
+      message: paymentResult.message || 'Payment request was rejected by provider.',
+      data: {
+        transactionRef,
+        status: paymentResult.status,
+        providerRef: paymentResult.providerRef,
+        providerStatus: paymentResult.providerStatus,
+        verification: paymentResult.verification,
+      },
+    });
+  }
 
   res.json({
     success: true,
@@ -173,9 +194,20 @@ const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount)
       }
     }
 
+    const normalizedProviderStatus = (verification.status || result.status || 'pending').toLowerCase();
+    const mappedStatus =
+      normalizedProviderStatus === 'success' || normalizedProviderStatus === 'successful' || normalizedProviderStatus === 'completed'
+        ? 'completed'
+        : normalizedProviderStatus === 'failed' || normalizedProviderStatus === 'error' || normalizedProviderStatus === 'cancelled' || normalizedProviderStatus === 'canceled'
+          ? 'failed'
+          : 'pending';
+
     return {
-      status: verification.status === 'success' || verification.status === 'completed' ? 'completed' : 'pending',
-      message: result.message || 'Payment request sent. Please approve on your phone.',
+      status: mappedStatus,
+      message:
+        mappedStatus === 'failed'
+          ? (result.message || 'Payment was rejected by provider before prompt delivery.')
+          : (result.message || 'Payment request sent. Please approve on your phone.'),
       providerRef: result.reference,
       providerTxnId: result.uuid,
       provider: provider,
