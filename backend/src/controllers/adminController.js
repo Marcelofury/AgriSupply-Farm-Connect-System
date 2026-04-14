@@ -219,21 +219,25 @@ const updateUser = asyncHandler(async (req, res) => {
   if (is_suspended !== undefined) updateData.is_suspended = is_suspended;
   updateData.updated_at = new Date().toISOString();
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('users')
     .update(updateData)
-    .eq('id', id)
-    .select()
-    .single();
+    .eq('id', id);
 
   if (error) {
     logger.error('Update user error:', error);
       throw new ApiError(400, `Failed to update user: ${error.message || 'Unknown database error'}`);
   }
 
+  const { data } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
   res.json({
     success: true,
-    data,
+    data: data || { id, ...updateData },
   });
 });
 
@@ -464,39 +468,53 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status, is_featured, rejection_reason } = req.body;
 
+  const { data: existingProduct } = await supabase
+    .from('products')
+    .select('id, farmer_id, name, status')
+    .eq('id', id)
+    .maybeSingle();
+
   const updateData = { updated_at: new Date().toISOString() };
   if (status !== undefined) updateData.status = status;
   if (is_featured !== undefined) updateData.is_featured = is_featured;
   if (rejection_reason) updateData.rejection_reason = rejection_reason;
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('products')
     .update(updateData)
-    .eq('id', id)
-    .select('*, farmer:users!farmer_id(id, full_name)')
-    .single();
+    .eq('id', id);
 
   if (error) {
     logger.error('Update product error:', error);
       throw new ApiError(400, `Failed to update product: ${error.message || 'Unknown database error'}`);
   }
 
+  const { data } = await supabase
+    .from('products')
+    .select('*, farmer:users!farmer_id(id, full_name)')
+    .eq('id', id)
+    .maybeSingle();
+
+  const productForNotify = data || existingProduct;
+
   // Notify farmer
-  await supabase.from('notifications').insert({
-    user_id: data.farmer_id,
-    type: 'product',
-    title: status === 'active' ? 'Product Approved' : 'Product Update',
-    message: status === 'active' 
-      ? `Your product "${data.name}" has been approved and is now live.`
-      : `Your product "${data.name}" status has been updated to ${status}.`,
-    data: { product_id: id },
-    is_read: false,
-    created_at: new Date().toISOString(),
-  });
+  if (productForNotify?.farmer_id) {
+    await supabase.from('notifications').insert({
+      user_id: productForNotify.farmer_id,
+      type: 'product',
+      title: status === 'active' ? 'Product Approved' : 'Product Update',
+      message: status === 'active'
+        ? `Your product "${productForNotify.name || 'Product'}" has been approved and is now live.`
+        : `Your product "${productForNotify.name || 'Product'}" status has been updated to ${status || productForNotify.status}.`,
+      data: { product_id: id },
+      is_read: false,
+      created_at: new Date().toISOString(),
+    });
+  }
 
   res.json({
     success: true,
-    data,
+    data: data || { id, ...updateData },
   });
 });
 
