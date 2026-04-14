@@ -246,37 +246,6 @@ class AuthService {
     }
   }
 
-  Future<UserModel> _createProfileFromAuthUser(final User user) async {
-    final metadata = user.userMetadata ?? <String, dynamic>{};
-    final rawPhone = (metadata['phone'] as String?)?.trim();
-
-    final profileData = <String, dynamic>{
-      'id': user.id,
-      'email': user.email,
-      'full_name': (metadata['full_name'] as String?)?.trim().isNotEmpty == true
-          ? (metadata['full_name'] as String).trim()
-          : (user.email?.split('@').first ?? 'User'),
-      'role': (metadata['role'] as String?)?.trim().isNotEmpty == true
-          ? (metadata['role'] as String).trim()
-          : 'buyer',
-      'is_verified': true,
-      'created_at': DateTime.now().toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
-    };
-
-    if (rawPhone != null && rawPhone.isNotEmpty) {
-      profileData['phone'] = rawPhone;
-    }
-
-    final created = await _supabase
-        .from('users')
-        .upsert(profileData, onConflict: 'id')
-        .select()
-        .single();
-
-    return UserModel.fromJson(created);
-  }
-
   // Sign in with phone (OTP)
   Future<bool> signInWithPhone({required final String phone}) async {
     try {
