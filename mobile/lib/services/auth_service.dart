@@ -333,12 +333,50 @@ class AuthService {
         throw Exception('Invalid credentials');
       }
 
-      return await getUserProfile(authResponse.user!.id);
+      var profile = await getUserProfile(authResponse.user!.id);
+
+      // Self-heal missing profile rows for users that exist in auth but not users table.
+      if (profile == null) {
+        profile = await _createProfileFromAuthUser(authResponse.user!);
+      }
+
+      return profile;
     } on AuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {
       throw Exception('Failed to sign in: $e');
     }
+  }
+
+  Future<UserModel> _createProfileFromAuthUser(final User user) async {
+    final metadata = user.userMetadata ?? <String, dynamic>{};
+    final rawPhone = (metadata['phone'] as String?)?.trim();
+
+    final profileData = <String, dynamic>{
+      'id': user.id,
+      'email': user.email,
+      'full_name': (metadata['full_name'] as String?)?.trim().isNotEmpty == true
+          ? (metadata['full_name'] as String).trim()
+          : (user.email?.split('@').first ?? 'User'),
+      'role': (metadata['role'] as String?)?.trim().isNotEmpty == true
+          ? (metadata['role'] as String).trim()
+          : 'buyer',
+      'is_verified': true,
+      'created_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+
+    if (rawPhone != null && rawPhone.isNotEmpty) {
+      profileData['phone'] = rawPhone;
+    }
+
+    final created = await _supabase
+        .from('users')
+        .upsert(profileData, onConflict: 'id')
+        .select()
+        .single();
+
+    return UserModel.fromJson(created);
   }
 
   // Sign in with phone (OTP)

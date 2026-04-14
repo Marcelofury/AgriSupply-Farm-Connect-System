@@ -12,6 +12,44 @@ const {
 const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@agrisupply.ug';
 const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD || 'admin1234';
 
+const buildProfileFromAuthUser = async ({ user, fallback = {} }) => {
+  const metadata = user?.user_metadata || {};
+  const fullName = metadata.full_name || fallback.fullName || user?.email?.split('@')[0] || 'User';
+  const role = metadata.role || fallback.role || 'buyer';
+  const rawPhone = metadata.phone || fallback.phone || null;
+  const formattedPhone = rawPhone ? formatPhoneNumber(rawPhone) : null;
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+    full_name: fullName,
+    role,
+    region: fallback.region || null,
+    district: fallback.district || null,
+    farm_name: fallback.farmName || null,
+    is_verified: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  if (formattedPhone) {
+    payload.phone = formattedPhone;
+  }
+
+  const { data, error } = await supabase
+    .from('users')
+    .upsert(payload, { onConflict: 'id' })
+    .select('*')
+    .single();
+
+  if (error || !data) {
+    logger.error('Failed to build profile from auth user:', error);
+    throw new ApiError(500, 'Failed to create user profile');
+  }
+
+  return data;
+};
+
 /**
  * @desc    Register a new user
  * @route   POST /api/v1/auth/register
@@ -47,8 +85,15 @@ const register = asyncHandler(async (req, res) => {
     .single();
 
   if (profileError || !profile) {
-    logger.error('Profile fetch error after creation:', profileError);
-    throw new ApiError(500, 'User created but profile not found. Please try logging in.');
+    logger.warn('Profile missing after registration trigger; attempting fallback profile creation');
+    profile = await buildProfileFromAuthUser({
+      user: authData.user,
+      fallback: {
+        fullName,
+        role,
+        phone,
+      },
+    });
   }
 
   // Create default notification preferences
@@ -101,7 +146,8 @@ const login = asyncHandler(async (req, res) => {
     .single();
 
   if (profileError || !profile) {
-    throw new ApiError(404, 'User profile not found');
+    logger.warn(`Profile missing at login for user ${data.user.id}; attempting fallback profile creation`);
+    profile = await buildProfileFromAuthUser({ user: data.user });
   }
 
   // Check if user is suspended
