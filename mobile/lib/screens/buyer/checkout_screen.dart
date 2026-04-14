@@ -232,7 +232,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           result.message ?? 'A payment request has been sent to your phone.',
         );
       } else {
-        _showError(result.message ?? 'Payment initiation failed');
+        final rawMessage = (result.message ?? 'Payment initiation failed').toLowerCase();
+        final looksProviderImmediateFailure =
+            rawMessage.contains('auto-fail') ||
+            rawMessage.contains('auto failed') ||
+            rawMessage.contains('provider') && rawMessage.contains('failed') ||
+            rawMessage.contains('rejected');
+
+        if (looksProviderImmediateFailure) {
+          _showError(
+            'Payment provider rejected the request before phone prompt. Please try once after a short wait, or contact support if it persists.',
+          );
+        } else {
+          _showError(result.message ?? 'Payment initiation failed');
+        }
       }
     } catch (e) {
       if (!mounted) return;
