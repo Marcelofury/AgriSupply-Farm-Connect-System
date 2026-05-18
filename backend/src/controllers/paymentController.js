@@ -6,6 +6,125 @@ const { formatPhoneNumber, getMobileMoneyProvider, generateOrderNumber } = requi
 const logger = require('../utils/logger');
 const marzpayService = require('../services/marzpayService');
 const { createInAppNotification } = require('../utils/notificationHelper');
+const { sendSms } = require('../services/smsProviderService');
+
+const MIN_MARZPAY_AMOUNT = Number(process.env.MARZPAY_MIN_AMOUNT || 500);
+const MAX_MARZPAY_AMOUNT = 10000000;
+
+function mapMarzPayStatus(status) {
+  const normalized = String(status || '').toLowerCase();
+
+  if (['success', 'successful', 'completed', 'paid'].includes(normalized)) {
+    return 'completed';
+  }
+
+  if (['failed', 'error', 'cancelled', 'canceled'].includes(normalized)) {
+    return 'failed';
+  }
+
+  return 'pending';
+}
+
+function formatSmsTemplate(template, variables) {
+  return String(template || '').replace(/\{(\w+)\}/g, (_, key) => String(variables?.[key] ?? ''));
+}
+
+function buildPaymentSmsMessage({ success, name, amount, orderNumber }) {
+  const successTemplate = process.env.SMS_PAYMENT_SUCCESS ||
+    'Thank you {name}! Your payment of UGX {amount} for order #{orderNumber} was received. -AgriSupply';
+  const failedTemplate = process.env.SMS_PAYMENT_FAILED ||
+    'Sorry {name}, payment of UGX {amount} for order #{orderNumber} failed. Please try again. -AgriSupply';
+
+  const selected = success ? successTemplate : failedTemplate;
+  return formatSmsTemplate(selected, {
+    name: name || 'Customer',
+    amount: Number(amount || 0).toFixed(0),
+    orderNumber: orderNumber || 'N/A',
+  });
+}
+
+function extractMarzpayCallback(payload) {
+  const root = payload || {};
+  const data = root.data || {};
+  const transaction = data.transaction || root.transaction || {};
+
+  const transactionRef =
+    root.reference ||
+    root.transactionRef ||
+    root.transaction_ref ||
+    root.customer_reference ||
+    data.reference ||
+    data.transactionRef ||
+    data.transaction_ref ||
+    transaction.reference ||
+    transaction.transactionRef ||
+    transaction.transaction_ref ||
+    null;
+
+  const providerRef =
+    root.internal_reference ||
+    root.provider_reference ||
+    root.providerRef ||
+    data.internal_reference ||
+    data.provider_reference ||
+    data.providerRef ||
+    transaction.provider_reference ||
+    transaction.providerRef ||
+    null;
+
+  const providerStatus =
+    root.status ||
+    root.transactionStatus ||
+    root.transaction_status ||
+    data.status ||
+    data.transactionStatus ||
+    data.transaction_status ||
+    transaction.status ||
+    'pending';
+
+  const providerUuid =
+    root.uuid ||
+    root.transaction_id ||
+    data.uuid ||
+    data.transaction_id ||
+    transaction.uuid ||
+    transaction.transaction_id ||
+    null;
+
+  return {
+    transactionRef,
+    providerRef,
+    providerStatus,
+    providerUuid,
+  };
+}
+
+async function sendPaymentSms({ userId, phoneFallback, success, amount, orderNumber }) {
+  if (!userId && !phoneFallback) {
+    return;
+  }
+
+  const { data: user } = userId
+    ? await supabase.from('users').select('full_name, phone').eq('id', userId).single()
+    : { data: null };
+
+  const phone = user?.phone || phoneFallback;
+  if (!phone) {
+    return;
+  }
+
+  const message = buildPaymentSmsMessage({
+    success,
+    name: user?.full_name,
+    amount,
+    orderNumber,
+  });
+
+  const smsResult = await sendSms({ phone, message });
+  if (!smsResult?.ok) {
+    logger.warn('Payment SMS not sent', smsResult?.reason || 'unknown');
+  }
+}
 
 // Payment provider configurations
 const MTN_API_URL = process.env.MTN_ENVIRONMENT === 'production'
@@ -80,7 +199,7 @@ const initiatePayment = asyncHandler(async (req, res) => {
     method: paymentMethod,
     transaction_ref: transactionRef,
     status: paymentResult.status,
-    provider_reference: paymentResult.providerTxnId || paymentResult.providerRef,
+    provider_reference: paymentResult.providerRef || paymentResult.providerTxnId,
     transaction_id: paymentResult.providerTxnId || paymentResult.providerRef,
     phone: formatPhoneNumber(phone),
     created_at: new Date().toISOString(),
@@ -151,8 +270,15 @@ const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount)
     throw new ApiError(400, 'Phone number must be MTN (77/78/76) or Airtel (70/75/74) Uganda');
   }
 
+  if (!Number.isFinite(orderAmount) || orderAmount < MIN_MARZPAY_AMOUNT || orderAmount > MAX_MARZPAY_AMOUNT) {
+    throw new ApiError(400, `Amount must be between ${MIN_MARZPAY_AMOUNT} and ${MAX_MARZPAY_AMOUNT} UGX`);
+  }
+
   try {
     const marzpayReference = randomUUID();
+    const callbackUrl =
+      process.env.MARZPAY_CALLBACK_URL ||
+      (process.env.APP_URL ? `${process.env.APP_URL}/api/v1/payments/marzpay/callback` : undefined);
 
     // Optional: Validate phone number before payment
     const validation = await marzpayService.validateMobileNumber(formattedPhone);
@@ -165,6 +291,7 @@ const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount)
       country: 'UG',
       amount: orderAmount,
       description: `AgriSupply Order #${order.order_number}`,
+      callbackUrl,
     });
 
     let verification = {
@@ -195,12 +322,7 @@ const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount)
     }
 
     const normalizedProviderStatus = (verification.status || result.status || 'pending').toLowerCase();
-    const mappedStatus =
-      normalizedProviderStatus === 'success' || normalizedProviderStatus === 'successful' || normalizedProviderStatus === 'completed'
-        ? 'completed'
-        : normalizedProviderStatus === 'failed' || normalizedProviderStatus === 'error' || normalizedProviderStatus === 'cancelled' || normalizedProviderStatus === 'canceled'
-          ? 'failed'
-          : 'pending';
+    const mappedStatus = mapMarzPayStatus(normalizedProviderStatus);
 
     return {
       status: mappedStatus,
@@ -208,7 +330,7 @@ const initiateMarzPayPayment = async (order, phone, transactionRef, orderAmount)
         mappedStatus === 'failed'
           ? (result.message || 'Payment was rejected by provider before prompt delivery.')
           : (result.message || 'Payment request sent. Please approve on your phone.'),
-      providerRef: result.reference,
+      providerRef: result.reference || marzpayReference,
       providerTxnId: result.uuid,
       provider: provider,
       providerStatus: verification.status || result.status || 'pending',
@@ -512,7 +634,7 @@ const mtnCallback = asyncHandler(async (req, res) => {
     // Notify user
     const { data: order } = await supabase
       .from('orders')
-      .select('buyer_id, order_number')
+      .select('buyer_id, order_number, shipping_address')
       .eq('id', payment.order_id)
       .single();
 
@@ -525,6 +647,14 @@ const mtnCallback = asyncHandler(async (req, res) => {
           ? `Payment for order #${order.order_number} was successful`
           : `Payment for order #${order.order_number} failed. Please try again.`,
         data: { orderId: payment.order_id },
+      });
+
+      await sendPaymentSms({
+        userId: order.buyer_id,
+        phoneFallback: order.shipping_address?.phone,
+        success: paymentStatus === 'completed',
+        amount: payment.amount,
+        orderNumber: order.order_number,
       });
     }
   }
@@ -563,6 +693,32 @@ const airtelCallback = asyncHandler(async (req, res) => {
           updated_at: new Date().toISOString(),
         })
         .eq('id', payment.order_id);
+
+      const { data: order } = await supabase
+        .from('orders')
+        .select('buyer_id, order_number, shipping_address')
+        .eq('id', payment.order_id)
+        .single();
+
+      if (order) {
+        await createInAppNotification({
+          userId: order.buyer_id,
+          type: paymentStatus === 'completed' ? 'payment_received' : 'payment_failed',
+          title: paymentStatus === 'completed' ? 'Payment Successful' : 'Payment Failed',
+          message: paymentStatus === 'completed'
+            ? `Payment for order #${order.order_number} was successful`
+            : `Payment for order #${order.order_number} failed. Please try again.`,
+          data: { orderId: payment.order_id },
+        });
+
+        await sendPaymentSms({
+          userId: order.buyer_id,
+          phoneFallback: order.shipping_address?.phone,
+          success: paymentStatus === 'completed',
+          amount: payment.amount,
+          orderNumber: order.order_number,
+        });
+      }
     }
   }
 
@@ -576,48 +732,58 @@ const airtelCallback = asyncHandler(async (req, res) => {
  */
 const marzpayCallback = asyncHandler(async (req, res) => {
   logger.info('MarzPay callback received:', req.body);
+  const { transactionRef, providerRef, providerStatus, providerUuid } = extractMarzpayCallback(req.body);
 
-  // MarzPay callback payload structure
-  const { customer_reference, internal_reference, status, amount, provider } = req.body;
-
-  if (!customer_reference && !internal_reference) {
+  if (!transactionRef && !providerRef && !providerUuid) {
     return res.status(400).json({ success: false, message: 'Missing reference' });
   }
 
-  // Map MarzPay status to our status
-  let paymentStatus = 'pending';
-  if (status === 'success' || status === 'successful') {
-    paymentStatus = 'completed';
-  } else if (status === 'failed' || status === 'error') {
-    paymentStatus = 'failed';
+  const paymentStatus = mapMarzPayStatus(providerStatus);
+  const now = new Date().toISOString();
+
+  const orFilters = [];
+  if (transactionRef) {
+    orFilters.push(`transaction_ref.eq.${transactionRef}`);
+  }
+  if (providerRef) {
+    orFilters.push(`provider_reference.eq.${providerRef}`, `transaction_id.eq.${providerRef}`);
+  }
+  if (providerUuid) {
+    orFilters.push(`transaction_id.eq.${providerUuid}`);
   }
 
-  // Update payment record
+  const updatePayload = {
+    status: paymentStatus,
+    updated_at: now,
+  };
+
+  if (providerRef) {
+    updatePayload.provider_reference = providerRef;
+  }
+
+  if (providerUuid) {
+    updatePayload.transaction_id = providerUuid;
+  }
+
   const { data: payment } = await supabase
     .from('payments')
-    .update({
-      status: paymentStatus,
-      provider_reference: internal_reference,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('transaction_ref', customer_reference || internal_reference)
+    .update(updatePayload)
+    .or(orFilters.join(','))
     .select()
-    .single();
+    .maybeSingle();
 
   if (payment) {
-    // Update order payment status
     await supabase
       .from('orders')
       .update({
         payment_status: paymentStatus,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       })
       .eq('id', payment.order_id);
 
-    // Notify user
     const { data: order } = await supabase
       .from('orders')
-      .select('buyer_id, order_number')
+      .select('buyer_id, order_number, shipping_address')
       .eq('id', payment.order_id)
       .single();
 
@@ -627,9 +793,17 @@ const marzpayCallback = asyncHandler(async (req, res) => {
         type: paymentStatus === 'completed' ? 'payment_received' : 'payment_failed',
         title: paymentStatus === 'completed' ? 'Payment Successful' : 'Payment Failed',
         message: paymentStatus === 'completed'
-          ? `Payment for order #${order.order_number} was successful via ${provider}`
+          ? `Payment for order #${order.order_number} was successful via MarzPay`
           : `Payment for order #${order.order_number} failed. Please try again.`,
         data: { orderId: payment.order_id },
+      });
+
+      await sendPaymentSms({
+        userId: order.buyer_id,
+        phoneFallback: order.shipping_address?.phone,
+        success: paymentStatus === 'completed',
+        amount: payment.amount,
+        orderNumber: order.order_number,
       });
     }
   }
@@ -732,6 +906,32 @@ const cardCallback = asyncHandler(async (req, res) => {
           updated_at: new Date().toISOString(),
         })
         .eq('id', payment.order_id);
+
+      const { data: order } = await supabase
+        .from('orders')
+        .select('buyer_id, order_number, shipping_address')
+        .eq('id', payment.order_id)
+        .single();
+
+      if (order) {
+        await createInAppNotification({
+          userId: order.buyer_id,
+          type: paymentStatus === 'completed' ? 'payment_received' : 'payment_failed',
+          title: paymentStatus === 'completed' ? 'Payment Successful' : 'Payment Failed',
+          message: paymentStatus === 'completed'
+            ? `Payment for order #${order.order_number} was successful`
+            : `Payment for order #${order.order_number} failed. Please try again.`,
+          data: { orderId: payment.order_id },
+        });
+
+        await sendPaymentSms({
+          userId: order.buyer_id,
+          phoneFallback: order.shipping_address?.phone,
+          success: paymentStatus === 'completed',
+          amount: payment.amount,
+          orderNumber: order.order_number,
+        });
+      }
     }
   }
 
