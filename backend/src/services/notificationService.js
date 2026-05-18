@@ -1,26 +1,16 @@
-import 'dart:convert';
+const axios = require('axios');
+const { supabase } = require('../config/supabase');
+const logger = require('../utils/logger');
+const { sendSms } = require('./smsProviderService');
 
-import 'package:http/http.dart' as http;
-
-import '../config/supabase.dart';
-import '../utils/logger.dart';
-
-/**
- * Firebase Admin SDK for Push Notifications
- * 
- * Note: You need to install firebase-admin package:
- * npm install firebase-admin
- * 
- * And set up Firebase service account credentials in your environment
- */
-
-// Firebase Admin initialization (add this to index.js or a separate firebase-admin.js file)
-// const admin = require('firebase-admin');
-// const serviceAccount = require('./path-to-serviceAccountKey.json');
-//
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
+function getFirebaseAdmin() {
+  try {
+    const admin = require('firebase-admin');
+    return admin;
+  } catch (error) {
+    return null;
+  }
+}
 
 class NotificationService {
   /**
@@ -31,8 +21,8 @@ class NotificationService {
    */
   async sendPushNotification(deviceToken, notification) {
     try {
-      // Using Firebase Admin SDK (recommended)
-      if (typeof admin !== 'undefined' && admin.messaging) {
+      const admin = getFirebaseAdmin();
+      if (admin?.messaging) {
         const message = {
           token: deviceToken,
           notification: {
@@ -44,70 +34,50 @@ class NotificationService {
             referenceId: notification.referenceId || '',
             ...notification.data,
           },
-          android: {
-            priority: 'high',
-            notification: {
-              sound: 'default',
-              channelId: 'default',
-            },
-          },
-          apns: {
-            headers: {
-              'apns-priority': '10',
-            },
-            payload: {
-              aps: {
-                sound: 'default',
-                badge: 1,
-              },
-            },
-          },
         };
 
-        const response = await admin.messaging().send(message);
-        logger.info('Push notification sent successfully:', response);
+        await admin.messaging().send(message);
         return true;
       }
 
-      // Fallback: Using FCM REST API
       const fcmApiKey = process.env.FIREBASE_SERVER_KEY;
       if (!fcmApiKey) {
-        throw new Error('Firebase server key not configured');
+        logger.warn('Firebase server key not configured');
+        return false;
       }
 
-      const response = await http.post(
+      const response = await axios.post(
         'https://fcm.googleapis.com/fcm/send',
+        {
+          to: deviceToken,
+          notification: {
+            title: notification.title,
+            body: notification.body,
+            sound: 'default',
+          },
+          data: {
+            type: notification.type || 'general',
+            referenceId: notification.referenceId || '',
+            ...notification.data,
+          },
+          priority: 'high',
+        },
         {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `key=${fcmApiKey}`,
           },
-          body: JSON.stringify({
-            to: deviceToken,
-            notification: {
-              title: notification.title,
-              body: notification.body,
-              sound: 'default',
-            },
-            data: {
-              type: notification.type || 'general',
-              referenceId: notification.referenceId || '',
-              ...notification.data,
-            },
-            priority: 'high',
-          }),
         }
       );
 
       if (response.status === 200) {
-        logger.info('Push notification sent via REST API');
         return true;
-      } else {
-        logger.error('FCM API error:', response.data);
-        return false;
       }
+
+      logger.error('FCM API error:', response.data);
+      return false;
     } catch (error) {
-      logger.error('Send push notification error:', error);
+      logger.error('Send push notification error:', error.message || error);
       return false;
     }
   }
@@ -120,11 +90,9 @@ class NotificationService {
    */
   async sendEmailNotification(email, emailData) {
     try {
-      // Using SendGrid, Mailgun, or similar service
-      const emailService = process.env.EMAIL_SERVICE; // 'sendgrid' or 'mailgun'
-      
+      const emailService = process.env.EMAIL_SERVICE;
+
       if (emailService === 'sendgrid') {
-        // SendGrid implementation
         const sgMail = require('@sendgrid/mail');
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -137,10 +105,10 @@ class NotificationService {
         };
 
         await sgMail.send(msg);
-        logger.info('Email sent successfully via SendGrid');
         return true;
-      } else if (emailService === 'mailgun') {
-        // Mailgun implementation
+      }
+
+      if (emailService === 'mailgun') {
         const mailgun = require('mailgun-js')({
           apiKey: process.env.MAILGUN_API_KEY,
           domain: process.env.MAILGUN_DOMAIN,
@@ -155,14 +123,13 @@ class NotificationService {
         };
 
         await mailgun.messages().send(data);
-        logger.info('Email sent successfully via Mailgun');
         return true;
-      } else {
-        logger.warn('No email service configured');
-        return false;
       }
+
+      logger.warn('No email service configured');
+      return false;
     } catch (error) {
-      logger.error('Send email notification error:', error);
+      logger.error('Send email notification error:', error.message || error);
       return false;
     }
   }
@@ -175,30 +142,10 @@ class NotificationService {
    */
   async sendSMSNotification(phone, message) {
     try {
-      const smsService = process.env.SMS_SERVICE; // 'twilio' or 'egosms'
-
-      if (smsService === 'twilio') {
-        // Twilio implementation
-        const twilio = require('twilio');
-        const client = twilio(
-          process.env.TWILIO_ACCOUNT_SID,
-          process.env.TWILIO_AUTH_TOKEN
-        );
-
-        await client.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: phone,
-        });
-
-        logger.info('SMS sent successfully via Twilio');
-        return true;
-      } else {
-        logger.warn('No SMS service configured');
-        return false;
-      }
+      const result = await sendSms({ phone, message });
+      return Boolean(result?.ok);
     } catch (error) {
-      logger.error('Send SMS notification error:', error);
+      logger.error('Send SMS notification error:', error.message || error);
       return false;
     }
   }
@@ -211,7 +158,6 @@ class NotificationService {
    */
   async sendNotificationToUser(userId, notification) {
     try {
-      // Get user's notification preferences
       const { data: preferences } = await supabase
         .from('notification_preferences')
         .select('*')
@@ -224,7 +170,6 @@ class NotificationService {
         .eq('id', userId)
         .single();
 
-      // Send push notification if enabled
       if (preferences?.push_enabled) {
         const { data: devices } = await supabase
           .from('user_devices')
@@ -236,7 +181,6 @@ class NotificationService {
         }
       }
 
-      // Send email if enabled
       if (preferences?.email_enabled && user?.email) {
         await this.sendEmailNotification(user.email, {
           subject: notification.title,
@@ -245,7 +189,6 @@ class NotificationService {
         });
       }
 
-      // Send SMS if enabled
       if (preferences?.sms_enabled && user?.phone) {
         await this.sendSMSNotification(
           user.phone,
@@ -253,7 +196,7 @@ class NotificationService {
         );
       }
     } catch (error) {
-      logger.error('Send notification to user error:', error);
+      logger.error('Send notification to user error:', error.message || error);
     }
   }
 }
