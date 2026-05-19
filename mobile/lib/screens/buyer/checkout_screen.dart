@@ -117,14 +117,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     // Simple delivery fee calculation based on region
     switch (_selectedRegion) {
       case 'Central':
-        return 5000;
+        return 500;
       case 'Eastern':
       case 'Western':
-        return 10000;
+        return 1000;
       case 'Northern':
-        return 15000;
+        return 1500;
       default:
-        return 5000;
+        return 500;
     }
   }
 
