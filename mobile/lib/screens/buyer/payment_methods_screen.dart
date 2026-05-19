@@ -110,11 +110,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     final prefs = await SharedPreferences.getInstance();
     final rows = prefs.getStringList(key) ?? <String>[];
 
-    final parsed = rows.map((row) {
+    final parsed = rows.map((final row) {
       final parts = row.split('|');
       final id = parts.isNotEmpty ? parts[0] : DateTime.now().millisecondsSinceEpoch.toString();
       final type = parts.length > 1 ? parts[1] : 'marzpay';
-      final isDefault = parts.length > 2 ? parts[2] == '1' : false;
+      final isDefault = parts.length > 2 && parts[2] == '1';
       final detailsRaw = parts.length > 3 ? parts[3] : '';
 
       final details = <String, String>{};
@@ -148,8 +148,8 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
     if (key == null) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final rows = _paymentMethods.map((m) {
-      final details = m.details.entries.map((e) => '${e.key}=${e.value}').join(';');
+    final rows = _paymentMethods.map((final m) {
+      final details = m.details.entries.map((final e) => '${e.key}=${e.value}').join(';');
       return '${m.id}|${m.type}|${m.isDefault ? '1' : '0'}|$details';
     }).toList();
 
