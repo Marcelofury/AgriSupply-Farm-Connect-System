@@ -147,22 +147,24 @@ const generateTrackingNumber = () => {
  * @returns {number} Delivery fee in UGX
  */
 const calculateDeliveryFee = (fromRegion, toRegion) => {
-  if (fromRegion === toRegion) {
-    return 5000; // Same region
+  const safeFromRegion = fromRegion || toRegion || 'Central';
+  const safeToRegion = toRegion || fromRegion || 'Central';
+  if (safeFromRegion === safeToRegion) {
+    return 500; // Same region
   }
   
   // Different regions
   const regionFees = {
-    'Central-Eastern': 10000,
-    'Central-Northern': 15000,
-    'Central-Western': 12000,
-    'Eastern-Northern': 12000,
-    'Eastern-Western': 15000,
-    'Northern-Western': 18000,
+    'Central-Eastern': 1000,
+    'Central-Northern': 1500,
+    'Central-Western': 1000,
+    'Eastern-Northern': 1500,
+    'Eastern-Western': 1000,
+    'Northern-Western': 1500,
   };
-  
-  const key = [fromRegion, toRegion].sort().join('-');
-  return regionFees[key] || 15000;
+
+  const key = [safeFromRegion, safeToRegion].sort().join('-');
+  return regionFees[key] || 1500;
 };
 
 /**

@@ -216,7 +216,9 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   // Calculate delivery fee
-  const uniqueFarmerRegions = [...new Set(products.map(p => p.farmer.region))];
+  const uniqueFarmerRegions = [...new Set(
+    products.map(p => p.farmer?.region || buyerRegion),
+  )];
   let deliveryFee = 0;
   
   for (const farmerRegion of uniqueFarmerRegions) {
