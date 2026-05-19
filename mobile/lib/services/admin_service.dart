@@ -277,7 +277,7 @@ class AdminService {
     final buyer = raw['buyer'] as Map<String, dynamic>?;
     final orderItems = (raw['order_items'] as List<dynamic>? ?? <dynamic>[])
         .whereType<Map<String, dynamic>>()
-        .map((item) => {
+        .map((final item) => {
               'id': item['id'] ?? '',
               'order_id': item['order_id'] ?? raw['id'] ?? '',
               'product_id': item['product_id'] ?? '',
