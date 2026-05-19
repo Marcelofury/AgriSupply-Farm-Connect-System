@@ -56,10 +56,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Send Broadcast'),
         content: StatefulBuilder(
-          builder: (context, setModalState) => Column(
+          builder: (final context, final setModalState) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
@@ -82,7 +82,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   DropdownMenuItem(value: 'farmer', child: Text('Farmers')),
                   DropdownMenuItem(value: 'admin', child: Text('Admins')),
                 ],
-                onChanged: (v) => setModalState(() => role = v),
+                onChanged: (final v) => setModalState(() => role = v),
               ),
             ],
           ),
@@ -257,7 +257,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   final auth = Provider.of<AuthProvider>(context, listen: false);
                   await auth.signOut();
                   if (!mounted) return;
-                  Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
+                  Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (final route) => false);
                 },
               ),
             ],
