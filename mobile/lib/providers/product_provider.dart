@@ -158,7 +158,6 @@ class ProductProvider extends ChangeNotifier {
     try {
       if (query.trim().isEmpty) {
         _searchResults = await _productService.getProducts(
-          pageSize: _pageSize,
           category: _selectedCategory,
           region: _selectedRegion,
           minPrice: _minPrice,
