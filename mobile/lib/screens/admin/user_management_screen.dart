@@ -741,10 +741,10 @@ class _UserManagementScreenState extends State<UserManagementScreen>
   }
 
   Future<void> _showEditUserDialog(final UserModel user) async {
-    String selectedRole = user.userType;
-    bool isVerified = user.isVerified;
-    bool isPremium = user.isPremium;
-    bool isSuspended = user.isSuspended;
+    var selectedRole = user.userType;
+    var isVerified = user.isVerified;
+    var isPremium = user.isPremium;
+    var isSuspended = user.isSuspended;
 
     await showDialog<void>(
       context: context,
@@ -762,7 +762,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                   DropdownMenuItem(value: 'farmer', child: Text('Farmer')),
                   DropdownMenuItem(value: 'admin', child: Text('Admin')),
                 ],
-                onChanged: (value) {
+                onChanged: (final value) {
                   if (value != null) {
                     setModalState(() => selectedRole = value);
                   }
@@ -772,19 +772,19 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Verified'),
                 value: isVerified,
-                onChanged: (value) => setModalState(() => isVerified = value),
+                onChanged: (final value) => setModalState(() => isVerified = value),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Premium'),
                 value: isPremium,
-                onChanged: (value) => setModalState(() => isPremium = value),
+                onChanged: (final value) => setModalState(() => isPremium = value),
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('Suspended'),
                 value: isSuspended,
-                onChanged: (value) => setModalState(() => isSuspended = value),
+                onChanged: (final value) => setModalState(() => isSuspended = value),
               ),
             ],
           ),
@@ -806,7 +806,7 @@ class _UserManagementScreenState extends State<UserManagementScreen>
                     isSuspended: isSuspended,
                   );
 
-                  final index = _users.indexWhere((u) => u.id == user.id);
+                  final index = _users.indexWhere((final u) => u.id == user.id);
                   if (index >= 0) {
                     _users[index] = updated;
                   }
