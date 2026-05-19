@@ -587,11 +587,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   List<MapEntry<String, double>> get _salesEntries {
-    final map = (_salesAnalytics['salesByDate'] as Map<String, dynamic>? ?? <String, dynamic>{});
-    final entries = map.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+    final map = _salesAnalytics['salesByDate'] as Map<String, dynamic>? ?? <String, dynamic>{};
+    final entries = map.entries.toList()..sort((final a, final b) => a.key.compareTo(b.key));
 
     return entries
-        .map((entry) {
+        .map((final entry) {
           final value = entry.value as Map<String, dynamic>?;
           final amount = (value?['amount'] as num?)?.toDouble() ?? 0;
           return MapEntry(entry.key, amount);
@@ -606,7 +606,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     }
 
     return entries.asMap().entries
-        .map((entry) => _makeBarGroup(entry.key, entry.value.value))
+        .map((final entry) => _makeBarGroup(entry.key, entry.value.value))
         .toList();
   }
 
@@ -615,19 +615,19 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     if (entries.isEmpty) return 10;
 
     final maxValue = entries
-        .map((e) => e.value)
-        .fold<double>(0, (prev, value) => value > prev ? value : prev);
+        .map((final e) => e.value)
+        .fold<double>(0, (final prev, final value) => value > prev ? value : prev);
 
     if (maxValue <= 0) return 10;
     return maxValue * 1.2;
   }
 
   List<PieChartSectionData> _buildPieSections() {
-    final byCategory = (_productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final byCategory = _productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final values = byCategory.values
-        .map((v) => (v as num?)?.toDouble() ?? 0)
+        .map((final v) => (v as num?)?.toDouble() ?? 0)
         .toList();
-    if (values.isEmpty || values.every((v) => v == 0)) {
+    if (values.isEmpty || values.every((final v) => v == 0)) {
       return [
         PieChartSectionData(
           color: AppColors.grey200,
@@ -659,9 +659,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   List<Widget> _buildCategoryLegends() {
-    final byCategory = (_productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final byCategory = _productAnalytics['byCategory'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final entries = byCategory.entries.toList();
-    final total = entries.fold<num>(0, (sum, e) => sum + ((e.value as num?) ?? 0));
+    final total = entries.fold<num>(0, (final sum, final e) => sum + ((e.value as num?) ?? 0));
 
     if (entries.isEmpty || total == 0) {
       return [_buildLegendItem('No data', AppColors.grey500, '0%')];
@@ -675,7 +675,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       AppColors.grey500,
     ];
 
-    return entries.asMap().entries.take(5).map((entry) {
+    return entries.asMap().entries.take(5).map((final entry) {
       final value = (entry.value.value as num?) ?? 0;
       final percent = ((value / total) * 100).toStringAsFixed(0);
       return _buildLegendItem(
@@ -813,7 +813,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   List<Widget> _buildRegionalBars() {
-    final map = (_regionalAnalytics['ordersByRegion'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    final map = _regionalAnalytics['ordersByRegion'] as Map<String, dynamic>? ?? <String, dynamic>{};
     if (map.isEmpty) {
       return const [
         Padding(
@@ -824,12 +824,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     }
 
     final entries = map.entries.toList();
-    final maxCount = entries.fold<int>(0, (prev, e) {
+    final maxCount = entries.fold<int>(0, (final prev, final e) {
       final count = ((e.value as Map<String, dynamic>)['count'] as num?)?.toInt() ?? 0;
       return count > prev ? count : prev;
     });
 
-    return entries.map((entry) {
+    return entries.map((final entry) {
       final value = entry.value as Map<String, dynamic>;
       final count = (value['count'] as num?)?.toInt() ?? 0;
       final percentage = maxCount == 0 ? 0.0 : count / maxCount;
