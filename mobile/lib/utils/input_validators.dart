@@ -1,7 +1,7 @@
 class InputValidators {
   static final RegExp _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
   static final RegExp _ugandaPhoneRegex = RegExp(r'^(\+256|0)?7\d{8}$');
-  static final RegExp _passwordRuleRegex = RegExp(r'[A-Za-z0-9]');
+  static final RegExp _passwordRuleRegex = RegExp('[A-Za-z0-9]');
 
   static String? requiredField(final String? value, final String fieldName) {
     if (value == null || value.trim().isEmpty) {
