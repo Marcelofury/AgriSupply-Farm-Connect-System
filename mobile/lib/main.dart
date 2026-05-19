@@ -63,9 +63,7 @@ class _AgriSupplyAppState extends State<AgriSupplyApp> {
       }
     } catch (_) {}
 
-    _deepLinkSub = _appLinks.uriLinkStream.listen((final uri) {
-      _handleDeepLink(uri);
-    });
+    _deepLinkSub = _appLinks.uriLinkStream.listen(_handleDeepLink);
   }
 
   void _handleDeepLink(final Uri uri) {
