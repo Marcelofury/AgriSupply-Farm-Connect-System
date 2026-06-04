@@ -19,6 +19,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoading = true;
+  bool _hasLoaded = false;
 
   @override
   void initState() {
@@ -37,15 +38,34 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
 
-    if (authProvider.currentUser != null) {
-      await orderProvider.fetchBuyerOrders(authProvider.currentUser!.id);
+    if (authProvider.currentUser == null) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+      return;
     }
 
-    setState(() => _isLoading = false);
+    if (mounted) {
+      setState(() => _isLoading = true);
+    }
+
+    await orderProvider.fetchBuyerOrders(authProvider.currentUser!.id);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _hasLoaded = true;
+      });
+    }
   }
 
   @override
   Widget build(final BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    if (!_hasLoaded && authProvider.currentUser != null && !_isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadOrders());
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Orders'),
