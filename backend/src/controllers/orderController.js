@@ -351,6 +351,14 @@ const createOrder = asyncHandler(async (req, res) => {
     created_at: new Date().toISOString(),
   });
 
+  await createInAppNotification({
+    userId: buyerId,
+    type: 'order_placed',
+    title: 'Order Placed',
+    message: `Your order #${orderNumber} was placed successfully`,
+    data: { orderId: order.id },
+  });
+
   // Notify farmers
   const farmerIds = [...new Set(orderItems.map(item => item.farmer_id))];
   await createBulkInAppNotifications({
