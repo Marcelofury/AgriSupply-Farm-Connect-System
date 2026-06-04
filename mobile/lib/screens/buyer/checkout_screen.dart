@@ -95,6 +95,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       if (order != null) {
         cartProvider.clearCart();
+        await orderProvider.fetchBuyerOrders(authProvider.currentUser!.id);
         
         if (_selectedPaymentMethod == PaymentMethod.mobileMoney) {
           // Initiate MarzPay payment
@@ -194,7 +195,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               Navigator.pop(context);
               Navigator.pushNamedAndRemoveUntil(
                 this.context,
-                AppRoutes.buyerHome,
+                AppRoutes.buyerOrders,
                 (final route) => false,
               );
             },
