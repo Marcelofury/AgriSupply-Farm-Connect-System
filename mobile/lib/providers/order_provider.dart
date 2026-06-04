@@ -131,6 +131,15 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  Future<List<Map<String, dynamic>>> getStatusHistory(final String orderId) async {
+    try {
+      return await _orderService.getStatusHistory(orderId);
+    } catch (e) {
+      _errorMessage = e.toString();
+      return [];
+    }
+  }
+
   // Load farmer orders (alias for fetchFarmerOrders)
   Future<void> loadFarmerOrders(final String farmerId) async {
     await fetchFarmerOrders(farmerId);
@@ -336,11 +345,13 @@ class OrderProvider extends ChangeNotifier {
   // Get active orders (not completed or cancelled)
   List<OrderModel> get activeBuyerOrders => _buyerOrders.where((final order) =>
       order.status != OrderStatus.delivered &&
+      order.status != 'completed' &&
       order.status != OrderStatus.cancelled &&
       order.status != 'refunded').toList();
 
   List<OrderModel> get activeFarmerOrders => _farmerOrders.where((final order) =>
       order.status != OrderStatus.delivered &&
+      order.status != 'completed' &&
       order.status != OrderStatus.cancelled &&
       order.status != 'refunded').toList();
 
@@ -357,10 +368,10 @@ class OrderProvider extends ChangeNotifier {
             o.status == OrderStatus.inTransit)
         .length;
     _deliveredCount = _buyerOrders
-        .where((final o) => o.status == OrderStatus.delivered)
+      .where((final o) => o.status == OrderStatus.delivered || o.status == 'completed')
         .length;
     _totalRevenue = _buyerOrders
-        .where((final o) => o.status == OrderStatus.delivered)
+      .where((final o) => o.status == OrderStatus.delivered || o.status == 'completed')
         .fold(0, (final sum, final o) => sum + o.total);
   }
 
@@ -374,10 +385,10 @@ class OrderProvider extends ChangeNotifier {
             o.status == OrderStatus.processing)
         .length;
     _deliveredCount = _farmerOrders
-        .where((final o) => o.status == OrderStatus.delivered)
+      .where((final o) => o.status == OrderStatus.delivered || o.status == 'completed')
         .length;
     _totalRevenue = _farmerOrders
-        .where((final o) => o.status == OrderStatus.delivered)
+      .where((final o) => o.status == OrderStatus.delivered || o.status == 'completed')
         .fold(0, (final sum, final o) => sum + o.total);
   }
 
@@ -392,10 +403,10 @@ class OrderProvider extends ChangeNotifier {
             o.status == OrderStatus.shipped)
         .length;
     _deliveredCount = _allOrders
-        .where((final o) => o.status == OrderStatus.delivered)
+      .where((final o) => o.status == OrderStatus.delivered || o.status == 'completed')
         .length;
     _totalRevenue = _allOrders
-        .where((final o) => o.status == OrderStatus.delivered)
+      .where((final o) => o.status == OrderStatus.delivered || o.status == 'completed')
         .fold(0, (final sum, final o) => sum + o.total);
   }
 
