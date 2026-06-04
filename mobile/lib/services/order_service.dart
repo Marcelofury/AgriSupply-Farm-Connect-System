@@ -11,6 +11,20 @@ class OrderService {
     };
   }
 
+  Map<String, dynamic> _normalizeFarmerOrderPayload(final Map<String, dynamic> raw) {
+    final normalized = _normalizeOrderPayload(raw);
+    final items = normalized['items'];
+
+    if (items is List && items.isNotEmpty) {
+      final first = items.first;
+      if (first is Map<String, dynamic> && first['status'] is String) {
+        normalized['status'] = first['status'];
+      }
+    }
+
+    return normalized;
+  }
+
   // Get orders by buyer
   Future<List<OrderModel>> getOrdersByBuyer(final String buyerId) async {
     try {
@@ -44,7 +58,7 @@ class OrderService {
 
       final list = (response['data'] as List<dynamic>? ?? <dynamic>[])
           .whereType<Map<String, dynamic>>()
-          .map(_normalizeOrderPayload)
+          .map(_normalizeFarmerOrderPayload)
           .map(OrderModel.fromJson)
           .toList();
 
@@ -145,29 +159,22 @@ class OrderService {
     }
   }
 
+  // Confirm order (farmer)
+  Future<void> confirmOrder(final String orderId) async {
+    try {
+      await _apiService.post('/orders/$orderId/confirm');
+    } catch (e) {
+      throw Exception('Failed to confirm order: $e');
+    }
+  }
+
   // Ship order
   Future<void> shipOrder(final String orderId, {final String? trackingNumber}) async {
     try {
-      final updates = <String, dynamic>{
-        'status': 'shipped',
-        'updated_at': DateTime.now().toIso8601String(),
-      };
-
-      if (trackingNumber != null) {
-        updates['tracking_number'] = trackingNumber;
-      }
-
-      await _apiService.update('orders', orderId, updates);
-
-      // Add to status history
-      await _apiService.insert('order_status_history', {
-        'order_id': orderId,
-        'status': 'shipped',
-        'notes': trackingNumber != null ? 'Tracking: $trackingNumber' : null,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-
-      await _notifyBuyerStatusChange(orderId, OrderStatus.shipped);
+      await _apiService.post(
+        '/orders/$orderId/ship',
+        body: trackingNumber == null ? null : {'trackingNumber': trackingNumber},
+      );
     } catch (e) {
       throw Exception('Failed to ship order: $e');
     }
@@ -176,23 +183,10 @@ class OrderService {
   // Cancel order
   Future<void> cancelOrder(final String orderId, {final String? reason}) async {
     try {
-      await _apiService.update('orders', orderId, {
-        'status': 'cancelled',
-        'cancellation_reason': reason,
-        'cancelled_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      // Add to status history
-      await _apiService.insert('order_status_history', {
-        'order_id': orderId,
-        'status': 'cancelled',
-        'notes': reason,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-
-      // Restore product quantities
-      await _restoreProductQuantities(orderId);
+      await _apiService.post(
+        '/orders/$orderId/cancel',
+        body: reason == null ? null : {'reason': reason},
+      );
     } catch (e) {
       throw Exception('Failed to cancel order: $e');
     }
