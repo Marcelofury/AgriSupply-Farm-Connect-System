@@ -151,6 +151,8 @@ class NotificationProvider extends ChangeNotifier {
       'product',
       'order',
       'order_update',
+      'new_order',
+      'order_placed',
       'payment',
       'payment_received',
       'payment_failed',
