@@ -20,6 +20,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
   late TabController _tabController;
   bool _isLoading = false;
   String _searchQuery = '';
+  bool _hasLoaded = false;
 
   @override
   void initState() {
@@ -39,7 +40,12 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+      if (authProvider.currentUser == null) {
+        return;
+      }
+
       await orderProvider.loadFarmerOrders(authProvider.currentUser!.id);
+      _hasLoaded = true;
     } catch (e) {
       // Handle error
     } finally {
@@ -49,6 +55,11 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
 
   @override
   Widget build(final BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    if (!_hasLoaded && authProvider.currentUser != null && !_isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadOrders());
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Orders'),

@@ -33,14 +33,22 @@ class OrderService {
   // Get orders by farmer
   Future<List<OrderModel>> getOrdersByFarmer(final String farmerId) async {
     try {
-      final data = await _apiService.query(
-        'orders',
-        select: '*, order_items!inner(*, products(*)), users!orders_buyer_id_fkey(full_name, phone, photo_url)',
-        filters: {'order_items.farmer_id': farmerId},
-        orderBy: 'created_at',
-      );
+      if (farmerId.isEmpty) {
+        return [];
+      }
 
-      return data.map(OrderModel.fromJson).toList();
+      final response = await _apiService.get('/orders/farmer', queryParams: {
+        'page': '1',
+        'limit': '100',
+      });
+
+      final list = (response['data'] as List<dynamic>? ?? <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map(_normalizeOrderPayload)
+          .map(OrderModel.fromJson)
+          .toList();
+
+      return list;
     } catch (e) {
       throw Exception('Failed to fetch farmer orders: $e');
     }

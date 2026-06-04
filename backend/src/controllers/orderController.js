@@ -56,16 +56,16 @@ const getFarmerOrders = asyncHandler(async (req, res) => {
   const farmerId = req.user.id;
 
   let query = supabase
-    .from('order_items')
+    .from('orders')
     .select(`
       *,
-      order:order_id (
-        id, order_number, status, payment_status, shipping_address, created_at,
-        buyer:buyer_id (id, full_name, phone, photo_url)
-      ),
-      product:product_id (id, name, images, price, unit)
+      buyer:buyer_id (id, full_name, phone, photo_url),
+      order_items!inner (
+        *,
+        product:product_id (id, name, images, price, unit)
+      )
     `, { count: 'exact' })
-    .eq('farmer_id', farmerId);
+    .eq('order_items.farmer_id', farmerId);
 
   if (status) {
     query = query.eq('status', status);
