@@ -70,7 +70,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
               controller: _tabController,
               children: [
                 _buildOrdersList(['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery', 'in_transit']),
-                _buildOrdersList(['delivered']),
+                _buildOrdersList(['delivered', 'completed']),
                 _buildOrdersList(['cancelled']),
               ],
             ),
@@ -80,7 +80,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
   Widget _buildOrdersList(final List<String> statuses) {
     return Consumer<OrderProvider>(
       builder: (final context, final orderProvider, final child) {
-        final orders = orderProvider.orders
+        final orders = orderProvider.buyerOrders
             .where((final order) => statuses.contains(order.status))
             .toList();
 
@@ -168,6 +168,16 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
                     color: AppColors.grey500,
                   ),
             ),
+            const SizedBox(height: 12),
+            Text(
+              'History',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.grey600,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 6),
+            _buildHistoryRow(order.status),
             const Divider(height: 24),
             ...order.items.take(2).map((final item) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -273,6 +283,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
         color = AppColors.primaryGreen;
         break;
       case 'delivered':
+      case 'completed':
         color = AppColors.success;
         break;
       case 'cancelled':
@@ -297,5 +308,63 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
         ),
       ),
     );
+  }
+
+  Widget _buildHistoryRow(final String status) {
+    const labels = ['Pending', 'Processing', 'Delivered'];
+    final currentIndex = _historyStageIndex(status);
+
+    return Row(
+      children: labels.asMap().entries.map((final entry) {
+        final index = entry.key;
+        final label = entry.value;
+        final isReached = index <= currentIndex;
+        final color = isReached ? AppColors.primaryGreen : AppColors.grey400;
+
+        return Container(
+          margin: EdgeInsets.only(right: index == labels.length - 1 ? 0 : 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              if (isReached)
+                Icon(Icons.check, size: 12, color: color)
+              else
+                Icon(Icons.circle_outlined, size: 12, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  int _historyStageIndex(final String status) {
+    switch (status) {
+      case 'pending':
+      case 'confirmed':
+        return 0;
+      case 'processing':
+      case 'shipped':
+      case 'out_for_delivery':
+      case 'in_transit':
+        return 1;
+      case 'delivered':
+      case 'completed':
+        return 2;
+      default:
+        return 0;
+    }
   }
 }

@@ -327,6 +327,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   IconData _getNotificationIcon(final String type) {
+    if (type == NotificationType.orderUpdate ||
+        type == 'new_order' ||
+        type == 'order_placed' ||
+        type.startsWith('order_')) {
+      return Icons.shopping_bag;
+    }
+
+    if (type == 'payment_received' ||
+        type == 'payment_failed' ||
+        type.startsWith('payment_')) {
+      return Icons.payment;
+    }
+
     switch (type) {
       case NotificationType.order:
         return Icons.shopping_bag;
@@ -346,6 +359,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Color _getNotificationColor(final String type) {
+    if (type == NotificationType.orderUpdate ||
+        type == 'new_order' ||
+        type == 'order_placed' ||
+        type.startsWith('order_')) {
+      return AppColors.primaryGreen;
+    }
+
+    if (type == 'payment_received' ||
+        type == 'payment_failed' ||
+        type.startsWith('payment_')) {
+      return AppColors.success;
+    }
+
     switch (type) {
       case NotificationType.order:
         return AppColors.primaryGreen;

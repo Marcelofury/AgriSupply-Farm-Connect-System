@@ -100,7 +100,12 @@ class OrderService {
 
       final response = await _apiService.post('/orders', body: orderPayload);
       final data = response['data'] ?? response;
-      return OrderModel.fromJson(data as Map<String, dynamic>);
+      final order = OrderModel.fromJson(data as Map<String, dynamic>);
+
+      await _notifyFarmers(items);
+      await _notifyBuyerOrderPlaced(order);
+
+      return order;
     } catch (e) {
       throw Exception('Failed to create order: $e');
     }
@@ -110,6 +115,18 @@ class OrderService {
   Future<void> updateOrderStatus(final String orderId, final String status) async {
     try {
       await _apiService.put('/orders/$orderId/status', body: {'status': status});
+
+      try {
+        await _apiService.insert('order_status_history', {
+          'order_id': orderId,
+          'status': status,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      } catch (_) {
+        // Allow status updates even if history logging fails.
+      }
+
+      await _notifyBuyerStatusChange(orderId, status);
     } catch (e) {
       throw Exception('Failed to update order status: $e');
     }
@@ -323,6 +340,23 @@ class OrderService {
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
       });
+    }
+  }
+
+  Future<void> _notifyBuyerOrderPlaced(final OrderModel order) async {
+    try {
+      final orderLabel = order.orderNumber ?? order.id.substring(0, 8);
+      await _apiService.insert('notifications', {
+        'user_id': order.buyerId,
+        'type': 'order_placed',
+        'title': 'Order Placed',
+        'body': 'Your order #$orderLabel has been received and is pending confirmation',
+        'data': {'order_id': order.id},
+        'is_read': false,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    } catch (_) {
+      // Silent fail for notifications.
     }
   }
 

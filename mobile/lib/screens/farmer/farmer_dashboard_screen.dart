@@ -152,7 +152,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hello, ${user?.fullName.split(' ').first ?? 'Farmer'}! 🌾',
+                        'Hello, ${user?.fullName.split(' ').first ?? 'Farmer'}!',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 4),
@@ -484,45 +484,60 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                   ),
                 ],
               ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.grey100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.receipt, color: AppColors.primaryGreen),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          order.buyerName,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          '${order.items.length} items',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  Row(
                     children: [
-                      Text(
-                        'UGX ${order.totalAmount.toStringAsFixed(0)}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppColors.primaryGreen,
-                            ),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.grey100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.receipt, color: AppColors.primaryGreen),
                       ),
-                      _buildStatusChip(order.status),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              order.buyerName,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(
+                              '${order.items.length} items',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'UGX ${order.totalAmount.toStringAsFixed(0)}',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: AppColors.primaryGreen,
+                                ),
+                          ),
+                          _buildStatusChip(order.status),
+                        ],
+                      ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'History',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.grey600,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  _buildHistoryRow(order.status),
                 ],
               ),
             );
@@ -544,6 +559,7 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
         break;
       case 'shipped':
       case 'delivered':
+      case 'completed':
         color = AppColors.success;
         break;
       default:
@@ -747,10 +763,76 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                               '${order.items.length} items • UGX ${order.totalAmount.toStringAsFixed(0)}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'History',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColors.grey600,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                            const SizedBox(height: 6),
+                            _buildHistoryRow(order.status),
                             if (order.isPending) ...[
                               const SizedBox(height: 12),
                               Row(
                                 children: [
+                                      const labels = ['Pending', 'Processing', 'Delivered'];
+                                      final currentIndex = _historyStageIndex(status);
+
+                                      return Row(
+                                        children: labels.asMap().entries.map((final entry) {
+                                          final index = entry.key;
+                                          final label = entry.value;
+                                          final isReached = index <= currentIndex;
+                                          final color = isReached ? AppColors.primaryGreen : AppColors.grey400;
+
+                                          return Container(
+                                            margin: EdgeInsets.only(right: index == labels.length - 1 ? 0 : 8),
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: color.withOpacity(0.12),
+                                              borderRadius: BorderRadius.circular(14),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                if (isReached)
+                                                  Icon(Icons.check, size: 12, color: color)
+                                                else
+                                                  Icon(Icons.circle_outlined, size: 12, color: color),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  label,
+                                                  style: TextStyle(
+                                                    color: color,
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                      );
+                                    }
+
+                                    int _historyStageIndex(final String status) {
+                                      switch (status) {
+                                        case 'pending':
+                                        case 'confirmed':
+                                          return 0;
+                                        case 'processing':
+                                        case 'shipped':
+                                        case 'out_for_delivery':
+                                        case 'in_transit':
+                                          return 1;
+                                        case 'delivered':
+                                        case 'completed':
+                                          return 2;
+                                        default:
+                                          return 0;
+                                      }
+                                    }
                                   Expanded(
                                     child: OutlinedButton(
                                       onPressed: () {},

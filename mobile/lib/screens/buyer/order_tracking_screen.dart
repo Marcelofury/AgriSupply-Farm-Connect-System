@@ -21,6 +21,7 @@ class OrderTrackingScreen extends StatefulWidget {
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   OrderModel? _order;
   bool _isLoading = true;
+  Map<String, DateTime> _statusHistory = {};
 
   @override
   void initState() {
@@ -32,8 +33,36 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     try {
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
       final order = await orderProvider.getOrderById(widget.orderId);
+      final history = <String, DateTime>{};
+
+      if (order != null) {
+        try {
+          final rawHistory = await orderProvider.getStatusHistory(order.id);
+          for (final entry in rawHistory) {
+            final status = entry['status'] as String?;
+            final createdAtRaw = entry['created_at'] as String?;
+            if (status == null || createdAtRaw == null) continue;
+            final createdAt = DateTime.parse(createdAtRaw);
+            final existing = history[status];
+            if (existing == null || createdAt.isBefore(existing)) {
+              history[status] = createdAt;
+            }
+          }
+        } catch (_) {
+          // Ignore history failures and fall back to order timestamps.
+        }
+
+        history.putIfAbsent('pending', () => order.createdAt);
+        if (order.deliveredAt != null) {
+          history.putIfAbsent('delivered', () => order.deliveredAt!);
+        }
+        if (order.status == 'completed') {
+          history.putIfAbsent('completed', () => order.updatedAt);
+        }
+      }
       setState(() {
         _order = order;
+        _statusHistory = history;
         _isLoading = false;
       });
     } catch (e) {
@@ -121,6 +150,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         statusIcon = Icons.check_circle;
         statusMessage = 'Delivered successfully';
         break;
+      case 'completed':
+        statusColor = AppColors.success;
+        statusIcon = Icons.check_circle;
+        statusMessage = 'Delivered successfully';
+        break;
       case 'cancelled':
         statusColor = AppColors.error;
         statusIcon = Icons.cancel;
@@ -196,7 +230,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       {'status': 'delivered', 'label': 'Delivered', 'icon': Icons.home},
     ];
 
-    final currentIndex = steps.indexWhere((final s) => s['status'] == _order!.status);
+    final normalizedStatus = _normalizeStatus(_order!.status);
+    var currentIndex = steps.indexWhere((final s) => s['status'] == normalizedStatus);
+    if (currentIndex < 0) {
+      currentIndex = 0;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,6 +249,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           final step = entry.value;
           final isCompleted = index <= currentIndex;
           final isCurrent = index == currentIndex;
+          final stepStatus = step['status']! as String;
+          final stepTimestamp = _getStatusTimestamp(stepStatus);
 
           return Row(
             children: [
@@ -261,10 +301,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                               : AppColors.grey500,
                         ),
                       ),
-                      if (isCurrent && !_order!.isCancelled)
+                      if (stepTimestamp != null && (isCompleted || isCurrent))
                         Text(
                           DateFormat('MMM dd, yyyy HH:mm')
-                              .format(_order!.updatedAt),
+                              .format(stepTimestamp),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                     ],
@@ -276,6 +316,36 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         }),
       ],
     );
+  }
+
+  String _normalizeStatus(final String status) {
+    switch (status) {
+      case 'out_for_delivery':
+      case 'in_transit':
+      case 'shipped':
+        return 'shipped';
+      case 'completed':
+        return 'delivered';
+      default:
+        return status;
+    }
+  }
+
+  DateTime? _getStatusTimestamp(final String status) {
+    switch (status) {
+      case 'pending':
+        return _statusHistory['pending'] ?? _order?.createdAt;
+      case 'shipped':
+        return _statusHistory['shipped'] ??
+            _statusHistory['in_transit'] ??
+            _statusHistory['out_for_delivery'];
+      case 'delivered':
+        return _statusHistory['delivered'] ??
+            _statusHistory['completed'] ??
+            _order?.deliveredAt;
+      default:
+        return _statusHistory[status];
+    }
   }
 
   Widget _buildDeliveryInfo() {
