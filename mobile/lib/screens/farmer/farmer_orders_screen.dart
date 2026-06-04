@@ -119,7 +119,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                 children: [
                   _buildOrderList(OrderStatus.pending),
                   _buildOrderList(OrderStatus.confirmed),
-                  _buildOrderList(OrderStatus.inTransit),
+                  _buildOrderList(OrderStatus.shipped),
                   _buildOrderList(OrderStatus.delivered),
                   _buildOrderList(OrderStatus.cancelled),
                 ],
@@ -141,8 +141,8 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
             .where((final o) => o.status == OrderStatus.confirmed)
             .length;
         final inTransit = provider.farmerOrders
-            .where((final o) => o.status == OrderStatus.inTransit)
-            .length;
+          .where((final o) => o.status == OrderStatus.shipped)
+          .length;
 
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -504,10 +504,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                   if (order.status == OrderStatus.pending) ...[
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => _updateOrderStatus(
-                          order.id,
-                          OrderStatus.cancelled,
-                        ),
+                        onPressed: () => _declineOrder(order.id),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.error,
                           side: const BorderSide(color: AppColors.error),
@@ -518,10 +515,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => _updateOrderStatus(
-                          order.id,
-                          OrderStatus.confirmed,
-                        ),
+                        onPressed: () => _acceptOrder(order.id),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                         ),
@@ -531,10 +525,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                   ] else if (order.status == OrderStatus.confirmed) ...[
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: () => _updateOrderStatus(
-                          order.id,
-                          OrderStatus.inTransit,
-                        ),
+                        onPressed: () => _shipOrder(order.id),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                         ),
@@ -557,7 +548,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
         return AppColors.warning;
       case OrderStatus.confirmed:
         return AppColors.info;
-      case OrderStatus.inTransit:
+      case OrderStatus.shipped:
         return AppColors.secondaryOrange;
       case OrderStatus.delivered:
         return AppColors.success;
@@ -574,7 +565,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
         return Icons.schedule;
       case OrderStatus.confirmed:
         return Icons.check_circle;
-      case OrderStatus.inTransit:
+      case OrderStatus.shipped:
         return Icons.local_shipping;
       case OrderStatus.delivered:
         return Icons.done_all;
@@ -591,7 +582,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
         return 'Pending';
       case OrderStatus.confirmed:
         return 'Confirmed';
-      case OrderStatus.inTransit:
+      case OrderStatus.shipped:
         return 'In Transit';
       case OrderStatus.delivered:
         return 'Delivered';
@@ -610,18 +601,25 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     );
   }
 
-  Future<void> _updateOrderStatus(final String orderId, final String status) async {
+  Future<void> _acceptOrder(final String orderId) async {
     setState(() => _isLoading = true);
 
     try {
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-      final success = await orderProvider.updateOrderStatus(orderId, status);
+      final success = await orderProvider.confirmOrder(orderId);
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Order ${_getStatusLabel(status).toLowerCase()}'),
+            content: const Text('Order confirmed'),
             backgroundColor: AppColors.success,
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to confirm order'),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -629,7 +627,79 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to update order'),
+            content: Text('Failed to confirm order'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _declineOrder(final String orderId) async {
+    setState(() => _isLoading = true);
+
+    try {
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+      final success = await orderProvider.cancelOrder(orderId);
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order cancelled'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to cancel order'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to cancel order'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _shipOrder(final String orderId) async {
+    setState(() => _isLoading = true);
+
+    try {
+      final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+      final success = await orderProvider.shipOrder(orderId);
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order marked as in transit'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to start delivery'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to start delivery'),
             backgroundColor: AppColors.error,
           ),
         );
