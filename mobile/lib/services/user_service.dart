@@ -299,7 +299,7 @@ class UserService {
         'user_id': userId,
         'type': 'account',
         'title': 'Account Verified',
-        'body': 'Congratulations! Your account has been verified. You now have access to all features.',
+          'message': 'Congratulations! Your account has been verified. You now have access to all features.',
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
       });
@@ -314,7 +314,7 @@ class UserService {
         'user_id': userId,
         'type': 'account',
         'title': 'Account Suspended',
-        'body': reason ?? 'Your account has been suspended. Please contact support for more information.',
+          'message': reason ?? 'Your account has been suspended. Please contact support for more information.',
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
       });
@@ -329,7 +329,7 @@ class UserService {
         'user_id': userId,
         'type': 'account',
         'title': 'Account Restored',
-        'body': 'Your account has been restored. You can now access all features again.',
+          'message': 'Your account has been restored. You can now access all features again.',
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
       });
@@ -344,7 +344,7 @@ class UserService {
         'user_id': userId,
         'type': 'account',
         'title': 'Welcome to Premium!',
-        'body': 'You now have access to all premium features including AI assistance and advanced analytics.',
+          'message': 'You now have access to all premium features including AI assistance and advanced analytics.',
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
       });
