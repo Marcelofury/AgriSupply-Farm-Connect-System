@@ -102,7 +102,12 @@ class OrderService {
       final data = response['data'] ?? response;
       final order = OrderModel.fromJson(data as Map<String, dynamic>);
 
-      await _notifyFarmers(items);
+      try {
+        await _notifyFarmers(items);
+      } catch (_) {
+        // Ignore notification errors to avoid blocking order creation.
+      }
+
       await _notifyBuyerOrderPlaced(order);
 
       return order;
@@ -332,14 +337,18 @@ class OrderService {
 
     // Send notification to each farmer
     for (final farmerId in farmerItems.keys) {
-      await _apiService.insert('notifications', {
-        'user_id': farmerId,
-        'type': 'new_order',
-        'title': 'New Order Received',
-        'message': 'You have received a new order with ${farmerItems[farmerId]!.length} item(s)',
-        'is_read': false,
-        'created_at': DateTime.now().toIso8601String(),
-      });
+      try {
+        await _apiService.insert('notifications', {
+          'user_id': farmerId,
+          'type': 'new_order',
+          'title': 'New Order Received',
+          'message': 'You have received a new order with ${farmerItems[farmerId]!.length} item(s)',
+          'is_read': false,
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      } catch (_) {
+        // RLS may block client-side inserts for other users.
+      }
     }
   }
 
