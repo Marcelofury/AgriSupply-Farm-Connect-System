@@ -218,6 +218,8 @@ class OrderModel {
         return 'Out for delivery';
       case 'delivered':
         return 'Delivered';
+      case 'completed':
+        return 'Completed';
       case 'cancelled':
         return 'Cancelled';
       default:
