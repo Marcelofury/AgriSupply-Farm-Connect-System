@@ -1,14 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/cart_model.dart';
 import '../models/product_model.dart';
 
 class CartProvider extends ChangeNotifier {
+  CartProvider() {
+    _restoreFromStorage();
+  }
   final List<CartItemModel> _items = [];
   String? _selectedPaymentMethod;
   String? _deliveryAddress;
   String? _deliveryNotes;
   double _deliveryFee = 5000; // Default delivery fee in UGX
+
+  static const _storageKey = 'agrisupply.cart';
 
   List<CartItemModel> get items => List.unmodifiable(_items);
   int get itemCount => _items.length;
@@ -73,11 +81,13 @@ class CartProvider extends ChangeNotifier {
     }
     
     notifyListeners();
+    _persistToStorage();
   }
 
   void removeItem(final String productId) {
     _items.removeWhere((final item) => item.product.id == productId);
     notifyListeners();
+    _persistToStorage();
   }
 
   void updateQuantity(final String productId, final int quantity) {
@@ -93,6 +103,7 @@ class CartProvider extends ChangeNotifier {
       }
       
       notifyListeners();
+      _persistToStorage();
     }
   }
 
@@ -104,6 +115,7 @@ class CartProvider extends ChangeNotifier {
       if (item.quantity < item.product.availableQuantity) {
         _items[index] = item.copyWith(quantity: item.quantity + 1);
         notifyListeners();
+        _persistToStorage();
       }
     }
   }
@@ -119,6 +131,7 @@ class CartProvider extends ChangeNotifier {
         _items.removeAt(index);
       }
       notifyListeners();
+      _persistToStorage();
     }
   }
 
@@ -141,21 +154,25 @@ class CartProvider extends ChangeNotifier {
   void setPaymentMethod(final String method) {
     _selectedPaymentMethod = method;
     notifyListeners();
+    _persistToStorage();
   }
 
   void setDeliveryAddress(final String address) {
     _deliveryAddress = address;
     notifyListeners();
+    _persistToStorage();
   }
 
   void setDeliveryNotes(final String notes) {
     _deliveryNotes = notes;
     notifyListeners();
+    _persistToStorage();
   }
 
   void setDeliveryFee(final double fee) {
     _deliveryFee = fee;
     notifyListeners();
+    _persistToStorage();
   }
 
   void clear() {
@@ -165,6 +182,7 @@ class CartProvider extends ChangeNotifier {
     _deliveryNotes = null;
     _deliveryFee = 5000;
     notifyListeners();
+    _persistToStorage();
   }
 
   // Alias for clear() - clears all cart items
@@ -233,5 +251,33 @@ class CartProvider extends ChangeNotifier {
     _deliveryFee = ((json['delivery_fee'] ?? 5000) as num).toDouble();
     
     notifyListeners();
+    _persistToStorage();
+  }
+
+  Future<void> _persistToStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final encoded = jsonEncode(toJson());
+      await prefs.setString(_storageKey, encoded);
+    } catch (_) {
+      // Ignore persistence errors.
+    }
+  }
+
+  Future<void> _restoreFromStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_storageKey);
+      if (raw == null || raw.isEmpty) {
+        return;
+      }
+
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) {
+        fromJson(decoded);
+      }
+    } catch (_) {
+      // Ignore restoration errors.
+    }
   }
 }
