@@ -218,7 +218,31 @@ class OrderProvider extends ChangeNotifier {
 
   // Confirm order (farmer)
   Future<bool> confirmOrder(final String orderId) async {
-    return updateOrderStatus(orderId, OrderStatus.confirmed);
+    _errorMessage = null;
+
+    try {
+      await _orderService.confirmOrder(orderId);
+
+      _updateOrderInList(_farmerOrders, orderId, (final order) {
+        return order.copyWith(status: OrderStatus.confirmed);
+      });
+
+      _updateOrderInList(_allOrders, orderId, (final order) {
+        return order.copyWith(status: OrderStatus.confirmed);
+      });
+
+      if (_selectedOrder?.id == orderId) {
+        _selectedOrder = _selectedOrder!.copyWith(status: OrderStatus.confirmed);
+      }
+
+      _calculateFarmerStats();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
   }
 
   // Start processing order (farmer)
