@@ -99,7 +99,7 @@ class NotificationService {
         'user_id': userId,
         'type': type,
         'title': title,
-        'body': body,
+        'message': body,
         'data': data,
         'is_read': false,
         'created_at': DateTime.now().toIso8601String(),
