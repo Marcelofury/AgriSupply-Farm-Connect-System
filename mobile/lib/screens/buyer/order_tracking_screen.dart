@@ -599,7 +599,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         const SizedBox(width: 16),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () => _showCancelOrderDialog(),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
             ),
@@ -607,6 +607,54 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showCancelOrderDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (final context) => AlertDialog(
+        title: const Text('Cancel Order'),
+        content: const Text('Are you sure you want to cancel this order? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Keep Order'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+              final success = await orderProvider.cancelOrder(
+                widget.orderId,
+                reason: 'Cancelled by buyer',
+              );
+              if (mounted) {
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Order cancelled successfully'),
+                      backgroundColor: AppColors.success,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(orderProvider.errorMessage ?? 'Failed to cancel order'),
+                      backgroundColor: AppColors.error,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Cancel Order'),
+          ),
+        ],
+      ),
     );
   }
 }
