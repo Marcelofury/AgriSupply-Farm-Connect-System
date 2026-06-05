@@ -837,7 +837,12 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                                 children: [
                                   Expanded(
                                     child: OutlinedButton(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        await orderProvider.cancelOrder(
+                                          order.id,
+                                          reason: 'Declined by farmer',
+                                        );
+                                      },
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: AppColors.error,
                                         side: const BorderSide(color: AppColors.error),
@@ -848,7 +853,9 @@ class _FarmerDashboardScreenState extends State<FarmerDashboardScreen> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: ElevatedButton(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        await orderProvider.confirmOrder(order.id);
+                                      },
                                       child: const Text('Accept'),
                                     ),
                                   ),
