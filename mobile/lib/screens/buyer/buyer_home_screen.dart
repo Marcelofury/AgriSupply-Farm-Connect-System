@@ -6,6 +6,7 @@ import '../../config/theme.dart';
 import '../../models/product_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../widgets/category_chip.dart';
 import '../../widgets/product_card.dart';
@@ -54,7 +55,16 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (final index) => setState(() => _currentIndex = index),
+        onTap: (final index) {
+          setState(() => _currentIndex = index);
+          if (index == 2) {
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+            if (authProvider.currentUser != null) {
+              orderProvider.fetchBuyerOrders(authProvider.currentUser!.id);
+            }
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -454,32 +464,148 @@ class _BuyerHomeScreenState extends State<BuyerHomeScreen> {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.receipt_long_outlined,
-                      size: 80,
-                      color: AppColors.grey400,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No orders yet',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Start shopping to see your orders here',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.grey600,
+              child: Consumer<OrderProvider>(
+                builder: (final context, final orderProvider, final child) {
+                  if (orderProvider.isLoading && orderProvider.buyerOrders.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final orders = orderProvider.buyerOrders;
+
+                  if (orders.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.receipt_long_outlined,
+                            size: 80,
+                            color: AppColors.grey400,
                           ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No orders yet',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Start shopping to see your orders here',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.grey600,
+                                ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                      if (authProvider.currentUser != null) {
+                        await orderProvider.fetchBuyerOrders(authProvider.currentUser!.id);
+                      }
+                    },
+                    child: ListView.builder(
+                      itemCount: orders.length,
+                      itemBuilder: (final context, final index) {
+                        final order = orders[index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Order #${order.id.substring(0, 8)}',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  _buildOrderStatusChip(order.status),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${order.items.length} items \u2022 UGX ${order.totalAmount.toStringAsFixed(0)}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                order.createdAt.toLocal().toString().split('.').first,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.grey600,
+                                    ),
+                              ),
+                              if (order.deliveryAddress != null && order.deliveryAddress!.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Deliver to: ${order.deliveryAddress}',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.grey500,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderStatusChip(final String status) {
+    Color color;
+    switch (status) {
+      case 'pending':
+        color = AppColors.warning;
+        break;
+      case 'confirmed':
+      case 'processing':
+        color = AppColors.info;
+        break;
+      case 'shipped':
+      case 'delivered':
+      case 'completed':
+        color = AppColors.success;
+        break;
+      default:
+        color = AppColors.grey500;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        status.toUpperCase(),
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
