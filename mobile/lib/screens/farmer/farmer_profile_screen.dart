@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -72,6 +73,15 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+    _loadOrders();
+  }
+
+  void _loadOrders() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    if (authProvider.currentUser != null && orderProvider.farmerOrders.isEmpty) {
+      orderProvider.fetchFarmerOrders(authProvider.currentUser!.id);
+    }
   }
 
   void _loadUserData() {
@@ -515,6 +525,10 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
     return Consumer<AuthProvider>(
       builder: (final context, final provider, final child) {
         final user = provider.user;
+        final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+        final ordersCount = orderProvider.farmerOrders.isNotEmpty
+            ? orderProvider.farmerOrders.length.toString()
+            : (user?.totalOrders?.toString() ?? '0');
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -528,12 +542,12 @@ class _FarmerProfileScreenState extends State<FarmerProfileScreen> {
               _buildStatItem(
                   'Products', user?.totalProducts?.toString() ?? '0'),
               Container(height: 40, width: 1, color: AppColors.grey300),
-              _buildStatItem('Orders', user?.totalOrders?.toString() ?? '0'),
+              _buildStatItem('Orders', ordersCount),
               Container(height: 40, width: 1, color: AppColors.grey300),
               _buildStatItem(
                 'Rating',
                 user?.rating.toStringAsFixed(1) ?? '0.0',
-                suffix: '⭐',
+                suffix: '\u{2B50}',
               ),
             ],
           ),
