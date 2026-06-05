@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
@@ -66,6 +67,15 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
   void initState() {
     super.initState();
     _loadUserData();
+    _loadOrders();
+  }
+
+  void _loadOrders() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    if (authProvider.currentUser != null && orderProvider.buyerOrders.isEmpty) {
+      orderProvider.fetchBuyerOrders(authProvider.currentUser!.id);
+    }
   }
 
   void _loadUserData() {
@@ -480,7 +490,12 @@ class _BuyerProfileScreenState extends State<BuyerProfileScreen> {
                     children: [
                       _buildInfoRow('Member since', 'January 2026'),
                       const Divider(height: 24),
-                      _buildInfoRow('Total orders', '0'),
+                      Consumer<OrderProvider>(
+                        builder: (final context, final orderProvider, final child) {
+                          final count = orderProvider.buyerOrders.length.toString();
+                          return _buildInfoRow('Total orders', count);
+                        },
+                      ),
                     ],
                   ),
                 ),
