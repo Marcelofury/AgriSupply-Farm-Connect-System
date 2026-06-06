@@ -724,13 +724,13 @@ const cancelOrder = asyncHandler(async (req, res) => {
   for (const item of order.order_items) {
     const { data: product } = await supabase
       .from('products')
-      .select('quantity')
+      .select('quantity_available')
       .eq('id', item.product_id)
       .single();
 
     await supabase
       .from('products')
-      .update({ quantity: product.quantity + item.quantity })
+      .update({ quantity_available: product.quantity_available + item.quantity })
       .eq('id', item.product_id);
   }
 
