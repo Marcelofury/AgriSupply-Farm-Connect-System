@@ -283,6 +283,21 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
                 ),
               ],
             ),
+            if (order.isPending) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _cancelOrder(order.id),
+                  icon: const Icon(Icons.cancel, size: 18),
+                  label: const Text('Cancel Order'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -385,6 +400,33 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen>
         return 2;
       default:
         return 0;
+    }
+  }
+
+  Future<void> _cancelOrder(final String orderId) async {
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final success = await orderProvider.cancelOrder(
+      orderId,
+      reason: 'Cancelled by buyer',
+    );
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order cancelled successfully'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(orderProvider.errorMessage ?? 'Failed to cancel order'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }
