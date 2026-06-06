@@ -101,8 +101,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Future<void> _selectDate(final bool isHarvestDate) async {
     final date = await showDatePicker(
       context: context,
-      initialDate: isHarvestDate ? _harvestDate : (_expiryDate ?? DateTime.now()),
-      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      initialDate: isHarvestDate ? _harvestDate : (_expiryDate ?? _harvestDate),
+      firstDate: isHarvestDate
+          ? DateTime.now().subtract(const Duration(days: 30))
+          : _harvestDate,
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
 
@@ -110,6 +112,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
       setState(() {
         if (isHarvestDate) {
           _harvestDate = date;
+          if (_expiryDate != null && _expiryDate!.isBefore(_harvestDate)) {
+            _expiryDate = null;
+          }
         } else {
           _expiryDate = date;
         }
@@ -122,6 +127,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     if (_selectedImages.isEmpty && _existingImages.isEmpty) {
       _showError('Please add at least one product image');
+      return;
+    }
+
+    if (_expiryDate != null && _expiryDate!.isBefore(_harvestDate)) {
+      _showError('Expiry date must be on or after the harvest date');
       return;
     }
 

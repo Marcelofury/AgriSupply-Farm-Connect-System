@@ -421,7 +421,13 @@ const createProduct = asyncHandler(async (req, res) => {
     productData.harvest_date = new Date(harvestDate).toISOString();
   }
   if (expiryDate) {
-    productData.expiry_date = new Date(expiryDate).toISOString();
+    const expiry = new Date(expiryDate);
+    const harvest = harvestDate ? new Date(harvestDate) : null;
+    if (harvest && expiry < harvest) {
+      res.status(400);
+      throw new Error('Expiry date must be on or after the harvest date');
+    }
+    productData.expiry_date = expiry.toISOString();
   }
 
   const { data, error } = await supabase
@@ -496,6 +502,27 @@ const updateProduct = asyncHandler(async (req, res) => {
       } else {
         filteredUpdates[key] = updates[key];
       }
+    }
+  }
+
+  // Validate expiry_date >= harvest_date for updates
+  if (filteredUpdates.expiry_date || filteredUpdates.harvest_date) {
+    const { data: existing } = await supabase
+      .from('products')
+      .select('harvest_date, expiry_date')
+      .eq('id', id)
+      .single();
+
+    const harvest = filteredUpdates.harvest_date
+      ? new Date(filteredUpdates.harvest_date)
+      : (existing?.harvest_date ? new Date(existing.harvest_date) : null);
+    const expiry = filteredUpdates.expiry_date
+      ? new Date(filteredUpdates.expiry_date)
+      : (existing?.expiry_date ? new Date(existing.expiry_date) : null);
+
+    if (harvest && expiry && expiry < harvest) {
+      res.status(400);
+      throw new Error('Expiry date must be on or after the harvest date');
     }
   }
 
