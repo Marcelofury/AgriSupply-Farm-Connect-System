@@ -504,7 +504,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
                   if (order.status == OrderStatus.pending) ...[
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: () => _declineOrder(order.id),
+                        onPressed: () => _showDeclineDialog(order.id),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.error,
                           side: const BorderSide(color: AppColors.error),
@@ -637,24 +637,54 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
     }
   }
 
+  void _showDeclineDialog(final String orderId) {
+    showDialog<void>(
+      context: context,
+      builder: (final context) => AlertDialog(
+        title: const Text('Decline Order'),
+        content: const Text(
+          'Are you sure you want to decline this order? '
+          'This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Keep Order'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _declineOrder(orderId);
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Decline'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _declineOrder(final String orderId) async {
     setState(() => _isLoading = true);
 
     try {
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-      final success = await orderProvider.cancelOrder(orderId);
+      final success = await orderProvider.cancelOrder(
+        orderId,
+        reason: 'Declined by farmer',
+      );
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Order cancelled'),
+            content: Text('Order declined'),
             backgroundColor: AppColors.success,
           ),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to cancel order'),
+          SnackBar(
+            content: Text(orderProvider.errorMessage ?? 'Failed to decline order'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -663,7 +693,7 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to cancel order'),
+            content: Text('Failed to decline order'),
             backgroundColor: AppColors.error,
           ),
         );
