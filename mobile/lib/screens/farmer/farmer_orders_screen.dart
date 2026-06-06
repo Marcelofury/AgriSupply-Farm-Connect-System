@@ -674,16 +674,13 @@ class _FarmerOrdersScreenState extends State<FarmerOrdersScreen>
         reason: 'Declined by farmer',
       );
 
-      if (success) {
-        await _loadOrders();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Order declined'),
-              backgroundColor: AppColors.success,
-            ),
-          );
-        }
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order declined'),
+            backgroundColor: AppColors.success,
+          ),
+        );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
