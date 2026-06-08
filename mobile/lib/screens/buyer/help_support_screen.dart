@@ -42,7 +42,7 @@ class HelpSupportScreen extends StatelessWidget {
             title: 'WhatsApp',
             subtitle: 'Chat with us on WhatsApp',
             color: AppColors.success,
-            onTap: () => _launchWhatsApp('+25675352098'),
+            onTap: () => _launchWhatsApp('+256753520987'),
           ),
           const SizedBox(height: 24),
 
