@@ -123,14 +123,14 @@ class AboutScreen extends StatelessWidget {
                   _buildContactItem(
                     Icons.email,
                     'Email',
-                    'support@agrisupply.ug',
-                    () => _launchUrl('mailto:support@agrisupply.ug'),
+                    'agrisupply@gmail.com',
+                    () => _launchUrl('mailto:agrisupply@gmail.com'),
                   ),
                   _buildContactItem(
                     Icons.phone,
                     'Phone',
-                    '+256 700 000 000',
-                    () => _launchUrl('tel:+256700000000'),
+                    '+256 753 520 987',
+                    () => _launchUrl('tel:+256753520987'),
                   ),
                   _buildContactItem(
                     Icons.language,
