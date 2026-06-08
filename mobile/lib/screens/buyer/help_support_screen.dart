@@ -24,17 +24,17 @@ class HelpSupportScreen extends StatelessWidget {
           _buildContactCard(
             icon: Icons.phone,
             title: 'Phone Support',
-            subtitle: '+256 700 000 000',
+            subtitle: '+256 753 520 987',
             color: AppColors.primaryGreen,
-            onTap: () => _launchPhone('+256700000000'),
+            onTap: () => _launchPhone('+256753520987'),
           ),
           const SizedBox(height: 12),
           _buildContactCard(
             icon: Icons.email,
             title: 'Email Support',
-            subtitle: 'support@agrisupply.com',
+            subtitle: 'agrisupply@gmail.com',
             color: AppColors.info,
-            onTap: () => _launchEmail('support@agrisupply.com'),
+            onTap: () => _launchEmail('agrisupply@gmail.com'),
           ),
           const SizedBox(height: 12),
           _buildContactCard(
@@ -42,7 +42,7 @@ class HelpSupportScreen extends StatelessWidget {
             title: 'WhatsApp',
             subtitle: 'Chat with us on WhatsApp',
             color: AppColors.success,
-            onTap: () => _launchWhatsApp('+256700000000'),
+            onTap: () => _launchWhatsApp('+25675352098'),
           ),
           const SizedBox(height: 24),
 
